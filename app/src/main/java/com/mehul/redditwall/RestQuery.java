@@ -91,8 +91,8 @@ public class RestQuery {
         return jsonString;
     }
 
-    public ArrayList<Bitmap> getImages(String jsonResult) {
-        ArrayList<Bitmap> ret = new ArrayList<>();
+    public ArrayList<BitURL> getImages(String jsonResult) {
+        ArrayList<BitURL> ret = new ArrayList<>();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;
@@ -112,8 +112,9 @@ public class RestQuery {
 
                 JSONObject source = preview.getJSONArray("images").getJSONObject(0).getJSONObject("source");
                 try {
-                    Bitmap bitmap = Picasso.get().load(source.getString("url").replaceAll("amp;", "")).resize(width/2, 500).centerCrop().get();
-                    ret.add(bitmap);
+                    String url = source.getString("url").replaceAll("amp;", "");
+                    Bitmap bitmap = Picasso.get().load(url).resize(width / 2, 500).centerCrop().get();
+                    ret.add(new BitURL(bitmap, url));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
