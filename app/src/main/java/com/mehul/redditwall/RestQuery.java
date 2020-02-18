@@ -31,15 +31,24 @@ public class RestQuery {
         context = con;
     }
 
-    public String getQueryJson() {
+    public String getQueryJson(boolean first) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String jsonString = "";
 
         try {
+
             StringBuilder queryBuild = new StringBuilder(BASE);
-            queryBuild.append(QUERY);
-            queryBuild.append(END);
+            if (first) {
+                queryBuild.append(QUERY);
+                queryBuild.append(END);
+            } else {
+                queryBuild.append(QUERY);
+                queryBuild.append(END);
+                queryBuild.append("?after=");
+                queryBuild.append(MainActivity.AFTER);
+            }
+
 
             URL requestURL = new URL(queryBuild.toString());
 
@@ -90,6 +99,7 @@ public class RestQuery {
         try {
             JSONObject json = new JSONObject(jsonResult);
             json = json.getJSONObject("data");
+            MainActivity.AFTER = json.getString("after");
             JSONArray childrenArr = json.getJSONArray("children");
 
             for (int i = 0; i < childrenArr.length(); i++) {
