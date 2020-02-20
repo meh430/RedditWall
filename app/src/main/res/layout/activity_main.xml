@@ -50,7 +50,7 @@
                     android:layout_margin="8dp"
                     android:layout_weight="5"
                     android:background="@drawable/edit_states"
-                    android:hint="r/mobilewallpapers"
+                    android:hint="mobilewallpaper"
                     android:importantForAutofill="no"
                     android:inputType="text"
                     android:padding="10dp"
