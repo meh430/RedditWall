@@ -11,6 +11,7 @@ An app that pulls images from a specified subreddit to set as device wallpaper
 - Options between setting the home or lock screen wallpaper
 - Specify the image resolution in settings
 - Sort Reddit images by new or by hot
+- Save favorite subreddits using a Room database. Click on saved sub to search for images
 
 ![Alt text](https://github.com/meh430/RedditWall/blob/master/screens/main.png "Screen")
 ![Alt text](https://github.com/meh430/RedditWall/blob/master/screens/preview.png "Screen")
@@ -22,5 +23,5 @@ An app that pulls images from a specified subreddit to set as device wallpaper
 - Ability to specify a default subreddit to load from on start up
 - Ability to download the image
 - Ability to specify a download path in settings
-- Ability to save a list of favorite subreddits to pull images from
+- Ability to save a list of favorite subreddits to pull images from (DONE)
 - Store wallpaper setting and download history to be viewed later
