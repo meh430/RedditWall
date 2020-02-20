@@ -1,6 +1,7 @@
 package com.mehul.redditwall;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +15,12 @@ import java.util.ArrayList;
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
     private final ArrayList<BitURL> images;
     private LayoutInflater inflater;
+    private Context context;
 
     ImageAdapter(Context context, ArrayList<BitURL> list) {
         inflater = LayoutInflater.from(context);
         this.images = list;
+        this.context = context;
     }
 
     @NonNull
@@ -29,8 +32,18 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
     @Override
     public void onBindViewHolder(@NonNull ImageAdapter.ImageViewHolder holder, int position) {
-        BitURL current = images.get(position);
-        holder.image.setImageBitmap(current.getImg());
+        if (images != null) {
+            final BitURL current = images.get(position);
+            holder.image.setImageBitmap(current.getImg());
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent wallIntent = new Intent(context, WallActivity.class);
+                    wallIntent.putExtra(WallActivity.WALL_URL, current.getUrl());
+                    context.startActivity(wallIntent);
+                }
+            });
+        }
     }
 
     @Override

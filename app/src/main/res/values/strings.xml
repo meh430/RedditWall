@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">RedditWall</string>
+    <string-array name="location_options">
+        <item>Home</item>
+        <item>Lock Screen</item>
+        <item>Both</item>
+    </string-array>
 </resources>

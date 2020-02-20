@@ -4,9 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
     <item
+        android:id="@+id/settings"
+        android:icon="@drawable/ic_settings"
+        android:orderInCategory="100"
+        android:title="SETTINGS"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/saved_subs"
         android:icon="@drawable/ic_star_black"
-        android:orderInCategory="100"
+        android:orderInCategory="50"
         android:title="SAVED"
         app:showAsAction="always" />
 </menu>

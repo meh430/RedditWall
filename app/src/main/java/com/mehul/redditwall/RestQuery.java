@@ -2,6 +2,7 @@ package com.mehul.redditwall;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -26,6 +27,7 @@ public class RestQuery {
     private String END = "/.json";
     private String QUERY;
     private Context context;
+
     public RestQuery(String q, Context con) {
         QUERY = q;
         context = con;
@@ -37,13 +39,27 @@ public class RestQuery {
         String jsonString = "";
 
         try {
-
+            String MODIFIER = "";
+            SharedPreferences preferences = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE);
+            int sort = preferences.getInt(SettingsActivity.SORT_METHOD, R.id.sort_hot);
+            switch (sort) {
+                case R.id.sort_hot:
+                    MODIFIER = "/hot";
+                    break;
+                case R.id.sort_new:
+                    MODIFIER = "/new";
+                    break;
+                default:
+                    MODIFIER = "";
+            }
             StringBuilder queryBuild = new StringBuilder(BASE);
             if (first) {
                 queryBuild.append(QUERY);
+                queryBuild.append(MODIFIER);
                 queryBuild.append(END);
             } else {
                 queryBuild.append(QUERY);
+                queryBuild.append(MODIFIER);
                 queryBuild.append(END);
                 queryBuild.append("?after=");
                 queryBuild.append(MainActivity.AFTER);
@@ -94,7 +110,7 @@ public class RestQuery {
     public ArrayList<BitURL> getImages(String jsonResult) {
         ArrayList<BitURL> ret = new ArrayList<>();
         DisplayMetrics displayMetrics = new DisplayMetrics();
-        ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;
         try {
             JSONObject json = new JSONObject(jsonResult);

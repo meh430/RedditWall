@@ -2,6 +2,7 @@ package com.mehul.redditwall;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 //TODO: sort by new or hot? spinner
 //TODO: load images on the fly
 public class MainActivity extends AppCompatActivity {
-    private static int y;
+    public static final String SharedPrefFile = "com.mehul.redditwall";
     public static String AFTER = "";
     private String queryString;
     private EditText search;
@@ -37,7 +38,10 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar loading;
     private ProgressBar bottomLoading;
     private TextView info;
+    private LoadImages imageTask;
+    private LoadMoreImages moreImageTask;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,39 +57,63 @@ public class MainActivity extends AppCompatActivity {
         images = new ArrayList<>();
         adapter = new ImageAdapter(this, images);
         imageScroll.setAdapter(adapter);
+
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = null;
+        if (connMgr != null) {
+            networkInfo = connMgr.getActiveNetworkInfo();
+        }
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+            //get string from sharedpref
+            imageTask = new LoadImages(this);
+            imageTask.execute("mobilewallpaper");
+        } else {
+            info.setVisibility(View.VISIBLE);
+            info.setText("No Network");
+        }
+
         final Context c = this;
         imageScroll.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                y = dy;
-            }
-
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (!recyclerView.canScrollVertically(1)) {
-                    new LoadMoreImages(c).execute(search.getText().toString().length() == 0 ? "mobilewallpapers" : search.getText().toString());
-                }
 
-                /*if(RecyclerView.SCROLL_STATE_DRAGGING==newState){
-                    if(y<=0){
-                        toolbar.setVisibility(View.VISIBLE);
+                    if (moreImageTask == null) {
+                        cancelThreads();
+
+                        moreImageTask = new LoadMoreImages(c);
+                        moreImageTask.execute(queryString == null || queryString.length() == 0 ? "mobilewallpaper" : queryString);
+                    } else if (moreImageTask.getStatus() != AsyncTask.Status.RUNNING) {
+                        cancelThreads();
+
+                        moreImageTask = new LoadMoreImages(c);
+                        moreImageTask.execute(queryString == null || queryString.length() == 0 ? "mobilewallpaper" : queryString);
                     }
-                    else{
-                        y=0;
-                        toolbar.setVisibility(View.GONE);
-                    }
-                }*/
+                }
             }
         });
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        cancelThreads();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cancelThreads();
+    }
+
     @SuppressLint("SetTextI18n")
     public void startSearch(View view) {
+        cancelThreads();
+        queryString = "";
         loading.setVisibility(View.VISIBLE);
-        info.setText("LOADING...");
-        info.setVisibility(View.VISIBLE);
+        info.setVisibility(View.INVISIBLE);
         images.clear();
         adapter.notifyDataSetChanged();
         queryString = search.getText().toString();
@@ -103,12 +131,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (networkInfo != null && networkInfo.isConnected() && queryString.length() != 0) {
-            info.setText("LOADING...");
-            new LoadImages(this).execute(queryString);
+            imageTask = new LoadImages(this);
+            imageTask.execute(queryString);
         } else {
             if (queryString.length() == 0) {
-                new LoadImages(this).execute("mobilewallpapers");
+                imageTask = new LoadImages(this);
+                imageTask.execute("mobilewallpaper");
             } else {
+                info.setVisibility(View.VISIBLE);
                 info.setText("No Network");
             }
         }
@@ -127,8 +157,25 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.saved_subs) {
             //go to the next activity here
             return true;
+        } else if (id == R.id.settings) {
+            Intent launchSettings = new Intent(this, SettingsActivity.class);
+            startActivity(launchSettings);
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void cancelThreads() {
+
+        if (imageTask != null) {
+            loading.setVisibility(View.GONE);
+            imageTask.cancel(true);
+        }
+
+        if (moreImageTask != null) {
+            bottomLoading.setVisibility(View.GONE);
+            moreImageTask.cancel(true);
+        }
     }
 
     private class LoadImages extends AsyncTask<String, Void, ArrayList<BitURL>> {
@@ -143,8 +190,6 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             loading.setVisibility(View.VISIBLE);
-            info.setVisibility(View.VISIBLE);
-            info.setText("LOADING...");
         }
 
         @Override
@@ -158,7 +203,6 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(result);
             images.addAll(result);
             adapter.notifyDataSetChanged();
-            info.setVisibility(View.GONE);
             loading.setVisibility(View.GONE);
         }
     }
