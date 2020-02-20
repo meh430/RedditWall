@@ -18,6 +18,7 @@ An app that pulls images from a specified subreddit to set as device wallpaper
 ![Alt text](https://github.com/meh430/RedditWall/blob/master/screens/settings.png "Screen")
 
 ## Features in Progress
+- Ability to specify a default subreddit to load from on start up
 - Ability to download the image
 - Ability to specify a download path in settings
 - Ability to save a list of favorite subreddits to pull images from
