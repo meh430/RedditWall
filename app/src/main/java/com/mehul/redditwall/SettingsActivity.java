@@ -1,5 +1,6 @@
 package com.mehul.redditwall;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -14,18 +15,20 @@ import androidx.appcompat.app.AppCompatActivity;
 //TODO: change download path
 public class SettingsActivity extends AppCompatActivity {
     //pref keys
-    public static final String SORT_METHOD = "SORTIMG", IMG_WIDTH = "WIDTH", IMG_HEIGHT = "HEIGHT";
+    public static final String SORT_METHOD = "SORTIMG", IMG_WIDTH = "WIDTH", IMG_HEIGHT = "HEIGHT", DEFAULT = "DEFAULT";
 
-    private EditText widthEdit, heightEdit;
+    private EditText widthEdit, heightEdit, defaultEdit;
     private RadioGroup sortMethod;
     private SharedPreferences preferences;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         widthEdit = findViewById(R.id.width_edit);
         heightEdit = findViewById(R.id.height_edit);
+        defaultEdit = findViewById(R.id.default_edit);
         sortMethod = findViewById(R.id.sort_options);
         RadioButton sortNew = findViewById(R.id.sort_new);
         RadioButton sortHot = findViewById(R.id.sort_hot);
@@ -46,6 +49,9 @@ public class SettingsActivity extends AppCompatActivity {
         int height = preferences.getInt(IMG_HEIGHT, disp.heightPixels);
         widthEdit.setText(width + "");
         heightEdit.setText(height + "");
+
+        String defaultSub = preferences.getString(DEFAULT, "mobilewallpaper");
+        defaultEdit.setText(defaultSub);
     }
 
     public void saveSettings(View view) {
@@ -69,6 +75,8 @@ public class SettingsActivity extends AppCompatActivity {
             preferenceEditor.putInt(IMG_HEIGHT, height);
             Toast.makeText(this, "Saved Settings", Toast.LENGTH_SHORT).show();
         }
+        String defaultSub = defaultEdit.getText().toString();
+        preferenceEditor.putString(DEFAULT, defaultSub);
         preferenceEditor.apply();
     }
 }

@@ -3,6 +3,7 @@ package com.mehul.redditwall;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -28,9 +29,9 @@ import java.util.ArrayList;
 //TODO: sort by new or hot? spinner
 //TODO: load images on the fly
 public class MainActivity extends AppCompatActivity {
-    public static final String SharedPrefFile = "com.mehul.redditwall";
+    public static final String SharedPrefFile = "com.mehul.redditwall", SAVED = "SAVED";
     public static String AFTER = "";
-    private String queryString;
+    private String queryString, defaultLoad;
     private EditText search;
     private ArrayList<BitURL> images;
     private ImageAdapter adapter;
@@ -58,6 +59,16 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ImageAdapter(this, images);
         imageScroll.setAdapter(adapter);
 
+        SharedPreferences preferences = getSharedPreferences(SharedPrefFile, MODE_PRIVATE);
+        defaultLoad = preferences.getString(SettingsActivity.DEFAULT, "mobilewallpaper");
+
+        Intent savedIntent = getIntent();
+        defaultLoad = savedIntent.getStringExtra(SAVED);
+
+        defaultLoad = defaultLoad == null ? preferences.getString(SettingsActivity.DEFAULT, "mobilewallpaper") : defaultLoad;
+
+        search.setHint(defaultLoad);
+
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = null;
         if (connMgr != null) {
@@ -67,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         if (networkInfo != null && networkInfo.isConnected()) {
             //get string from sharedpref
             imageTask = new LoadImages(this);
-            imageTask.execute("mobilewallpaper");
+            imageTask.execute(defaultLoad);
         } else {
             info.setVisibility(View.VISIBLE);
             info.setText("No Network");
@@ -84,12 +95,12 @@ public class MainActivity extends AppCompatActivity {
                         cancelThreads();
 
                         moreImageTask = new LoadMoreImages(c);
-                        moreImageTask.execute(queryString == null || queryString.length() == 0 ? "mobilewallpaper" : queryString);
+                        moreImageTask.execute(queryString == null || queryString.length() == 0 ? defaultLoad : queryString);
                     } else if (moreImageTask.getStatus() != AsyncTask.Status.RUNNING) {
                         cancelThreads();
 
                         moreImageTask = new LoadMoreImages(c);
-                        moreImageTask.execute(queryString == null || queryString.length() == 0 ? "mobilewallpaper" : queryString);
+                        moreImageTask.execute(queryString == null || queryString.length() == 0 ? defaultLoad : queryString);
                     }
                 }
             }
@@ -136,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             if (queryString.length() == 0) {
                 imageTask = new LoadImages(this);
-                imageTask.execute("mobilewallpaper");
+                imageTask.execute(defaultLoad);
             } else {
                 info.setVisibility(View.VISIBLE);
                 info.setText("No Network");
@@ -156,6 +167,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.saved_subs) {
             //go to the next activity here
+            Intent launchSaved = new Intent(this, SavedActivity.class);
+            startActivity(launchSaved);
             return true;
         } else if (id == R.id.settings) {
             Intent launchSettings = new Intent(this, SettingsActivity.class);
