@@ -1,4 +1,4 @@
-# RedditWall
+## RedditWall
 An app that pulls images from a specified subreddit to set as device wallpaper
 - This app takes a query and uses Reddit's REST api to pull data in a JSON format
 - Parses the JSON data returned by the REST api and scrapes for image urls
