@@ -12,10 +12,10 @@ An app that pulls images from a specified subreddit to set as device wallpaper
 - Specify the image resolution in settings
 - Sort Reddit images by new or by hot
 
-![Alt text](https://github.com/meh430/RedditWall/blob/master/screens/main.png "Main Screen")
-![Alt text](https://github.com/meh430/RedditWall/blob/master/screens/preview.png "Main Screen")
-![Alt text](https://github.com/meh430/RedditWall/blob/master/screens/select.png "Main Screen")
-![Alt text](https://github.com/meh430/RedditWall/blob/master/screens/settings.png "Main Screen")
+![Alt text](https://github.com/meh430/RedditWall/blob/master/screens/main.png "Screen")
+![Alt text](https://github.com/meh430/RedditWall/blob/master/screens/preview.png "Screen")
+![Alt text](https://github.com/meh430/RedditWall/blob/master/screens/select.png "Screen")
+![Alt text](https://github.com/meh430/RedditWall/blob/master/screens/settings.png "Screen")
 
 ## Features in Progress
 - Ability to download the image
