@@ -1,9 +1,12 @@
 package com.mehul.redditwall.savedsub;
 
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.mehul.redditwall.MainActivity;
 import com.mehul.redditwall.R;
+import com.mehul.redditwall.SettingsActivity;
 
 import java.util.List;
 
@@ -36,10 +40,38 @@ public class SubAdapter extends RecyclerView.Adapter<SubAdapter.SubViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SubAdapter.SubViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final SubAdapter.SubViewHolder holder, int position) {
         if (subs != null) {
             final SubSaved current = subs.get(position);
             holder.bindTo(current);
+            holder.itemView.setLongClickable(true);
+            holder.itemView.setClickable(true);
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    AlertDialog.Builder defaultConfirm = new AlertDialog.Builder(con);
+                    defaultConfirm.setTitle("Set as default?");
+                    defaultConfirm.setMessage("Are you sure you want " + current.getSubName() + " to be your default subreddit?");
+                    defaultConfirm.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            SharedPreferences preferences = con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor prefEdit = preferences.edit();
+                            prefEdit.putString(SettingsActivity.DEFAULT, current.getSubName());
+                            prefEdit.apply();
+                            Toast.makeText(con, "Set " + current.getSubName() + " as default", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    defaultConfirm.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Toast.makeText(con, "Cancelled", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    defaultConfirm.show();
+                    return true;
+                }
+            });
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

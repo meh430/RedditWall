@@ -23,12 +23,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class SavedActivity extends AppCompatActivity {
     private RecyclerView recycler;
     private SubAdapter adapter;
     private EditText saveText;
-    private SubViewModel subViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +36,6 @@ public class SavedActivity extends AppCompatActivity {
         setContentView(R.layout.activity_saved);
         recycler = findViewById(R.id.saveScroll);
         saveText = findViewById(R.id.search);
-        subViewModel = new ViewModelProvider(this).get(SubViewModel.class);
         adapter = new SubAdapter(this);
         recycler.setAdapter(adapter);
         recycler.setLayoutManager(new LinearLayoutManager(this));
@@ -54,12 +53,13 @@ public class SavedActivity extends AppCompatActivity {
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                         int position = viewHolder.getAdapterPosition();
                         SubSaved saved = adapter.getSubAtPosition(position);
-                        subViewModel.deleteSavedSub(saved);
+                        MainActivity.subViewModel.deleteSavedSub(saved);
                     }
                 });
         helper.attachToRecyclerView(recycler);
 
-        subViewModel.getAllSubs().observe(this, new Observer<List<SubSaved>>() {
+        MainActivity.subViewModel = new ViewModelProvider(this).get(SubViewModel.class);
+        MainActivity.subViewModel.getAllSubs().observe(this, new Observer<List<SubSaved>>() {
             @Override
             public void onChanged(List<SubSaved> subSaveds) {
                 adapter.setTimeScores(subSaveds);
@@ -74,6 +74,7 @@ public class SavedActivity extends AppCompatActivity {
             return;
         } else {
             saveText.setText("");
+            saveVal = saveVal.toLowerCase();
         }
 
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -83,7 +84,14 @@ public class SavedActivity extends AppCompatActivity {
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }
 
-        subViewModel.insert(new SubSaved((int) (Math.random() * 10000) + 1, saveVal, new SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).format(new Date())));
+        for (SubSaved saved : Objects.requireNonNull(MainActivity.subViewModel.getAllSubs().getValue())) {
+            if (saved.getSubName().equalsIgnoreCase(saveVal)) {
+                Toast.makeText(this, saved.getSubName() + " has already been saved", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        MainActivity.subViewModel.insert(new SubSaved((int) (Math.random() * 10000) + 1, saveVal, new SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).format(new Date())));
         Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
     }
 }

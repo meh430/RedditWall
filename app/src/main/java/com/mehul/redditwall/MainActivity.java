@@ -19,8 +19,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.mehul.redditwall.savedsub.SubViewModel;
 
 import java.util.ArrayList;
 
@@ -42,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
     private LoadImages imageTask;
     private LoadMoreImages moreImageTask;
 
+    //viewmodels
+    public static SubViewModel subViewModel;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         images = new ArrayList<>();
         adapter = new ImageAdapter(this, images);
         imageScroll.setAdapter(adapter);
+
+        subViewModel = new ViewModelProvider(this).get(SubViewModel.class);
 
         SharedPreferences preferences = getSharedPreferences(SharedPrefFile, MODE_PRIVATE);
         defaultLoad = preferences.getString(SettingsActivity.DEFAULT, "mobilewallpaper");
