@@ -88,7 +88,7 @@ public class SubAdapter extends RecyclerView.Adapter<SubAdapter.SubViewHolder> {
         }
     }
 
-    public void setTimeScores(List<SubSaved> subs) {
+    public void setSubs(List<SubSaved> subs) {
         this.subs = subs;
         notifyDataSetChanged();
     }

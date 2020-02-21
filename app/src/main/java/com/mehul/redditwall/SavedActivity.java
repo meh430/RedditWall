@@ -54,15 +54,16 @@ public class SavedActivity extends AppCompatActivity {
                         int position = viewHolder.getAdapterPosition();
                         SubSaved saved = adapter.getSubAtPosition(position);
                         MainActivity.subViewModel.deleteSavedSub(saved);
+                        adapter.notifyDataSetChanged();
                     }
                 });
         helper.attachToRecyclerView(recycler);
-
         MainActivity.subViewModel = new ViewModelProvider(this).get(SubViewModel.class);
+
         MainActivity.subViewModel.getAllSubs().observe(this, new Observer<List<SubSaved>>() {
             @Override
             public void onChanged(List<SubSaved> subSaveds) {
-                adapter.setTimeScores(subSaveds);
+                adapter.setSubs(subSaveds);
             }
         });
     }

@@ -51,6 +51,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         return images.size();
     }
 
+    public void addImage(BitURL img) {
+        images.add(img);
+        notifyDataSetChanged();
+    }
+
 
     class ImageViewHolder extends RecyclerView.ViewHolder {
         final ImageView image;

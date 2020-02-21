@@ -155,6 +155,7 @@
             android:background="@drawable/rounded_button"
             android:foreground="@drawable/ripple"
             android:text="Clear Saved Subs"
+            android:onClick="clearSavedSubs"
             android:textColor="@android:color/white" />
     </LinearLayout>
 </RelativeLayout>

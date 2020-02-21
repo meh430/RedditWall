@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class LoadImages extends AsyncTask<String, Void, ArrayList<BitURL>> {
+    private class LoadImages extends AsyncTask<String, Void, Void> {
         Context context;
 
         LoadImages(Context con) {
@@ -214,21 +214,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected ArrayList<BitURL> doInBackground(String... strings) {
-            RestQuery rq = new RestQuery(strings[0], context);
-            return rq.getImages(rq.getQueryJson(true));
+        protected Void doInBackground(String... strings) {
+            RestQuery rq = new RestQuery(strings[0], context, images, adapter, loading);
+            rq.getImages(rq.getQueryJson(true));
+            //return rq.getImages(rq.getQueryJson(true));
+            return null;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<BitURL> result) {
+        protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            images.addAll(result);
+            //images.addAll(result);
             adapter.notifyDataSetChanged();
             loading.setVisibility(View.GONE);
         }
     }
 
-    private class LoadMoreImages extends AsyncTask<String, Void, ArrayList<BitURL>> {
+    private class LoadMoreImages extends AsyncTask<String, Void, Void> {
         Context context;
 
         LoadMoreImages(Context con) {
@@ -242,15 +244,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected ArrayList<BitURL> doInBackground(String... strings) {
-            RestQuery rq = new RestQuery(strings[0], context);
-            return rq.getImages(rq.getQueryJson(false));
+        protected Void doInBackground(String... strings) {
+            RestQuery rq = new RestQuery(strings[0], context, images, adapter, bottomLoading);
+            rq.getImages(rq.getQueryJson(false));
+            return null;
+            //return rq.getImages(rq.getQueryJson(false));
         }
 
         @Override
-        protected void onPostExecute(ArrayList<BitURL> result) {
+        protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            images.addAll(result);
+            //images.addAll(result);
             adapter.notifyDataSetChanged();
             bottomLoading.setVisibility(View.GONE);
         }

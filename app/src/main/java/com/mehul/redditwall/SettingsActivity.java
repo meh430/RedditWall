@@ -1,6 +1,7 @@
 package com.mehul.redditwall;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -10,6 +11,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 //TODO: change download path
@@ -78,5 +80,27 @@ public class SettingsActivity extends AppCompatActivity {
         String defaultSub = defaultEdit.getText().toString();
         preferenceEditor.putString(DEFAULT, defaultSub);
         preferenceEditor.apply();
+    }
+
+    public void clearSavedSubs(View view) {
+        AlertDialog.Builder confirmSubs = new AlertDialog.Builder(this);
+        confirmSubs.setTitle("Are you sure?");
+        confirmSubs.setMessage("Do you want to clear your saved subreddits?");
+        confirmSubs.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                MainActivity.subViewModel.deleteAll();
+                Toast.makeText(SettingsActivity.this, "Deleted saved subs", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        confirmSubs.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast.makeText(SettingsActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        confirmSubs.show();
     }
 }

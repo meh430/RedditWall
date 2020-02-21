@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.squareup.picasso.Picasso;
 
@@ -27,10 +29,16 @@ public class RestQuery {
     private String END = "/.json";
     private String QUERY;
     private Context context;
+    private ArrayList<BitURL> images;
+    private ImageAdapter adapter;
+    private ProgressBar progress;
 
-    public RestQuery(String q, Context con) {
+    public RestQuery(String q, Context con, ArrayList<BitURL> images, ImageAdapter adapter, ProgressBar progCircle) {
         QUERY = q;
         context = con;
+        this.images = images;
+        this.adapter = adapter;
+        progress = progCircle;
     }
 
     public String getQueryJson(boolean first) {
@@ -107,8 +115,8 @@ public class RestQuery {
         return jsonString;
     }
 
-    public ArrayList<BitURL> getImages(String jsonResult) {
-        ArrayList<BitURL> ret = new ArrayList<>();
+    public void getImages(String jsonResult) {
+        //ArrayList<BitURL> ret = new ArrayList<>();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;
@@ -130,7 +138,14 @@ public class RestQuery {
                 try {
                     String url = source.getString("url").replaceAll("amp;", "");
                     Bitmap bitmap = Picasso.get().load(url).resize(width / 2, 500).centerCrop().get();
-                    ret.add(new BitURL(bitmap, url));
+                    images.add(new BitURL(bitmap, url));//ret.add(new BitURL(bitmap, url));
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyDataSetChanged();
+                            progress.setVisibility(View.GONE);
+                        }
+                    });
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -138,6 +153,5 @@ public class RestQuery {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return ret;
     }
 }
