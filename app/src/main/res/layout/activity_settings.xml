@@ -111,12 +111,22 @@
             android:textSize="14sp" />
 
         <RadioButton
-            android:theme="@style/ThemeOverlay.MaterialComponents.Dark"
             android:id="@+id/sort_hot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:text="     Hot"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:theme="@style/ThemeOverlay.MaterialComponents.Dark" />
+
+        <RadioButton
+            android:theme="@style/ThemeOverlay.MaterialComponents.Dark"
+            android:id="@+id/sort_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="     Top"
             android:textColor="@android:color/white"
             android:textSize="14sp" />
     </RadioGroup>

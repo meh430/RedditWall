@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +25,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.chip.Chip;
 import com.mehul.redditwall.savedsub.SubViewModel;
 
 import java.util.ArrayList;
@@ -31,7 +34,7 @@ import java.util.ArrayList;
 //TODO: ability to download images
 //TODO: sort by new or hot? spinner
 //TODO: load images on the fly
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String SharedPrefFile = "com.mehul.redditwall", SAVED = "SAVED";
     public static String AFTER = "";
     private String queryString, defaultLoad;
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView info;
     private LoadImages imageTask;
     private LoadMoreImages moreImageTask;
+    private Chip hotChip, newChip, topChip;
 
     //viewmodels
     public static SubViewModel subViewModel;
@@ -55,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        hotChip = findViewById(R.id.hot_chip);
+        newChip = findViewById(R.id.new_chip);
+        topChip = findViewById(R.id.top_chip);
         loading = findViewById(R.id.loading);
         info = findViewById(R.id.info);
         bottomLoading = findViewById(R.id.progressBar);
@@ -69,6 +76,23 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences preferences = getSharedPreferences(SharedPrefFile, MODE_PRIVATE);
         defaultLoad = preferences.getString(SettingsActivity.DEFAULT, "mobilewallpaper");
+
+        int sortSelected = preferences.getInt(SettingsActivity.SORT_METHOD, R.id.sort_hot);
+        switch (sortSelected) {
+            case R.id.sort_hot:
+                hotChip.setChipBackgroundColorResource(R.color.chip);
+                break;
+            case R.id.sort_new:
+                newChip.setChipBackgroundColorResource(R.color.chip);
+                break;
+            case R.id.sort_top:
+                topChip.setChipBackgroundColorResource(R.color.chip);
+                break;
+        }
+
+        hotChip.setOnClickListener(this);
+        newChip.setOnClickListener(this);
+        topChip.setOnClickListener(this);
 
         Intent savedIntent = getIntent();
         defaultLoad = savedIntent.getStringExtra(SAVED);
@@ -199,6 +223,52 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void runQuery() {
+        cancelThreads();
+        imageTask = new LoadImages(this);
+        imageTask.execute((queryString == null || queryString.length() == 1) ? defaultLoad : queryString);
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (imageTask != null && imageTask.getStatus() == AsyncTask.Status.RUNNING) {
+            Toast.makeText(this, "Please wait", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        images.clear();
+        adapter.notifyDataSetChanged();
+        SharedPreferences.Editor prefEdit = getSharedPreferences(SharedPrefFile, MODE_PRIVATE).edit();
+        if (view.equals(hotChip)) {
+            Log.e("CLICk", "CLICKED HOT");
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, R.id.sort_hot);
+            hotChip.setChipBackgroundColorResource(R.color.chip);
+            newChip.setChipBackgroundColorResource(R.color.white);
+            topChip.setChipBackgroundColorResource(R.color.white);
+            prefEdit.apply();
+
+            runQuery();
+        } else if (view.equals(newChip)) {
+            Log.e("CLICk", "CLICKED NEW");
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, R.id.sort_new);
+            hotChip.setChipBackgroundColorResource(R.color.white);
+            newChip.setChipBackgroundColorResource(R.color.chip);
+            topChip.setChipBackgroundColorResource(R.color.white);
+            prefEdit.apply();
+
+            runQuery();
+        } else if (view.equals(topChip)) {
+            Log.e("CLICk", "CLICKED TOP");
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, R.id.sort_top);
+            hotChip.setChipBackgroundColorResource(R.color.white);
+            newChip.setChipBackgroundColorResource(R.color.white);
+            topChip.setChipBackgroundColorResource(R.color.chip);
+            prefEdit.apply();
+
+            runQuery();
+        }
+    }
+
     private class LoadImages extends AsyncTask<String, Void, Void> {
         Context context;
 
@@ -227,6 +297,10 @@ public class MainActivity extends AppCompatActivity {
             //images.addAll(result);
             adapter.notifyDataSetChanged();
             loading.setVisibility(View.GONE);
+            if (images.size() == 0) {
+                info.setVisibility(View.VISIBLE);
+                info.setText("Subreddit does not exist or it has no images");
+            }
         }
     }
 

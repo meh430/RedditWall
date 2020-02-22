@@ -47,7 +47,8 @@ public class RestQuery {
         String jsonString = "";
 
         try {
-            String MODIFIER = "";
+            String MODIFIER;
+            //https://www.reddit.com/r/memes/top/.json?t=all
             SharedPreferences preferences = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE);
             int sort = preferences.getInt(SettingsActivity.SORT_METHOD, R.id.sort_hot);
             switch (sort) {
@@ -57,6 +58,9 @@ public class RestQuery {
                 case R.id.sort_new:
                     MODIFIER = "/new";
                     break;
+                case R.id.sort_top:
+                    MODIFIER = "/top";
+                    break;
                 default:
                     MODIFIER = "";
             }
@@ -65,14 +69,21 @@ public class RestQuery {
                 queryBuild.append(QUERY);
                 queryBuild.append(MODIFIER);
                 queryBuild.append(END);
+                if (MODIFIER.contains("top")) {
+                    queryBuild.append("?t=all");
+                }
             } else {
                 queryBuild.append(QUERY);
                 queryBuild.append(MODIFIER);
                 queryBuild.append(END);
+                if (MODIFIER.contains("top")) {
+                    queryBuild.append("?t=all");
+                }
                 queryBuild.append("?after=");
                 queryBuild.append(MainActivity.AFTER);
             }
 
+            Log.e("URL", queryBuild.toString());
 
             URL requestURL = new URL(queryBuild.toString());
 

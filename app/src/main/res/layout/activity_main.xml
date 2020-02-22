@@ -68,6 +68,52 @@
                     android:textColor="#FFFFFF" />
             </LinearLayout>
 
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/sorting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/top"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="4dp"
+                android:layout_marginBottom="8dp"
+                android:padding="8dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="8dp">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/hot_chip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/chip_background"
+                    android:button="@android:color/transparent"
+                    android:padding="6dp"
+                    android:text="Sort by hot"
+                    app:checkedIcon="@null"
+                    app:checkedIconEnabled="false" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/new_chip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/chip_background"
+                    android:button="@android:color/transparent"
+                    android:padding="6dp"
+                    android:text="Sort by new"
+                    app:checkedIcon="@null"
+                    app:checkedIconEnabled="false" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/top_chip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/chip_background"
+                    android:button="@android:color/transparent"
+                    android:padding="6dp"
+                    android:text="Sort by top"
+                    app:checkedIcon="@null"
+                    app:checkedIconEnabled="false" />
+            </com.google.android.material.chip.ChipGroup>
+
             <TextView
                 android:id="@+id/info"
                 android:layout_width="wrap_content"
@@ -90,11 +136,14 @@
                 android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:layout_margin="4dp"
                 android:id="@+id/imageScroll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/top"
+                android:layout_below="@id/sorting"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="9dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
                 android:scrollbars="vertical"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
@@ -108,7 +157,6 @@
                 android:layout_margin="12dp"
                 android:visibility="gone" />
         </RelativeLayout>
-
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -34,6 +34,7 @@ public class SettingsActivity extends AppCompatActivity {
         sortMethod = findViewById(R.id.sort_options);
         RadioButton sortNew = findViewById(R.id.sort_new);
         RadioButton sortHot = findViewById(R.id.sort_hot);
+        RadioButton sortTop = findViewById(R.id.sort_top);
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, MODE_PRIVATE);
 
         int selectedSort = preferences.getInt(SORT_METHOD, R.id.sort_hot);
@@ -43,6 +44,9 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
             case R.id.sort_new:
                 sortNew.setChecked(true);
+                break;
+            case R.id.sort_top:
+                sortTop.setChecked(true);
                 break;
         }
         DisplayMetrics disp = new DisplayMetrics();
