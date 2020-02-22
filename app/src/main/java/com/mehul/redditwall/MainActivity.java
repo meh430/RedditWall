@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -81,12 +82,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (sortSelected) {
             case R.id.sort_hot:
                 hotChip.setChipBackgroundColorResource(R.color.chip);
+                hotChip.setTextColor(Color.WHITE);
                 break;
             case R.id.sort_new:
                 newChip.setChipBackgroundColorResource(R.color.chip);
+                hotChip.setTextColor(Color.WHITE);
                 break;
             case R.id.sort_top:
                 topChip.setChipBackgroundColorResource(R.color.chip);
+                hotChip.setTextColor(Color.WHITE);
                 break;
         }
 
@@ -240,10 +244,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         images.clear();
         adapter.notifyDataSetChanged();
         SharedPreferences.Editor prefEdit = getSharedPreferences(SharedPrefFile, MODE_PRIVATE).edit();
+        hotChip.setTextColor(Color.BLACK);
+        newChip.setTextColor(Color.BLACK);
+        topChip.setTextColor(Color.BLACK);
         if (view.equals(hotChip)) {
             Log.e("CLICk", "CLICKED HOT");
             prefEdit.putInt(SettingsActivity.SORT_METHOD, R.id.sort_hot);
             hotChip.setChipBackgroundColorResource(R.color.chip);
+            hotChip.setTextColor(Color.WHITE);
             newChip.setChipBackgroundColorResource(R.color.white);
             topChip.setChipBackgroundColorResource(R.color.white);
             prefEdit.apply();
@@ -254,6 +262,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             prefEdit.putInt(SettingsActivity.SORT_METHOD, R.id.sort_new);
             hotChip.setChipBackgroundColorResource(R.color.white);
             newChip.setChipBackgroundColorResource(R.color.chip);
+            newChip.setTextColor(Color.WHITE);
             topChip.setChipBackgroundColorResource(R.color.white);
             prefEdit.apply();
 
@@ -264,6 +273,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             hotChip.setChipBackgroundColorResource(R.color.white);
             newChip.setChipBackgroundColorResource(R.color.white);
             topChip.setChipBackgroundColorResource(R.color.chip);
+            topChip.setTextColor(Color.WHITE);
             prefEdit.apply();
 
             runQuery();

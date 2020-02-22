@@ -70,16 +70,17 @@ public class RestQuery {
                 queryBuild.append(MODIFIER);
                 queryBuild.append(END);
                 if (MODIFIER.contains("top")) {
-                    queryBuild.append("?t=all");
+                    queryBuild.append("?t=all&&");
                 }
             } else {
                 queryBuild.append(QUERY);
                 queryBuild.append(MODIFIER);
                 queryBuild.append(END);
                 if (MODIFIER.contains("top")) {
-                    queryBuild.append("?t=all");
+                    queryBuild.append("?t=all&&after=");
+                } else {
+                    queryBuild.append("?after=");
                 }
-                queryBuild.append("?after=");
                 queryBuild.append(MainActivity.AFTER);
             }
 

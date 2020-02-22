@@ -4,6 +4,6 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#D81B1B</color>
     <color name="cardViewBackground">#2D2E31</color>
-    <color name="chip">#8A8A97</color>
+    <color name="chip">#E53935</color>
     <color name="white">@android:color/white</color>
 </resources>
