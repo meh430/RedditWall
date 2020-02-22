@@ -5,136 +5,148 @@
     android:layout_height="match_parent"
     tools:context=".SettingsActivity"
     tools:ignore="HardcodedText">
-    <TextView
-        android:id="@+id/default_load"
-        android:layout_width="wrap_content"
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/buttons"
         android:layout_alignParentTop="true"
-        android:layout_margin="12dp"
-        android:text="Set Default Subreddit:"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
+        android:layout_centerHorizontal="true">
 
-    <EditText
-        android:id="@+id/default_edit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/default_load"
-        android:layout_gravity="center"
-        android:layout_margin="12dp"
-        android:background="@drawable/edit_states"
-        android:hint="Default sub"
-        android:importantForAutofill="no"
-        android:inputType="text"
-        android:padding="8dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/pref_res_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/default_edit"
-        android:layout_margin="12dp"
-        android:text="Set Preferred Resolution:"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
+            <TextView
+                android:id="@+id/default_load"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:text="Set Default Subreddit:"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/default_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="12dp"
+                android:background="@drawable/edit_states"
+                android:hint="Default sub"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:padding="8dp" />
+
+            <TextView
+                android:id="@+id/pref_res_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:text="Set Preferred Resolution:"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:id="@+id/res_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="14dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/width_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="3"
+                    android:background="@drawable/edit_states"
+                    android:hint="Width"
+                    android:importantForAutofill="no"
+                    android:inputType="number"
+                    android:padding="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="X"
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp" />
+
+                <EditText
+                    android:id="@+id/height_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="3"
+                    android:background="@drawable/edit_states"
+                    android:hint="Height"
+                    android:importantForAutofill="no"
+                    android:inputType="number"
+                    android:padding="8dp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/img_sort_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:text="Sort Images By:"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <RadioGroup
+                android:id="@+id/sort_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:orientation="vertical">
+
+                <RadioButton
+                    android:id="@+id/sort_new"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:text="     New"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:theme="@style/ThemeOverlay.MaterialComponents.Dark" />
+
+                <RadioButton
+                    android:id="@+id/sort_hot"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:text="     Hot"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:theme="@style/ThemeOverlay.MaterialComponents.Dark" />
+
+                <RadioButton
+                    android:id="@+id/sort_top"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:text="     Top"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:theme="@style/ThemeOverlay.MaterialComponents.Dark" />
+            </RadioGroup>
+
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
-        android:id="@+id/res_setting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/pref_res_title"
-        android:layout_margin="14dp"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/width_edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="3"
-            android:background="@drawable/edit_states"
-            android:hint="Width"
-            android:importantForAutofill="no"
-            android:inputType="number"
-            android:padding="8dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="X"
-            android:textColor="@android:color/white"
-            android:textSize="24sp" />
-
-        <EditText
-            android:id="@+id/height_edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="3"
-            android:background="@drawable/edit_states"
-            android:hint="Height"
-            android:importantForAutofill="no"
-            android:inputType="number"
-            android:padding="8dp" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/img_sort_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/res_setting"
-        android:layout_margin="12dp"
-        android:text="Sort Images By:"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
-
-    <RadioGroup
-        android:id="@+id/sort_options"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/img_sort_title"
-        android:layout_margin="10dp"
-        android:orientation="vertical">
-
-        <RadioButton
-            android:theme="@style/ThemeOverlay.MaterialComponents.Dark"
-            android:id="@+id/sort_new"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="     New"
-            android:textColor="@android:color/white"
-            android:textSize="14sp" />
-
-        <RadioButton
-            android:id="@+id/sort_hot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="     Hot"
-            android:textColor="@android:color/white"
-            android:textSize="14sp"
-            android:theme="@style/ThemeOverlay.MaterialComponents.Dark" />
-
-        <RadioButton
-            android:theme="@style/ThemeOverlay.MaterialComponents.Dark"
-            android:id="@+id/sort_top"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="     Top"
-            android:textColor="@android:color/white"
-            android:textSize="14sp" />
-    </RadioGroup>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/buttons"
         android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_margin="8dp"
         android:orientation="vertical">
@@ -164,8 +176,8 @@
             android:layout_margin="12dp"
             android:background="@drawable/rounded_button"
             android:foreground="@drawable/ripple"
-            android:text="Clear Saved Subs"
             android:onClick="clearSavedSubs"
+            android:text="Clear Saved Subs"
             android:textColor="@android:color/white" />
     </LinearLayout>
 </RelativeLayout>

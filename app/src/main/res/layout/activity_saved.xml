@@ -10,17 +10,20 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/saveScroll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/search_section"
         android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:layout_margin="4dp"
         android:scrollbars="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:id="@+id/search_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_margin="8dp"
         android:orientation="horizontal"
         tools:ignore="UselessParent">
@@ -30,6 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:hint="Enter sub name"
             android:layout_margin="8dp"
             android:layout_weight="5"
             android:background="@drawable/edit_states"
