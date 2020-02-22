@@ -86,11 +86,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.sort_new:
                 newChip.setChipBackgroundColorResource(R.color.chip);
-                hotChip.setTextColor(Color.WHITE);
+                newChip.setTextColor(Color.WHITE);
                 break;
             case R.id.sort_top:
                 topChip.setChipBackgroundColorResource(R.color.chip);
-                hotChip.setTextColor(Color.WHITE);
+                topChip.setTextColor(Color.WHITE);
                 break;
         }
 
