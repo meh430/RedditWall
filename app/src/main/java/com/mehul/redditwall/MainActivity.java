@@ -232,7 +232,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        if (imageTask != null && imageTask.getStatus() == AsyncTask.Status.RUNNING) {
+        if ((imageTask != null && imageTask.getStatus() == AsyncTask.Status.RUNNING)
+                || (moreImageTask != null && moreImageTask.getStatus() == AsyncTask.Status.RUNNING)) {
             Toast.makeText(this, "Please wait", Toast.LENGTH_SHORT).show();
             return;
         }
