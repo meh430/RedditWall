@@ -281,6 +281,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            info.setVisibility(View.GONE);
             loading.setVisibility(View.VISIBLE);
         }
 
@@ -316,6 +317,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         protected void onPreExecute() {
             super.onPreExecute();
             bottomLoading.setVisibility(View.VISIBLE);
+            info.setVisibility(View.GONE);
         }
 
         @Override
