@@ -228,10 +228,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void runQuery() {
-        cancelThreads();
+        //cancelThreads();
         imageTask = new LoadImages(this);
-        imageTask.execute((queryString == null || queryString.length() == 1) ? defaultLoad : queryString);
-
+        imageTask.execute((queryString == null || queryString.length() == 1 || queryString.equalsIgnoreCase("")) ? defaultLoad : queryString);
+        Log.e("BRUH", queryString + ", " + defaultLoad);
     }
 
     @Override
@@ -312,9 +312,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             //images.addAll(result);
+            if (isCancelled()) {
+                images.clear();
+                adapter.notifyDataSetChanged();
+                return;
+            }
             adapter.notifyDataSetChanged();
             loading.setVisibility(View.GONE);
             if (images.size() == 0) {
+                Log.e("BRUH", queryString + ", " + defaultLoad);
                 info.setVisibility(View.VISIBLE);
                 info.setText("Subreddit does not exist or it has no images");
             }
@@ -350,6 +356,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
+            if (isCancelled()) {
+                images.clear();
+                adapter.notifyDataSetChanged();
+                return;
+            }
             //images.addAll(result);
             adapter.notifyDataSetChanged();
             bottomLoading.setVisibility(View.GONE);

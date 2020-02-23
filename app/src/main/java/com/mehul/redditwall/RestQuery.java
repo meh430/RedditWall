@@ -103,7 +103,6 @@ public class RestQuery {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (imageTask.isCancelled()) {
-                    images.clear();
                     break;
                 }
                 builder.append(line);
@@ -141,7 +140,6 @@ public class RestQuery {
 
     public void getImages(String jsonResult) {
         if (imageTask.isCancelled()) {
-            images.clear();
             return;
         }
         //ArrayList<BitURL> ret = new ArrayList<>();
