@@ -14,7 +14,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-//TODO: change download path
 public class SettingsActivity extends AppCompatActivity {
     //pref keys
     public static final String SORT_METHOD = "SORTIMG", IMG_WIDTH = "WIDTH", IMG_HEIGHT = "HEIGHT", DEFAULT = "DEFAULT";

@@ -28,12 +28,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.chip.Chip;
 import com.mehul.redditwall.savedsub.SubViewModel;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-//TODO: Have a list of saved subreddits
-//TODO: ability to download images
-//TODO: sort by new or hot? spinner
-//TODO: load images on the fly
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String SharedPrefFile = "com.mehul.redditwall", SAVED = "SAVED";
     public static String AFTER = "";
@@ -45,8 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ProgressBar loading;
     private ProgressBar bottomLoading;
     private TextView info;
-    private LoadImages imageTask;
-    private LoadMoreImages moreImageTask;
+    private LoadImages imageTask, scrollImageTask;
     private Chip hotChip, newChip, topChip;
 
     //viewmodels
@@ -112,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (networkInfo != null && networkInfo.isConnected()) {
             //get string from sharedpref
-            imageTask = new LoadImages(this);
+            imageTask = new LoadImages(this, loading, info, images, adapter, true);
             imageTask.execute(defaultLoad);
         } else {
             info.setVisibility(View.VISIBLE);
@@ -128,16 +124,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return;
                 }
 
-                if (moreImageTask == null) {
+                if (scrollImageTask == null) {
                     cancelThreads();
 
-                    moreImageTask = new LoadMoreImages(c);
-                    moreImageTask.execute(queryString == null || queryString.length() == 0 ? defaultLoad : queryString);
-                } else if (moreImageTask.getStatus() != AsyncTask.Status.RUNNING) {
+                    scrollImageTask = new LoadImages(c, bottomLoading, info, images, adapter, false);
+                    scrollImageTask.execute(queryString == null || queryString.length() == 0 ? defaultLoad : queryString);
+                } else if (scrollImageTask.getStatus() != AsyncTask.Status.RUNNING) {
                     cancelThreads();
 
-                    moreImageTask = new LoadMoreImages(c);
-                    moreImageTask.execute(queryString == null || queryString.length() == 0 ? defaultLoad : queryString);
+                    scrollImageTask = new LoadImages(c, bottomLoading, info, images, adapter, false);
+                    scrollImageTask.execute(queryString == null || queryString.length() == 0 ? defaultLoad : queryString);
                 }
             }
         });
@@ -178,11 +174,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         if (networkInfo != null && networkInfo.isConnected() && queryString.length() != 0) {
-            imageTask = new LoadImages(this);
+            imageTask = new LoadImages(this, loading, info, images, adapter, true);
             imageTask.execute(queryString);
         } else {
             if (queryString.length() == 0) {
-                imageTask = new LoadImages(this);
+                imageTask = new LoadImages(this, loading, info, images, adapter, true);
                 imageTask.execute(defaultLoad);
             } else {
                 info.setVisibility(View.VISIBLE);
@@ -221,15 +217,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             imageTask.cancel(true);
         }
 
-        if (moreImageTask != null) {
+        if (scrollImageTask != null) {
             bottomLoading.setVisibility(View.GONE);
-            moreImageTask.cancel(true);
+            scrollImageTask.cancel(true);
         }
     }
 
     public void runQuery() {
         //cancelThreads();
-        imageTask = new LoadImages(this);
+        imageTask = new LoadImages(this, loading, info, images, adapter, true);
         imageTask.execute((queryString == null || queryString.length() == 1 || queryString.equalsIgnoreCase("")) ? defaultLoad : queryString);
         Log.e("BRUH", queryString + ", " + defaultLoad);
     }
@@ -237,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if ((imageTask != null && imageTask.getStatus() == AsyncTask.Status.RUNNING)
-                || (moreImageTask != null && moreImageTask.getStatus() == AsyncTask.Status.RUNNING)) {
+                || (scrollImageTask != null && scrollImageTask.getStatus() == AsyncTask.Status.RUNNING)) {
             //Toast.makeText(this, "Please wait", Toast.LENGTH_SHORT).show();
             cancelThreads();
             //return;
@@ -281,74 +277,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private class LoadImages extends AsyncTask<String, Void, Void> {
-        Context context;
+    private static class LoadImages extends AsyncTask<String, Void, Void> {
+        WeakReference<Context> context;
+        WeakReference<ProgressBar> bLoad;
+        WeakReference<TextView> inf;
+        WeakReference<ArrayList<BitURL>> imgs;
+        WeakReference<ImageAdapter> adapt;
+        boolean first;
 
-        LoadImages(Context con) {
-            context = con;
-        }
-
-        @SuppressLint("SetTextI18n")
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            info.setVisibility(View.GONE);
-            loading.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Void doInBackground(String... strings) {
-            if (isCancelled()) {
-                images.clear();
-                return null;
-            }
-            RestQuery rq = new RestQuery(strings[0], context, images, adapter, loading, this);
-            rq.getImages(rq.getQueryJson(true));
-            //return rq.getImages(rq.getQueryJson(true));
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            //images.addAll(result);
-            if (isCancelled()) {
-                images.clear();
-                adapter.notifyDataSetChanged();
-                return;
-            }
-            adapter.notifyDataSetChanged();
-            loading.setVisibility(View.GONE);
-            if (images.size() == 0) {
-                Log.e("BRUH", queryString + ", " + defaultLoad);
-                info.setVisibility(View.VISIBLE);
-                info.setText("Subreddit does not exist or it has no images");
-            }
-        }
-    }
-
-    private class LoadMoreImages extends AsyncTask<String, Void, Void> {
-        Context context;
-
-        LoadMoreImages(Context con) {
-            context = con;
+        LoadImages(Context con, ProgressBar bLoad, TextView inf, ArrayList<BitURL> imgs, ImageAdapter adapt, boolean first) {
+            this.context = new WeakReference<>(con);
+            this.bLoad = new WeakReference<>(bLoad);
+            this.inf = new WeakReference<>(inf);
+            this.imgs = new WeakReference<>(imgs);
+            this.adapt = new WeakReference<>(adapt);
+            this.first = first;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            bottomLoading.setVisibility(View.VISIBLE);
-            info.setVisibility(View.GONE);
+            bLoad.get().setVisibility(View.VISIBLE);
+            inf.get().setVisibility(View.GONE);
         }
 
         @Override
         protected Void doInBackground(String... strings) {
             if (isCancelled()) {
-                images.clear();
+                imgs.clear();
                 return null;
             }
-            RestQuery rq = new RestQuery(strings[0], context, images, adapter, bottomLoading, this);
-            rq.getImages(rq.getQueryJson(false));
+            RestQuery rq = new RestQuery(strings[0], context.get(), imgs.get(), adapt.get(), bLoad.get(), this);
+            rq.getImages(rq.getQueryJson(first));
             return null;
             //return rq.getImages(rq.getQueryJson(false));
         }
@@ -357,13 +317,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             if (isCancelled()) {
-                images.clear();
-                adapter.notifyDataSetChanged();
+                imgs.get().clear();
+                adapt.get().notifyDataSetChanged();
                 return;
             }
             //images.addAll(result);
-            adapter.notifyDataSetChanged();
-            bottomLoading.setVisibility(View.GONE);
+            adapt.get().notifyDataSetChanged();
+            bLoad.get().setVisibility(View.GONE);
+
+            if (!first && imgs.get().size() == 0) {
+                inf.get().setVisibility(View.VISIBLE);
+                inf.get().setText("Subreddit does not exist or it has no images");
+            }
         }
     }
 }
