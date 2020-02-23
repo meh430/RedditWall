@@ -141,7 +141,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/sorting"
                 android:layout_marginStart="4dp"
-                android:layout_marginTop="9dp"
+                android:layout_marginTop="0dp"
                 android:layout_marginEnd="4dp"
                 android:layout_marginBottom="4dp"
                 android:scrollbars="vertical"
