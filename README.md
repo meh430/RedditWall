@@ -26,3 +26,4 @@ An app that pulls images from a specified subreddit to set as device wallpaper
 - Ability to specify a download path in settings
 - Store wallpaper setting and download history to be viewed later
 - Save favorite images to be viewed later
+- Display list of curated subreddit reccomandations to get wallpapers from
