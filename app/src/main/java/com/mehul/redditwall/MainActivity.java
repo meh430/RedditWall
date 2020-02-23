@@ -17,7 +17,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -239,8 +238,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         if ((imageTask != null && imageTask.getStatus() == AsyncTask.Status.RUNNING)
                 || (moreImageTask != null && moreImageTask.getStatus() == AsyncTask.Status.RUNNING)) {
-            Toast.makeText(this, "Please wait", Toast.LENGTH_SHORT).show();
-            return;
+            //Toast.makeText(this, "Please wait", Toast.LENGTH_SHORT).show();
+            cancelThreads();
+            //return;
         }
         images.clear();
         adapter.notifyDataSetChanged();
@@ -298,7 +298,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected Void doInBackground(String... strings) {
-            RestQuery rq = new RestQuery(strings[0], context, images, adapter, loading);
+            if (isCancelled()) {
+                images.clear();
+                return null;
+            }
+            RestQuery rq = new RestQuery(strings[0], context, images, adapter, loading, this);
             rq.getImages(rq.getQueryJson(true));
             //return rq.getImages(rq.getQueryJson(true));
             return null;
@@ -333,7 +337,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected Void doInBackground(String... strings) {
-            RestQuery rq = new RestQuery(strings[0], context, images, adapter, bottomLoading);
+            if (isCancelled()) {
+                images.clear();
+                return null;
+            }
+            RestQuery rq = new RestQuery(strings[0], context, images, adapter, bottomLoading, this);
             rq.getImages(rq.getQueryJson(false));
             return null;
             //return rq.getImages(rq.getQueryJson(false));

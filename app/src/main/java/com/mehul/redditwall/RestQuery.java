@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -32,13 +33,16 @@ public class RestQuery {
     private ArrayList<BitURL> images;
     private ImageAdapter adapter;
     private ProgressBar progress;
+    private AsyncTask<String, Void, Void> imageTask;
 
-    public RestQuery(String q, Context con, ArrayList<BitURL> images, ImageAdapter adapter, ProgressBar progCircle) {
+    public RestQuery(String q, Context con, ArrayList<BitURL> images, ImageAdapter adapter, ProgressBar progCircle,
+                     AsyncTask<String, Void, Void> imageTask) {
         QUERY = q;
         context = con;
         this.images = images;
         this.adapter = adapter;
         progress = progCircle;
+        this.imageTask = imageTask;
     }
 
     public String getQueryJson(boolean first) {
@@ -98,8 +102,16 @@ public class RestQuery {
 
             String line;
             while ((line = reader.readLine()) != null) {
+                if (imageTask.isCancelled()) {
+                    images.clear();
+                    break;
+                }
                 builder.append(line);
                 builder.append("\n");
+            }
+
+            if (imageTask.isCancelled()) {
+                return null;
             }
 
             if (builder.length() == 0) {
@@ -128,6 +140,10 @@ public class RestQuery {
     }
 
     public void getImages(String jsonResult) {
+        if (imageTask.isCancelled()) {
+            images.clear();
+            return;
+        }
         //ArrayList<BitURL> ret = new ArrayList<>();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -139,6 +155,10 @@ public class RestQuery {
             JSONArray childrenArr = json.getJSONArray("children");
 
             for (int i = 0; i < childrenArr.length(); i++) {
+                if (imageTask.isCancelled()) {
+                    images.clear();
+                    return;
+                }
                 JSONObject curr = childrenArr.getJSONObject(i);
                 JSONObject data = curr.getJSONObject("data");
                 if (!data.has("preview")) {
