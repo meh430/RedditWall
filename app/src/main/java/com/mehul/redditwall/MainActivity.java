@@ -125,19 +125,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (!recyclerView.canScrollVertically(1)) {
+                if (imageTask != null && imageTask.getStatus() == AsyncTask.Status.RUNNING) {
+                    return;
+                }
 
-                    if (moreImageTask == null) {
-                        cancelThreads();
+                if (moreImageTask == null) {
+                    cancelThreads();
 
-                        moreImageTask = new LoadMoreImages(c);
-                        moreImageTask.execute(queryString == null || queryString.length() == 0 ? defaultLoad : queryString);
-                    } else if (moreImageTask.getStatus() != AsyncTask.Status.RUNNING) {
-                        cancelThreads();
+                    moreImageTask = new LoadMoreImages(c);
+                    moreImageTask.execute(queryString == null || queryString.length() == 0 ? defaultLoad : queryString);
+                } else if (moreImageTask.getStatus() != AsyncTask.Status.RUNNING) {
+                    cancelThreads();
 
-                        moreImageTask = new LoadMoreImages(c);
-                        moreImageTask.execute(queryString == null || queryString.length() == 0 ? defaultLoad : queryString);
-                    }
+                    moreImageTask = new LoadMoreImages(c);
+                    moreImageTask.execute(queryString == null || queryString.length() == 0 ? defaultLoad : queryString);
                 }
             }
         });
