@@ -283,12 +283,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        if (imageTask != null && imageTask.first && imageTask.getStatus() == AsyncTask.Status.RUNNING) {
+        String temp;
+        switch (currentSort) {
+            case NEW:
+                temp = AFTER_NEW;
+                break;
+            case HOT:
+                temp = AFTER_HOT;
+                break;
+            case TOP:
+                temp = AFTER_TOP;
+                break;
+            default:
+                temp = null;
+                break;
+        }
+        if (imageTask != null && imageTask.first && imageTask.getStatus() == AsyncTask.Status.RUNNING && temp == null) {
             Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (scrollImageTask != null && scrollImageTask.getStatus() == AsyncTask.Status.RUNNING) {
+        if ((imageTask != null && imageTask.getStatus() == AsyncTask.Status.RUNNING) || (scrollImageTask != null && scrollImageTask.getStatus() == AsyncTask.Status.RUNNING)) {
             //Toast.makeText(this, "Please wait", Toast.LENGTH_SHORT).show();
             cancelThreads();
             //return;
