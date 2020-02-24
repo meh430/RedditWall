@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -59,7 +60,9 @@ public class SettingsActivity extends AppCompatActivity {
         defaultEdit.setText(defaultSub);
     }
 
-    public void saveSettings(View view) {
+    @Override
+    public void onPause() {
+        super.onPause();
         boolean valid = true;
         int selectedSort = sortMethod.getCheckedRadioButtonId();
         SharedPreferences.Editor preferenceEditor = preferences.edit();
@@ -73,13 +76,15 @@ public class SettingsActivity extends AppCompatActivity {
             height = Integer.parseInt(heightEdit.getText().toString());
         } catch (NumberFormatException e) {
             valid = false;
-            Toast.makeText(this, "Enter a valid number...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You didn't enter a valid number", Toast.LENGTH_SHORT).show();
         }
+
         if (valid) {
             preferenceEditor.putInt(IMG_WIDTH, width);
             preferenceEditor.putInt(IMG_HEIGHT, height);
             Toast.makeText(this, "Saved Settings", Toast.LENGTH_SHORT).show();
         }
+
         String defaultSub = defaultEdit.getText().toString();
         preferenceEditor.putString(DEFAULT, defaultSub);
         preferenceEditor.apply();
@@ -105,5 +110,14 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         confirmSubs.show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            super.onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

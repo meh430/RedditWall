@@ -25,7 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 //opens up https connection to get json data and return as a string
-public class RestQuery {
+class RestQuery {
     private String BASE = "https://www.reddit.com/r/";
     private String END = "/.json";
     private String QUERY;
@@ -36,8 +36,8 @@ public class RestQuery {
     private AsyncTask<String, Void, Void> imageTask;
     private int sort;
 
-    public RestQuery(String q, Context con, ArrayList<BitURL> images, ImageAdapter adapter, ProgressBar progCircle,
-                     AsyncTask<String, Void, Void> imageTask) {
+    RestQuery(String q, Context con, ArrayList<BitURL> images, ImageAdapter adapter, ProgressBar progCircle,
+              AsyncTask<String, Void, Void> imageTask) {
         QUERY = q;
         context = con;
         this.images = images;
@@ -46,7 +46,7 @@ public class RestQuery {
         this.imageTask = imageTask;
     }
 
-    public String getQueryJson(boolean first) {
+    String getQueryJson(boolean first) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String jsonString = "";
@@ -144,11 +144,11 @@ public class RestQuery {
         return jsonString;
     }
 
-    public void getImages(String jsonResult) {
+    void getImages(String jsonResult) {
         if (imageTask.isCancelled()) {
             return;
         }
-        //ArrayList<BitURL> ret = new ArrayList<>();
+        //TODO: change with lite mode
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;
@@ -170,7 +170,6 @@ public class RestQuery {
 
             for (int i = 0; i < childrenArr.length(); i++) {
                 if (imageTask.isCancelled()) {
-                    //images.clear();
                     return;
                 }
                 JSONObject curr = childrenArr.getJSONObject(i);
@@ -179,12 +178,31 @@ public class RestQuery {
                     continue;
                 }
                 JSONObject preview = data.getJSONObject("preview");
+                JSONObject image = preview.getJSONArray("images").getJSONObject(0);
+                JSONObject gif = null;
+                boolean isImage = true;
+                if (image.has("variants") && image.getJSONObject("variants").has("gif")) {
+                    isImage = false;
+                    gif = image.getJSONObject("variants").getJSONObject("gif");
+                }
 
-                JSONObject source = preview.getJSONArray("images").getJSONObject(0).getJSONObject("source");
+                JSONObject source;
+                if (isImage) {
+                    source = image.getJSONObject("source");
+                } else {
+                    source = gif.getJSONObject("source");
+                }
+
                 try {
                     String url = source.getString("url").replaceAll("amp;", "");
-                    Bitmap bitmap = Picasso.get().load(url).resize(width / 2, 500).centerCrop().get();
-                    images.add(new BitURL(bitmap, url));//ret.add(new BitURL(bitmap, url));
+                    //TODO: replace with glide
+                    if (isImage) {
+                        Bitmap bitmap = Picasso.get().load(url).resize(width / 2, 500).centerCrop().get();
+                        images.add(new BitURL(bitmap, url));
+                    } else {
+                        //Bitmap bitmap = Glide.with(context).asBitmap().load(url).override(width / 2, 500).centerCrop().submit().get();
+                        images.add(new BitURL(null, url));
+                    }
                     ((Activity) context).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

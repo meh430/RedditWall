@@ -32,22 +32,22 @@ import com.mehul.redditwall.savedsub.SubViewModel;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-//TODO: use three lists instead of one, don't clear them then
+@SuppressLint("SetTextI18n")
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    public static final String SharedPrefFile = "com.mehul.redditwall", SAVED = "SAVED";
+    public static final String SharedPrefFile = "com.mehul.redditwall", SAVED = "SAVED", QUERY = "QUERY", OVERRIDE = "OVERRIDE";
     private static final int NEW = 0, HOT = 1, TOP = 2;
     public static String AFTER_NEW = "", AFTER_HOT = "", AFTER_TOP = "";
     private String queryString, defaultLoad;
     private EditText search;
     private ArrayList<BitURL> hotImages, topImages, newImages;
     private ImageAdapter adapter;
-    private RecyclerView imageScroll;
     private ProgressBar loading;
     private ProgressBar bottomLoading;
     private TextView info;
     private LoadImages imageTask, scrollImageTask;
     private Chip hotChip, newChip, topChip;
     private int currentSort;
+    private SharedPreferences preferences;
 
     //viewmodels
     public static SubViewModel subViewModel;
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         info = findViewById(R.id.info);
         bottomLoading = findViewById(R.id.progressBar);
         search = findViewById(R.id.search);
-        imageScroll = findViewById(R.id.imageScroll);
+        RecyclerView imageScroll = findViewById(R.id.imageScroll);
         imageScroll.setLayoutManager(new GridLayoutManager(this, 2));
         hotImages = new ArrayList<>();
         newImages = new ArrayList<>();
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         subViewModel = new ViewModelProvider(this).get(SubViewModel.class);
 
-        SharedPreferences preferences = getSharedPreferences(SharedPrefFile, MODE_PRIVATE);
+        preferences = getSharedPreferences(SharedPrefFile, MODE_PRIVATE);
         defaultLoad = preferences.getString(SettingsActivity.DEFAULT, "mobilewallpaper");
 
         int sortSelected = preferences.getInt(SettingsActivity.SORT_METHOD, R.id.sort_hot);
@@ -108,9 +108,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         topChip.setOnClickListener(this);
 
         Intent savedIntent = getIntent();
-        defaultLoad = savedIntent.getStringExtra(SAVED);
 
-        defaultLoad = defaultLoad == null ? preferences.getString(SettingsActivity.DEFAULT, "mobilewallpaper") : defaultLoad;
+        if (savedIntent.getBooleanExtra(OVERRIDE, false)) {
+            defaultLoad = savedIntent.getStringExtra(SAVED);
+        } else {
+            defaultLoad = preferences.getString(SettingsActivity.DEFAULT, "mobilewallpaper");
+        }
 
         search.setHint(defaultLoad);
 
@@ -121,16 +124,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         if (networkInfo != null && networkInfo.isConnected()) {
-            //get string from sharedpref
-
-            imageTask = getTask(true);//new LoadImages(this, loading, info, images, adapter, true);
+            imageTask = getTask(true);
             imageTask.execute(defaultLoad);
         } else {
             info.setVisibility(View.VISIBLE);
             info.setText("No Network");
         }
 
-        final Context c = this;
         imageScroll.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -142,12 +142,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (scrollImageTask == null) {
                     cancelThreads();
 
-                    scrollImageTask = getTask(false);//new LoadImages(c, bottomLoading, info, images, adapter, false);
+                    scrollImageTask = getTask(false);
                     scrollImageTask.execute(queryString == null || queryString.length() == 0 ? defaultLoad : queryString);
                 } else if (scrollImageTask.getStatus() != AsyncTask.Status.RUNNING) {
                     cancelThreads();
 
-                    scrollImageTask = getTask(false);//new LoadImages(c, bottomLoading, info, images, adapter, false);
+                    scrollImageTask = getTask(false);
                     scrollImageTask.execute(queryString == null || queryString.length() == 0 ? defaultLoad : queryString);
                 }
             }
@@ -187,7 +187,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cancelThreads();
     }
 
-    @SuppressLint("SetTextI18n")
     public void startSearch(View view) {
         if (imageTask != null && imageTask.first && imageTask.getStatus() == AsyncTask.Status.RUNNING) {
             Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show();
@@ -200,18 +199,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         newImages.clear();
         hotImages.clear();
         topImages.clear();
-        /*switch (currentSort) {
-            case NEW:
-                newImages.clear();
-                break;
-            case HOT:
-                hotImages.clear();
-                break;
-            case TOP:
-                topImages.clear();
-                break;
-
-        }*/
         adapter.notifyDataSetChanged();
         queryString = search.getText().toString();
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -228,11 +215,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         if (networkInfo != null && networkInfo.isConnected() && queryString.length() != 0) {
-            imageTask = getTask(true);//new LoadImages(this, loading, info, images, adapter, true);
+            imageTask = getTask(true);
             imageTask.execute(queryString);
         } else {
             if (queryString.length() == 0) {
-                imageTask = getTask(true);//new LoadImages(this, loading, info, images, adapter, true);
+                imageTask = getTask(true);
                 imageTask.execute(defaultLoad);
             } else {
                 info.setVisibility(View.VISIBLE);
@@ -243,16 +230,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
+    //Launch activities from menu here
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.saved_subs) {
-            //go to the next activity here
             Intent launchSaved = new Intent(this, SavedActivity.class);
             startActivity(launchSaved);
             return true;
@@ -278,8 +264,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void runQuery() {
-        //cancelThreads();
-        imageTask = getTask(true);//new LoadImages(this, loading, info, images, adapter, true);
+        imageTask = getTask(true);
         imageTask.execute((queryString == null || queryString.length() == 1 || queryString.equalsIgnoreCase("")) ? defaultLoad : queryString);
         Log.e("BRUH", queryString + ", " + defaultLoad);
     }
@@ -307,12 +292,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         if ((imageTask != null && imageTask.getStatus() == AsyncTask.Status.RUNNING) || (scrollImageTask != null && scrollImageTask.getStatus() == AsyncTask.Status.RUNNING)) {
-            //Toast.makeText(this, "Please wait", Toast.LENGTH_SHORT).show();
             cancelThreads();
-            //return;
         }
         adapter.notifyDataSetChanged();
-        SharedPreferences.Editor prefEdit = getSharedPreferences(SharedPrefFile, MODE_PRIVATE).edit();
+        SharedPreferences.Editor prefEdit = preferences.edit();
         hotChip.setTextColor(Color.BLACK);
         newChip.setTextColor(Color.BLACK);
         topChip.setTextColor(Color.BLACK);
@@ -391,28 +374,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected Void doInBackground(String... strings) {
             if (isCancelled()) {
-                //imgs.clear();
                 return null;
             }
             RestQuery rq = new RestQuery(strings[0], context.get(), imgs.get(), adapt.get(), bLoad.get(), this);
             rq.getImages(rq.getQueryJson(first));
             return null;
-            //return rq.getImages(rq.getQueryJson(false));
         }
 
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             if (isCancelled()) {
-                //imgs.get().clear();
                 adapt.get().notifyDataSetChanged();
                 return;
             }
-            //images.addAll(result);
             adapt.get().notifyDataSetChanged();
             bLoad.get().setVisibility(View.GONE);
 
-            if (!first && imgs.get().size() == 0) {
+            if (first && imgs.get().size() == 0) {
                 inf.get().setVisibility(View.VISIBLE);
                 inf.get().setText("Subreddit does not exist or it has no images");
             }

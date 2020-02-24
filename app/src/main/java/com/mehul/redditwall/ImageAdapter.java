@@ -1,7 +1,9 @@
 package com.mehul.redditwall;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,14 +12,20 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
     private ArrayList<BitURL> images;
     private LayoutInflater inflater;
     private Context context;
+    private int width;
 
     ImageAdapter(Context context, ArrayList<BitURL> list) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        width = displayMetrics.widthPixels;
         inflater = LayoutInflater.from(context);
         this.images = list;
         this.context = context;
@@ -34,12 +42,17 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     public void onBindViewHolder(@NonNull ImageAdapter.ImageViewHolder holder, int position) {
         if (images != null) {
             final BitURL current = images.get(position);
-            holder.image.setImageBitmap(current.getImg());
+            if (current.getImg() == null) {
+                Glide.with(context).asGif().load(current.getUrl()).override(width / 2, 500).into(holder.image);
+            } else {
+                holder.image.setImageBitmap(current.getImg());
+            }
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent wallIntent = new Intent(context, WallActivity.class);
                     wallIntent.putExtra(WallActivity.WALL_URL, current.getUrl());
+                    wallIntent.putExtra(WallActivity.GIF, current.getImg() == null);
                     context.startActivity(wallIntent);
                 }
             });
@@ -51,7 +64,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         return images.size();
     }
 
-    public void setList(ArrayList<BitURL> list) {
+    void setList(ArrayList<BitURL> list) {
         images = list;
         notifyDataSetChanged();
     }

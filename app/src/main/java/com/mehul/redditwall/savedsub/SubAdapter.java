@@ -77,6 +77,7 @@ public class SubAdapter extends RecyclerView.Adapter<SubAdapter.SubViewHolder> {
                 public void onClick(View view) {
                     Intent launchMain = new Intent(con, MainActivity.class);
                     launchMain.putExtra(MainActivity.SAVED, current.getSubName());
+                    launchMain.putExtra(MainActivity.OVERRIDE, true);
                     ClipboardManager clipboard = (ClipboardManager) con.getSystemService(Context.CLIPBOARD_SERVICE);
                     ClipData clip = ClipData.newPlainText("Copied Text", current.getSubName());
                     assert clipboard != null;

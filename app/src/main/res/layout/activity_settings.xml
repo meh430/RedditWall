@@ -154,17 +154,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            android:background="@drawable/rounded_button_2"
-            android:foreground="@drawable/ripple"
-            android:onClick="saveSettings"
-            android:text="Save Settings"
-            android:textColor="@android:color/white" />
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="12dp"
+            android:layout_margin="10dp"
             android:background="@drawable/rounded_button"
             android:foreground="@drawable/ripple"
             android:text="Clear Image History"
@@ -173,7 +163,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="12dp"
+            android:layout_margin="10dp"
             android:background="@drawable/rounded_button"
             android:foreground="@drawable/ripple"
             android:onClick="clearSavedSubs"
