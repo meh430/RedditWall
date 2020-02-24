@@ -197,7 +197,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         queryString = "";
         loading.setVisibility(View.VISIBLE);
         info.setVisibility(View.INVISIBLE);
-        switch (currentSort) {
+        newImages.clear();
+        hotImages.clear();
+        topImages.clear();
+        /*switch (currentSort) {
             case NEW:
                 newImages.clear();
                 break;
@@ -208,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 topImages.clear();
                 break;
 
-        }
+        }*/
         adapter.notifyDataSetChanged();
         queryString = search.getText().toString();
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
