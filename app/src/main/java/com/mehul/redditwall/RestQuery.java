@@ -34,6 +34,7 @@ public class RestQuery {
     private ImageAdapter adapter;
     private ProgressBar progress;
     private AsyncTask<String, Void, Void> imageTask;
+    private int sort;
 
     public RestQuery(String q, Context con, ArrayList<BitURL> images, ImageAdapter adapter, ProgressBar progCircle,
                      AsyncTask<String, Void, Void> imageTask) {
@@ -52,20 +53,25 @@ public class RestQuery {
 
         try {
             String MODIFIER;
+            String AFTER;
             //https://www.reddit.com/r/memes/top/.json?t=all
             SharedPreferences preferences = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE);
-            int sort = preferences.getInt(SettingsActivity.SORT_METHOD, R.id.sort_hot);
+            sort = preferences.getInt(SettingsActivity.SORT_METHOD, R.id.sort_hot);
             switch (sort) {
                 case R.id.sort_hot:
                     MODIFIER = "/hot";
+                    AFTER = MainActivity.AFTER_HOT;
                     break;
                 case R.id.sort_new:
                     MODIFIER = "/new";
+                    AFTER = MainActivity.AFTER_NEW;
                     break;
                 case R.id.sort_top:
                     MODIFIER = "/top";
+                    AFTER = MainActivity.AFTER_TOP;
                     break;
                 default:
+                    AFTER = "";
                     MODIFIER = "";
             }
             StringBuilder queryBuild = new StringBuilder(BASE);
@@ -74,7 +80,7 @@ public class RestQuery {
                 queryBuild.append(MODIFIER);
                 queryBuild.append(END);
                 if (MODIFIER.contains("top")) {
-                    queryBuild.append("?t=all&&");
+                    queryBuild.append("?t=all");
                 }
             } else {
                 queryBuild.append(QUERY);
@@ -85,7 +91,7 @@ public class RestQuery {
                 } else {
                     queryBuild.append("?after=");
                 }
-                queryBuild.append(MainActivity.AFTER);
+                queryBuild.append(AFTER);
             }
 
             Log.e("URL", queryBuild.toString());
@@ -149,12 +155,22 @@ public class RestQuery {
         try {
             JSONObject json = new JSONObject(jsonResult);
             json = json.getJSONObject("data");
-            MainActivity.AFTER = json.getString("after");
+            switch (sort) {
+                case R.id.sort_hot:
+                    MainActivity.AFTER_HOT = json.getString("after");
+                    break;
+                case R.id.sort_new:
+                    MainActivity.AFTER_NEW = json.getString("after");
+                    break;
+                case R.id.sort_top:
+                    MainActivity.AFTER_TOP = json.getString("after");
+                    break;
+            }
             JSONArray childrenArr = json.getJSONArray("children");
 
             for (int i = 0; i < childrenArr.length(); i++) {
                 if (imageTask.isCancelled()) {
-                    images.clear();
+                    //images.clear();
                     return;
                 }
                 JSONObject curr = childrenArr.getJSONObject(i);

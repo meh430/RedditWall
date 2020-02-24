@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
-    private final ArrayList<BitURL> images;
+    private ArrayList<BitURL> images;
     private LayoutInflater inflater;
     private Context context;
 
@@ -51,8 +51,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         return images.size();
     }
 
-    public void addImage(BitURL img) {
-        images.add(img);
+    public void setList(ArrayList<BitURL> list) {
+        images = list;
         notifyDataSetChanged();
     }
 
