@@ -18,6 +18,10 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".FavImageActivity"
+            android:label="Favorite Images"
+            android:parentActivityName=".MainActivity" />
+        <activity
             android:name=".SavedActivity"
             android:label="Saved Reddits"
             android:parentActivityName=".MainActivity" />

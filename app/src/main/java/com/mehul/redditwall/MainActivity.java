@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.chip.Chip;
+import com.mehul.redditwall.favorites.FavViewModel;
 import com.mehul.redditwall.savedsub.SubViewModel;
 
 import java.lang.ref.WeakReference;
@@ -51,12 +52,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //viewmodels
     public static SubViewModel subViewModel;
+    public static FavViewModel favViewModel;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        favViewModel = new ViewModelProvider(this).get(FavViewModel.class);
+
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         hotChip = findViewById(R.id.hot_chip);
@@ -246,6 +250,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent launchSettings = new Intent(this, SettingsActivity.class);
             startActivity(launchSettings);
             return true;
+        } else if (id == R.id.fav_pics) {
+            Intent launchFav = new Intent(this, FavImageActivity.class);
+            startActivity(launchFav);
         }
         return super.onOptionsItemSelected(item);
     }

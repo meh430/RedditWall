@@ -20,6 +20,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -33,6 +34,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
+import com.mehul.redditwall.favorites.FavImage;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -49,7 +51,7 @@ public class WallActivity extends AppCompatActivity {
     private ImageView wallPreview;
     private boolean isGif;
     private int WRITE = 1231;
-    private String fname;
+    private String fname, imgUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +60,7 @@ public class WallActivity extends AppCompatActivity {
 
         wallPreview = findViewById(R.id.wall_holder);
         Intent incoming = getIntent();
-        String imgUrl = incoming.getStringExtra(WALL_URL);
+        imgUrl = incoming.getStringExtra(WALL_URL);
         isGif = incoming.getBooleanExtra(GIF, false);
         SharedPreferences preferences = getSharedPreferences(MainActivity.SharedPrefFile, MODE_PRIVATE);
         createNotificationChannel();
@@ -137,8 +139,25 @@ public class WallActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             super.onBackPressed();
             return true;
+        } else if (item.getItemId() == R.id.fav_image) {
+            for (FavImage img : MainActivity.favViewModel.getFavList()) {
+                if (imgUrl.equalsIgnoreCase(img.getFavUrl())) {
+                    Toast.makeText(this, "Already Added", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            }
+
+            Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show();
+            MainActivity.favViewModel.insert(new FavImage((int) (Math.random() * 10000) + 1, imgUrl, isGif));
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.wall_menu, menu);
+        return true;
     }
 
     public void downloadImage(View view) {
@@ -165,7 +184,6 @@ public class WallActivity extends AppCompatActivity {
         fname = new SimpleDateFormat("MM-dd-yyyy 'at' hh-mm-ss", Locale.CANADA).format(new Date())
                 .replaceAll(" ", "") + ".jpg";
         File file = new File(myDir, fname);
-        Log.e("BRUH", "" + file);
         if (file.exists())
             file.delete();
         try {
@@ -182,9 +200,8 @@ public class WallActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 1231) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == WRITE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 saveImage();
             } else {
                 Toast.makeText(this, "Cannot download, please grant permissions", Toast.LENGTH_SHORT).show();
