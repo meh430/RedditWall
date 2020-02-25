@@ -37,7 +37,9 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Random;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class WallActivity extends AppCompatActivity {
     private static final String PRIMARY_CHANNEL_ID = "primary_notification_channel";
@@ -160,10 +162,8 @@ public class WallActivity extends AppCompatActivity {
         String root = Environment.getExternalStorageDirectory().toString();
         File myDir = new File(root + "/RedditWalls");
         myDir.mkdirs();
-        Random generator = new Random();
-        int n = 10000;
-        n = generator.nextInt(n);
-        fname = "Image-" + n + ".jpg";
+        fname = new SimpleDateFormat("MM-dd-yyyy 'at' hh-mm-ss", Locale.CANADA).format(new Date())
+                .replaceAll(" ", "") + ".jpg";
         File file = new File(myDir, fname);
         Log.e("BRUH", "" + file);
         if (file.exists())
@@ -205,7 +205,7 @@ public class WallActivity extends AppCompatActivity {
         NotificationCompat.Builder notifyBuilder = getNotificationBuilder();
         notifyBuilder.setStyle(new NotificationCompat.BigPictureStyle()
                 .bigPicture(bitmap)
-                .setBigContentTitle("Notification Updated!"));
+                .setBigContentTitle("Finished Downloading!"));
         notifyManager.notify(NOTIFICATION_ID, notifyBuilder.build());
     }
 
@@ -238,9 +238,10 @@ public class WallActivity extends AppCompatActivity {
         notificationIntent.setAction(Intent.ACTION_VIEW);
         notificationIntent.setDataAndType(Uri.parse(Environment.getExternalStorageDirectory().toString() + "/RedditWalls/" + fname), "image/*");
         //flag indicating that if the described PendingIntent already exists, then keep it but replace its extra data with what is in this new Intent
-        PendingIntent notificationPendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent notificationPendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID,
+                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(this, PRIMARY_CHANNEL_ID);
-        notifyBuilder.setContentIntent(notificationPendingIntent).setAutoCancel(false).setContentTitle("You've been notified!")
+        notifyBuilder.setContentIntent(notificationPendingIntent).setAutoCancel(true).setContentTitle("You've been notified!")
                 .setContentText("View the Image!").setSmallIcon(R.drawable.ic_download).setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_ALL);
         return notifyBuilder;
