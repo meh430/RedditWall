@@ -2,6 +2,7 @@ package com.mehul.redditwall;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,8 +55,19 @@ public class FavImageActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<FavImage> favs) {
                 adapter.setFavs(favs);
+                if (adapter.getItemCount() == 0) {
+                    findViewById(R.id.fav_empty).setVisibility(View.VISIBLE);
+                } else {
+                    findViewById(R.id.fav_empty).setVisibility(View.GONE);
+                }
             }
         });
+
+        if (adapter.getItemCount() == 0) {
+            findViewById(R.id.fav_empty).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.fav_empty).setVisibility(View.GONE);
+        }
     }
 
     @Override

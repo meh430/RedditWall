@@ -65,8 +65,19 @@ public class SavedActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<SubSaved> subSaveds) {
                 adapter.setSubs(subSaveds);
+                if (adapter.getItemCount() == 0) {
+                    findViewById(R.id.sub_empty).setVisibility(View.VISIBLE);
+                } else {
+                    findViewById(R.id.sub_empty).setVisibility(View.GONE);
+                }
             }
         });
+
+        if (adapter.getItemCount() == 0) {
+            findViewById(R.id.sub_empty).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.sub_empty).setVisibility(View.GONE);
+        }
     }
 
     @Override

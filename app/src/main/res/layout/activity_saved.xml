@@ -7,6 +7,19 @@
     android:orientation="vertical"
     tools:context=".SavedActivity">
 
+    <TextView
+        android:id="@+id/sub_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:layout_margin="16dp"
+        android:gravity="center"
+        android:text="You do not have any saved subs, enter a sub you like in the field below to save it"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:visibility="gone" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/saveScroll"
         android:layout_width="match_parent"
