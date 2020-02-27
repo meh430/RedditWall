@@ -35,7 +35,6 @@ import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.mehul.redditwall.favorites.FavImage;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -71,7 +70,8 @@ public class WallActivity extends AppCompatActivity {
         if (isGif) {
             Glide.with(this).asGif().load(imgUrl).override(width, height).centerCrop().into(wallPreview);
         } else {
-            Picasso.get().load(imgUrl).resize(width, height).centerCrop().into(wallPreview);
+            Glide.with(this).load(imgUrl).override(width, height).centerCrop().into(wallPreview);
+            //Picasso.get().load(imgUrl).resize(width, height).centerCrop().into(wallPreview);
         }
     }
 
@@ -226,9 +226,9 @@ public class WallActivity extends AppCompatActivity {
         notifyManager.notify(NOTIFICATION_ID, notifyBuilder.build());
     }
 
-    public void cancelNotification() {
+    /*public void cancelNotification() {
         notifyManager.cancel(NOTIFICATION_ID);
-    }
+    }*/
 
     //creating a channel and putting it in the manager
     public void createNotificationChannel() {

@@ -1,10 +1,14 @@
 package com.mehul.redditwall;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -19,14 +23,13 @@ import com.mehul.redditwall.favorites.FavViewModel;
 import java.util.List;
 
 public class FavImageActivity extends AppCompatActivity {
-    private RecyclerView recycler;
     private FavAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fav_image);
-        recycler = findViewById(R.id.fav_scroll);
+        RecyclerView recycler = findViewById(R.id.fav_scroll);
         adapter = new FavAdapter(this);
         recycler.setAdapter(adapter);
         recycler.setLayoutManager(new GridLayoutManager(this, 2));
@@ -75,7 +78,34 @@ public class FavImageActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             super.onBackPressed();
             return true;
+        } else if (item.getItemId() == R.id.clear_list) {
+            AlertDialog.Builder confirmSubs = new AlertDialog.Builder(this);
+            confirmSubs.setTitle("Are you sure?");
+            confirmSubs.setMessage("Do you want to clear your favorites?");
+            confirmSubs.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    MainActivity.favViewModel.deleteAll();
+                    Toast.makeText(FavImageActivity.this, "Deleted favorite images", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            confirmSubs.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Toast.makeText(FavImageActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            confirmSubs.show();
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.clear_menu, menu);
+        return true;
     }
 }

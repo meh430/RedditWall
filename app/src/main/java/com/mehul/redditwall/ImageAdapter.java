@@ -20,12 +20,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     private ArrayList<BitURL> images;
     private LayoutInflater inflater;
     private Context context;
-    private int width;
+    private int width, height;
 
     ImageAdapter(Context context, ArrayList<BitURL> list) {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         width = displayMetrics.widthPixels;
+        height = displayMetrics.heightPixels;
         inflater = LayoutInflater.from(context);
         this.images = list;
         this.context = context;
@@ -43,7 +44,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         if (images != null) {
             final BitURL current = images.get(position);
             if (current.getImg() == null) {
-                Glide.with(context).asGif().load(current.getUrl()).override(width / 2, 500).into(holder.image);
+                Glide.with(context).asGif().load(current.getUrl()).override(width / 2, height / 4).into(holder.image);
             } else {
                 holder.image.setImageBitmap(current.getImg());
             }

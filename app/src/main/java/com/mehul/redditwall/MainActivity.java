@@ -35,8 +35,8 @@ import java.util.ArrayList;
 
 @SuppressLint("SetTextI18n")
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    public static final String SharedPrefFile = "com.mehul.redditwall", SAVED = "SAVED", QUERY = "QUERY", OVERRIDE = "OVERRIDE";
-    private static final int NEW = 0, HOT = 1, TOP = 2;
+    public static final String SharedPrefFile = "com.mehul.redditwall", SAVED = "SAVED", OVERRIDE = "OVERRIDE";
+    public static final int NEW = 0, HOT = 1, TOP = 2;
     public static String AFTER_NEW = "", AFTER_HOT = "", AFTER_TOP = "";
     private String queryString, defaultLoad;
     private EditText search;
@@ -81,15 +81,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         preferences = getSharedPreferences(SharedPrefFile, MODE_PRIVATE);
         defaultLoad = preferences.getString(SettingsActivity.DEFAULT, "mobilewallpaper");
 
-        int sortSelected = preferences.getInt(SettingsActivity.SORT_METHOD, R.id.sort_hot);
+        int sortSelected = preferences.getInt(SettingsActivity.SORT_METHOD, HOT);
         switch (sortSelected) {
-            case R.id.sort_hot:
+            case HOT:
                 adapter = new ImageAdapter(this, hotImages);
                 currentSort = HOT;
                 hotChip.setChipBackgroundColorResource(R.color.chip);
                 hotChip.setTextColor(Color.WHITE);
                 break;
-            case R.id.sort_new:
+            case NEW:
                 adapter = new ImageAdapter(this, newImages);
                 currentSort = NEW;
                 newChip.setChipBackgroundColorResource(R.color.chip);
@@ -272,7 +272,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void runQuery() {
         imageTask = getTask(true);
-        imageTask.execute((queryString == null || queryString.length() == 1 || queryString.equalsIgnoreCase("")) ? defaultLoad : queryString);
+        imageTask.execute((queryString == null || queryString.length() == 1 ||
+                queryString.equalsIgnoreCase("")) ? defaultLoad : queryString);
         Log.e("BRUH", queryString + ", " + defaultLoad);
     }
 
@@ -298,7 +299,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
 
-        if ((imageTask != null && imageTask.getStatus() == AsyncTask.Status.RUNNING) || (scrollImageTask != null && scrollImageTask.getStatus() == AsyncTask.Status.RUNNING)) {
+        if ((imageTask != null && imageTask.getStatus() == AsyncTask.Status.RUNNING)
+                || (scrollImageTask != null && scrollImageTask.getStatus() == AsyncTask.Status.RUNNING)) {
             cancelThreads();
         }
         adapter.notifyDataSetChanged();
@@ -309,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view.equals(hotChip)) {
             currentSort = HOT;
             Log.e("CLICk", "CLICKED HOT");
-            prefEdit.putInt(SettingsActivity.SORT_METHOD, R.id.sort_hot);
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, HOT);
             hotChip.setChipBackgroundColorResource(R.color.chip);
             hotChip.setTextColor(Color.WHITE);
             newChip.setChipBackgroundColorResource(R.color.white);
@@ -324,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (view.equals(newChip)) {
             currentSort = NEW;
             Log.e("CLICk", "CLICKED NEW");
-            prefEdit.putInt(SettingsActivity.SORT_METHOD, R.id.sort_new);
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, NEW);
             hotChip.setChipBackgroundColorResource(R.color.white);
             newChip.setChipBackgroundColorResource(R.color.chip);
             newChip.setTextColor(Color.WHITE);
@@ -339,7 +341,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (view.equals(topChip)) {
             currentSort = TOP;
             Log.e("CLICk", "CLICKED TOP");
-            prefEdit.putInt(SettingsActivity.SORT_METHOD, R.id.sort_top);
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, TOP);
             hotChip.setChipBackgroundColorResource(R.color.white);
             newChip.setChipBackgroundColorResource(R.color.white);
             topChip.setChipBackgroundColorResource(R.color.chip);
@@ -383,7 +385,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (isCancelled()) {
                 return null;
             }
-            RestQuery rq = new RestQuery(strings[0], context.get(), imgs.get(), adapt.get(), bLoad.get(), this);
+            RestQuery rq = new RestQuery(strings[0], context.get(), imgs.get(),
+                    adapt.get(), bLoad.get(), this);
             rq.getImages(rq.getQueryJson(first));
             return null;
         }

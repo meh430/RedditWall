@@ -1,26 +1,27 @@
 package com.mehul.redditwall;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
+import android.widget.SeekBar;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SettingsActivity extends AppCompatActivity {
     //pref keys
-    public static final String SORT_METHOD = "SORTIMG", IMG_WIDTH = "WIDTH", IMG_HEIGHT = "HEIGHT", DEFAULT = "DEFAULT";
+    public static final String SORT_METHOD = "SORTIMG", IMG_WIDTH = "WIDTH", IMG_HEIGHT = "HEIGHT", DEFAULT = "DEFAULT",
+            LOAD_SCALE = "LOAD", LOAD_GIF = "LOADGIF";
 
     private EditText widthEdit, heightEdit, defaultEdit;
-    private RadioGroup sortMethod;
+    private SeekBar scaleSeek;
+    private TextView seekCount;
     private SharedPreferences preferences;
 
     @SuppressLint("SetTextI18n")
@@ -28,27 +29,45 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        preferences = getSharedPreferences(MainActivity.SharedPrefFile, MODE_PRIVATE);
+        seekCount = findViewById(R.id.scale_count);
+        scaleSeek = findViewById(R.id.scale_seek);
         widthEdit = findViewById(R.id.width_edit);
         heightEdit = findViewById(R.id.height_edit);
         defaultEdit = findViewById(R.id.default_edit);
-        sortMethod = findViewById(R.id.sort_options);
-        RadioButton sortNew = findViewById(R.id.sort_new);
-        RadioButton sortHot = findViewById(R.id.sort_hot);
-        RadioButton sortTop = findViewById(R.id.sort_top);
-        preferences = getSharedPreferences(MainActivity.SharedPrefFile, MODE_PRIVATE);
+        Switch gifSwitch = findViewById(R.id.gif_switch);
+        gifSwitch.setChecked(preferences.getBoolean(LOAD_GIF, true));
+        scaleSeek.setProgress(preferences.getInt(LOAD_SCALE, 0));
+        seekCount.setText((scaleSeek.getProgress() + 1) * 2 + "X");
+        gifSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    preferences.edit().putBoolean(LOAD_GIF, true).apply();
+                } else {
+                    preferences.edit().putBoolean(LOAD_GIF, false).apply();
+                }
+            }
+        });
+        scaleSeek = findViewById(R.id.scale_seek);
+        scaleSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if (i > 0) {
+                    seekCount.setText(((i + 1) * 2) + "X");
+                } else {
+                    seekCount.setText("2X");
+                }
+            }
 
-        int selectedSort = preferences.getInt(SORT_METHOD, R.id.sort_hot);
-        switch (selectedSort) {
-            case R.id.sort_hot:
-                sortHot.setChecked(true);
-                break;
-            case R.id.sort_new:
-                sortNew.setChecked(true);
-                break;
-            case R.id.sort_top:
-                sortTop.setChecked(true);
-                break;
-        }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
         DisplayMetrics disp = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(disp);
         int width = preferences.getInt(IMG_WIDTH, disp.widthPixels);
@@ -64,9 +83,8 @@ public class SettingsActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         boolean valid = true;
-        int selectedSort = sortMethod.getCheckedRadioButtonId();
         SharedPreferences.Editor preferenceEditor = preferences.edit();
-        preferenceEditor.putInt(SORT_METHOD, selectedSort);
+        preferenceEditor.putInt(LOAD_SCALE, scaleSeek.getProgress());
         DisplayMetrics disp = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(disp);
         int width = disp.widthPixels;
@@ -88,28 +106,6 @@ public class SettingsActivity extends AppCompatActivity {
         String defaultSub = defaultEdit.getText().toString();
         preferenceEditor.putString(DEFAULT, defaultSub);
         preferenceEditor.apply();
-    }
-
-    public void clearSavedSubs(View view) {
-        AlertDialog.Builder confirmSubs = new AlertDialog.Builder(this);
-        confirmSubs.setTitle("Are you sure?");
-        confirmSubs.setMessage("Do you want to clear your saved subreddits?");
-        confirmSubs.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                MainActivity.subViewModel.deleteAll();
-                Toast.makeText(SettingsActivity.this, "Deleted saved subs", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        confirmSubs.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Toast.makeText(SettingsActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        confirmSubs.show();
     }
 
     @Override

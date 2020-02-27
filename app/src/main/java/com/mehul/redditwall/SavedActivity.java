@@ -1,7 +1,9 @@
 package com.mehul.redditwall;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -9,6 +11,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -27,7 +30,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class SavedActivity extends AppCompatActivity {
-    private RecyclerView recycler;
     private SubAdapter adapter;
     private EditText saveText;
 
@@ -35,7 +37,7 @@ public class SavedActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_saved);
-        recycler = findViewById(R.id.saveScroll);
+        RecyclerView recycler = findViewById(R.id.saveScroll);
         saveText = findViewById(R.id.search);
         adapter = new SubAdapter(this);
         recycler.setAdapter(adapter);
@@ -85,9 +87,37 @@ public class SavedActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             super.onBackPressed();
             return true;
+        } else if (item.getItemId() == R.id.clear_list) {
+            AlertDialog.Builder confirmSubs = new AlertDialog.Builder(this);
+            confirmSubs.setTitle("Are you sure?");
+            confirmSubs.setMessage("Do you want to clear your saved subreddits?");
+            confirmSubs.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    MainActivity.subViewModel.deleteAll();
+                    Toast.makeText(SavedActivity.this, "Deleted saved subs", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            confirmSubs.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Toast.makeText(SavedActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            confirmSubs.show();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.clear_menu, menu);
+        return true;
+    }
+
 
     public void saveSub(View view) {
         String saveVal = saveText.getText().toString();

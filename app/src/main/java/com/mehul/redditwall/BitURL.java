@@ -2,20 +2,20 @@ package com.mehul.redditwall;
 
 import android.graphics.Bitmap;
 
-public class BitURL {
+class BitURL {
     private Bitmap img;
     private String url;
 
-    public BitURL(Bitmap i, String u) {
+    BitURL(Bitmap i, String u) {
         img = i;
         url = u;
     }
 
-    public Bitmap getImg() {
+    Bitmap getImg() {
         return img;
     }
 
-    public String getUrl() {
+    String getUrl() {
         return url;
     }
 }

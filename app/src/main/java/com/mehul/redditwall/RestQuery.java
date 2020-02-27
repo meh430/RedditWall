@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,11 +23,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 //opens up https connection to get json data and return as a string
 class RestQuery {
-    private String BASE = "https://www.reddit.com/r/";
-    private String END = "/.json";
     private String QUERY;
     private Context context;
     private ArrayList<BitURL> images;
@@ -56,17 +55,17 @@ class RestQuery {
             String AFTER;
             //https://www.reddit.com/r/memes/top/.json?t=all
             SharedPreferences preferences = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE);
-            sort = preferences.getInt(SettingsActivity.SORT_METHOD, R.id.sort_hot);
+            sort = preferences.getInt(SettingsActivity.SORT_METHOD, MainActivity.HOT);
             switch (sort) {
-                case R.id.sort_hot:
+                case MainActivity.HOT:
                     MODIFIER = "/hot";
                     AFTER = MainActivity.AFTER_HOT;
                     break;
-                case R.id.sort_new:
+                case MainActivity.NEW:
                     MODIFIER = "/new";
                     AFTER = MainActivity.AFTER_NEW;
                     break;
-                case R.id.sort_top:
+                case MainActivity.TOP:
                     MODIFIER = "/top";
                     AFTER = MainActivity.AFTER_TOP;
                     break;
@@ -74,7 +73,9 @@ class RestQuery {
                     AFTER = "";
                     MODIFIER = "";
             }
+            String BASE = "https://www.reddit.com/r/";
             StringBuilder queryBuild = new StringBuilder(BASE);
+            String END = "/.json";
             if (first) {
                 queryBuild.append(QUERY);
                 queryBuild.append(MODIFIER);
@@ -145,6 +146,8 @@ class RestQuery {
     }
 
     void getImages(String jsonResult) {
+        int scale = (context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE).
+                getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2;
         if (imageTask.isCancelled()) {
             return;
         }
@@ -152,17 +155,18 @@ class RestQuery {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;
+        int height = displayMetrics.heightPixels;
         try {
             JSONObject json = new JSONObject(jsonResult);
             json = json.getJSONObject("data");
             switch (sort) {
-                case R.id.sort_hot:
+                case MainActivity.HOT:
                     MainActivity.AFTER_HOT = json.getString("after");
                     break;
-                case R.id.sort_new:
+                case MainActivity.NEW:
                     MainActivity.AFTER_NEW = json.getString("after");
                     break;
-                case R.id.sort_top:
+                case MainActivity.TOP:
                     MainActivity.AFTER_TOP = json.getString("after");
                     break;
             }
@@ -181,9 +185,12 @@ class RestQuery {
                 JSONObject image = preview.getJSONArray("images").getJSONObject(0);
                 JSONObject gif = null;
                 boolean isImage = true;
-                if (image.has("variants") && image.getJSONObject("variants").has("gif")) {
-                    isImage = false;
-                    gif = image.getJSONObject("variants").getJSONObject("gif");
+                boolean canLoadGif = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE).getBoolean(SettingsActivity.LOAD_GIF, true);
+                if (canLoadGif) {
+                    if (image.has("variants") && image.getJSONObject("variants").has("gif")) {
+                        isImage = false;
+                        gif = image.getJSONObject("variants").getJSONObject("gif");
+                    }
                 }
 
                 JSONObject source;
@@ -197,7 +204,9 @@ class RestQuery {
                     String url = source.getString("url").replaceAll("amp;", "");
                     //TODO: replace with glide
                     if (isImage) {
-                        Bitmap bitmap = Picasso.get().load(url).resize(width / 2, 500).centerCrop().get();
+                        Bitmap bitmap = Glide.with(context).asBitmap().load(url).override(width / scale, height / 4).centerCrop().submit().get();
+                        //Bitmap bitmap = Picasso.get().load(url).resize(width / 12, height / 4).centerCrop().get();
+
                         images.add(new BitURL(bitmap, url));
                     } else {
                         //Bitmap bitmap = Glide.with(context).asBitmap().load(url).override(width / 2, 500).centerCrop().submit().get();
@@ -210,7 +219,7 @@ class RestQuery {
                             progress.setVisibility(View.GONE);
                         }
                     });
-                } catch (IOException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }

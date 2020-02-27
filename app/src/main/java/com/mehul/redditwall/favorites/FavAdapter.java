@@ -14,9 +14,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.mehul.redditwall.MainActivity;
 import com.mehul.redditwall.R;
+import com.mehul.redditwall.SettingsActivity;
 import com.mehul.redditwall.WallActivity;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class FavAdapter extends RecyclerView.Adapter<FavAdapter.FavViewHolder> {
     private final LayoutInflater inflater;
     private List<FavImage> favs;
     private Context con;
-    private int width;
+    private int width, height, scale;
 
     public FavAdapter(Context context) {
         con = context;
@@ -32,6 +33,9 @@ public class FavAdapter extends RecyclerView.Adapter<FavAdapter.FavViewHolder> {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         width = displayMetrics.widthPixels;
+        height = displayMetrics.heightPixels;
+        scale = (context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE).
+                getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2;
     }
 
     @NonNull
@@ -88,9 +92,9 @@ public class FavAdapter extends RecyclerView.Adapter<FavAdapter.FavViewHolder> {
         void bindTo(FavImage saved) {
             String url = saved.getFavUrl();
             if (saved.isGif()) {
-                Glide.with(con).asGif().load(url).override(width / 2, 500).centerCrop().into(img);
+                Glide.with(con).asGif().load(url).override(width / scale, height / 4).centerCrop().into(img);
             } else {
-                Picasso.get().load(url).resize(width / 2, 500).centerCrop().into(img);
+                Glide.with(con).load(url).override(width / 2, height / 4).centerCrop().into(img);
             }
         }
     }
