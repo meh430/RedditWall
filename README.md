@@ -15,7 +15,7 @@ An app that pulls images from a specified subreddit to set as device wallpaper
 - Save favorite subreddits using a Room database. Click on saved sub to search for images
 - Long press a saved sub to set it as the default one
 
-<img src="screens/main.png" height="662" width="447"><img src="screens/preview.png" height="662" width="447"><img src="screens/select.png" height="662" width="447"><img src="screens/saved.png" height="662" width="447"><img src="screens/setting.png" height="662" width="447">
+<img src="screens/home.png" height="662" width="447"><img src="screens/prev.png" height="662" width="447"><img src="screens/select.png" height="662" width="447"><img src="screens/saves.png" height="662" width="447"><img src="screens/settings.png" height="662" width="447">
 
 ## Features in Progress/Planned Features
 - Ability to download the image
