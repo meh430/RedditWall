@@ -253,6 +253,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (id == R.id.fav_pics) {
             Intent launchFav = new Intent(this, FavImageActivity.class);
             startActivity(launchFav);
+        } else if (id == R.id.recc_subs) {
+            Intent launcRec = new Intent(this, RecActivity.class);
+            startActivity(launcRec);
         }
         return super.onOptionsItemSelected(item);
     }

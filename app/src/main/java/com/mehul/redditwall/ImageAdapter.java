@@ -73,13 +73,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
     class ImageViewHolder extends RecyclerView.ViewHolder {
         final ImageView image;
-        final ImageAdapter adapter;
 
         ImageViewHolder(View view, ImageAdapter adapt) {
             super(view);
 
             image = view.findViewById(R.id.image_holder);
-            this.adapter = adapt;
         }
     }
 }
