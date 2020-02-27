@@ -14,16 +14,17 @@ An app that pulls images from a specified subreddit to set as device wallpaper
 - Sort Reddit images by new or by hot
 - Save favorite subreddits using a Room database. Click on saved sub to search for images
 - Long press a saved sub to set it as the default one
+- Ability to download the image
+- Save favorite images to be viewed later
+- Set scale down for images being loaded in gridview to minimize bandwidth consumption
+
 
 <img src="screens/home.png" height="662" width="447"><img src="screens/prev.png" height="662" width="447"><img src="screens/fav.png" height="662" width="447"><img src="screens/saves.png" height="662" width="447"><img src="screens/settings.png" height="662" width="447">
 
 ## Features in Progress/Planned Features
-- Ability to download the image
 - Ability to specify a download path in settings
 - Store wallpaper setting and download history to be viewed later
-- Save favorite images to be viewed later
-- Display list of curated subreddit reccomandations to get wallpapers from
+- Display list of curated subreddit recommendation to get wallpapers from
 - Randomly chosen wallpaper from list of favorites that refreshes at a specified interval
-- Lite mode that loads in lower resolution images for the main screen
 - Setting for only allowing downloads when connected to wifi
 - GIF support. Be able to set GIFs as wallpaper
