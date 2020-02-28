@@ -3,7 +3,7 @@
     style="@style/cardViewStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="6dp">
+    android:layout_margin="8dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
             android:layout_margin="12dp"
             android:text="NAME"
             android:textColor="@color/white"
-            android:textSize="20sp" />
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/rec_desc"
@@ -37,7 +37,7 @@
             android:layout_margin="12dp"
             android:text="A description for the reccomendation"
             android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:textSize="18sp" />
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

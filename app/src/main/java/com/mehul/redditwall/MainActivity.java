@@ -35,7 +35,7 @@ import java.util.ArrayList;
 
 @SuppressLint("SetTextI18n")
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    public static final String SharedPrefFile = "com.mehul.redditwall", SAVED = "SAVED", OVERRIDE = "OVERRIDE";
+    public static final String SharedPrefFile = "com.mehul.redditwall", SAVED = "SAVED", OVERRIDE = "OVERRIDE", QUERY = "QUERY";
     public static final int NEW = 0, HOT = 1, TOP = 2;
     public static String AFTER_NEW = "", AFTER_HOT = "", AFTER_TOP = "";
     private String queryString, defaultLoad;
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (connMgr != null) {
             networkInfo = connMgr.getActiveNetworkInfo();
         }
-
+        preferences.edit().putString(QUERY, defaultLoad).apply();
         if (networkInfo != null && networkInfo.isConnected()) {
             imageTask = getTask(true);
             imageTask.execute(defaultLoad);
@@ -220,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (networkInfo != null && networkInfo.isConnected() && queryString.length() != 0) {
             imageTask = getTask(true);
+            preferences.edit().putString(QUERY, defaultLoad).apply();
             imageTask.execute(queryString);
         } else {
             if (queryString.length() == 0) {

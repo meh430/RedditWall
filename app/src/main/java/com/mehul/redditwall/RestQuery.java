@@ -215,7 +215,9 @@ class RestQuery {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            adapter.notifyDataSetChanged();
+                            if (adapter != null) {
+                                adapter.notifyDataSetChanged();
+                            }
                             progress.setVisibility(View.GONE);
                         }
                     });

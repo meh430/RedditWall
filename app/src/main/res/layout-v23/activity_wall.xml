@@ -5,6 +5,13 @@
     android:layout_height="match_parent"
     tools:context=".WallActivity">
 
+    <ProgressBar
+        android:id="@+id/load_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
     <ImageView
         android:id="@+id/wall_holder"
         android:layout_width="match_parent"

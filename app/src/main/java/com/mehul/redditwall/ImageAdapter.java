@@ -40,7 +40,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ImageAdapter.ImageViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ImageAdapter.ImageViewHolder holder, final int position) {
         if (images != null) {
             final BitURL current = images.get(position);
             if (current.getImg() == null) {
@@ -52,8 +52,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                 @Override
                 public void onClick(View view) {
                     Intent wallIntent = new Intent(context, WallActivity.class);
+                    wallIntent.putExtra(WallActivity.INDEX, position);
                     wallIntent.putExtra(WallActivity.WALL_URL, current.getUrl());
                     wallIntent.putExtra(WallActivity.GIF, current.getImg() == null);
+                    wallIntent.putExtra(WallActivity.FROM_MAIN, true);
+                    wallIntent.putExtra(WallActivity.LIST, WallActivity.listToJson(images, null));
+
                     context.startActivity(wallIntent);
                 }
             });

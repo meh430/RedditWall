@@ -46,7 +46,7 @@ public class FavAdapter extends RecyclerView.Adapter<FavAdapter.FavViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final FavAdapter.FavViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final FavAdapter.FavViewHolder holder, final int position) {
         if (favs != null) {
             final FavImage current = favs.get(position);
             holder.bindTo(current);
@@ -59,6 +59,9 @@ public class FavAdapter extends RecyclerView.Adapter<FavAdapter.FavViewHolder> {
                     Intent wallIntent = new Intent(con, WallActivity.class);
                     wallIntent.putExtra(WallActivity.WALL_URL, current.getFavUrl());
                     wallIntent.putExtra(WallActivity.GIF, current.isGif());
+                    wallIntent.putExtra(WallActivity.INDEX, position);
+                    wallIntent.putExtra(WallActivity.FROM_MAIN, false);
+                    wallIntent.putExtra(WallActivity.LIST, WallActivity.listToJson(null, favs));
                     con.startActivity(wallIntent);
                 }
             });
