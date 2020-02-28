@@ -8,6 +8,7 @@ An app that pulls images from a specified subreddit to set as device wallpaper
 - Loads images from a specified subreddit into a gridview user interface
 - Loads more images on scroll
 - Preview image and have the option to set it as a wallpaper
+- Swipe left or right to view the next or previous preview
 - Options between setting the home or lock screen wallpaper
 - Specify the image resolution in settings
 - Specify a default subreddit to load from on start up
