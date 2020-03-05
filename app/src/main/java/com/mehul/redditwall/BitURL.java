@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 
 import com.google.gson.annotations.SerializedName;
 
-class BitURL {
+public class BitURL {
     @SerializedName("img")
     private Bitmap img;
     @SerializedName("url")

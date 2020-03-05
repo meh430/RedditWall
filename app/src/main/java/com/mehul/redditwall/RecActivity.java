@@ -65,7 +65,7 @@ public class RecActivity extends AppCompatActivity {
 
         @Override
         protected ArrayList<Recommendation> doInBackground(Void... voids) {
-            return RestRecs.parseJSON(RestRecs.getRecsJSON());
+            return RestRecs.INSTANCE.parseJSON(RestRecs.INSTANCE.getRecsJSON());
         }
 
         @Override
