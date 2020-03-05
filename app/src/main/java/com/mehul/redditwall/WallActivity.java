@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -68,6 +69,8 @@ public class WallActivity extends AppCompatActivity implements GestureDetector.O
     private GestureDetector detector;
     private LoadImages task;
     private SharedPreferences preferences;
+    private Drawable filledStar, openStar;
+    private Menu starred;
 
     public static String listToJson(ArrayList<BitURL> imgs, List<FavImage> favs) {
         if (imgs != null) {
@@ -146,6 +149,9 @@ public class WallActivity extends AppCompatActivity implements GestureDetector.O
         getWindowManager().getDefaultDisplay().getMetrics(disp);
         width = preferences.getInt(SettingsActivity.IMG_WIDTH, disp.widthPixels);
         height = preferences.getInt(SettingsActivity.IMG_HEIGHT, disp.heightPixels);
+        filledStar = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_black);
+        openStar = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_open);
+
         if (isGif) {
             Glide.with(this).asGif().load(imgUrl).override(width, height).centerCrop().into(wallPreview);
         } else {
@@ -222,11 +228,13 @@ public class WallActivity extends AppCompatActivity implements GestureDetector.O
         } else if (item.getItemId() == R.id.fav_image) {
             for (FavImage img : MainActivity.favViewModel.getFavList()) {
                 if (imgUrl.equalsIgnoreCase(img.getFavUrl())) {
-                    Toast.makeText(this, "Already Added", Toast.LENGTH_SHORT).show();
+                    item.setIcon(openStar);
+                    MainActivity.favViewModel.deleteFavImage(img);
+                    Toast.makeText(this, "Unfavorited", Toast.LENGTH_SHORT).show();
                     return true;
                 }
             }
-
+            item.setIcon(filledStar);
             Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show();
             MainActivity.favViewModel.insert(new FavImage((int) (Math.random() * 10000) + 1, imgUrl, isGif));
             return true;
@@ -237,6 +245,15 @@ public class WallActivity extends AppCompatActivity implements GestureDetector.O
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.wall_menu, menu);
+        for (FavImage img : MainActivity.favViewModel.getFavList()) {
+            if (imgUrl.equalsIgnoreCase(img.getFavUrl())) {
+                menu.getItem(0).setIcon(filledStar);
+                return true;
+            }
+        }
+
+        menu.getItem(0).setIcon(openStar);
+        starred = menu;
         return true;
     }
 
@@ -383,6 +400,19 @@ public class WallActivity extends AppCompatActivity implements GestureDetector.O
             } else {
                 Glide.with(this).load(imgUrl).override(width, height).centerCrop().into(wallPreview);
             }
+
+            if (fromMain) {
+                for (FavImage img : MainActivity.favViewModel.getFavList()) {
+                    if (imgUrl.equalsIgnoreCase(img.getFavUrl())) {
+                        starred.getItem(0).setIcon(filledStar);
+                        return;
+                    }
+                }
+
+                starred.getItem(0).setIcon(openStar);
+            } else {
+                starred.getItem(0).setIcon(filledStar);
+            }
         } else {
             Toast.makeText(this, "Reached the end", Toast.LENGTH_SHORT).show();
         }
@@ -407,6 +437,19 @@ public class WallActivity extends AppCompatActivity implements GestureDetector.O
                 Glide.with(this).asGif().load(imgUrl).override(width, height).centerCrop().into(wallPreview);
             } else {
                 Glide.with(this).load(imgUrl).override(width, height).centerCrop().into(wallPreview);
+            }
+
+            if (fromMain) {
+                for (FavImage img : MainActivity.favViewModel.getFavList()) {
+                    if (imgUrl.equalsIgnoreCase(img.getFavUrl())) {
+                        starred.getItem(0).setIcon(filledStar);
+                        return;
+                    }
+                }
+
+                starred.getItem(0).setIcon(openStar);
+            } else {
+                starred.getItem(0).setIcon(filledStar);
             }
         } else if ((task == null || task.getStatus() != AsyncTask.Status.RUNNING) && fromMain) {
             Toast.makeText(this, "Reached the end", Toast.LENGTH_SHORT).show();
