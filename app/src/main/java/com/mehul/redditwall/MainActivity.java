@@ -83,9 +83,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         subViewModel = new ViewModelProvider(this).get(SubViewModel.class);
 
         preferences = getSharedPreferences(SharedPrefFile, MODE_PRIVATE);
-        defaultLoad = preferences.getString(SettingsActivity.Companion.getDEFAULT(), "mobilewallpaper");
+        defaultLoad = preferences.getString(SettingsActivity.DEFAULT, "mobilewallpaper");
 
-        int sortSelected = preferences.getInt(SettingsActivity.Companion.getSORT_METHOD(), HOT);
+        int sortSelected = preferences.getInt(SettingsActivity.SORT_METHOD, HOT);
         switch (sortSelected) {
             case HOT:
                 adapter = new ImageAdapter(this, hotImages, imageTask, scrollImageTask);
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (savedIntent.getBooleanExtra(OVERRIDE, false)) {
             defaultLoad = savedIntent.getStringExtra(SAVED);
         } else {
-            defaultLoad = preferences.getString(SettingsActivity.Companion.getDEFAULT(), "mobilewallpaper");
+            defaultLoad = preferences.getString(SettingsActivity.DEFAULT, "mobilewallpaper");
         }
 
         search.setHint(defaultLoad);
@@ -319,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view.equals(hotChip)) {
             currentSort = HOT;
             Log.e("CLICk", "CLICKED HOT");
-            prefEdit.putInt(SettingsActivity.Companion.getSORT_METHOD(), HOT);
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, HOT);
             hotChip.setChipBackgroundColorResource(R.color.chip);
             hotChip.setTextColor(Color.WHITE);
             newChip.setChipBackgroundColorResource(R.color.white);
@@ -334,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (view.equals(newChip)) {
             currentSort = NEW;
             Log.e("CLICk", "CLICKED NEW");
-            prefEdit.putInt(SettingsActivity.Companion.getSORT_METHOD(), NEW);
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, NEW);
             hotChip.setChipBackgroundColorResource(R.color.white);
             newChip.setChipBackgroundColorResource(R.color.chip);
             newChip.setTextColor(Color.WHITE);
@@ -349,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (view.equals(topChip)) {
             currentSort = TOP;
             Log.e("CLICk", "CLICKED TOP");
-            prefEdit.putInt(SettingsActivity.Companion.getSORT_METHOD(), TOP);
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, TOP);
             hotChip.setChipBackgroundColorResource(R.color.white);
             newChip.setChipBackgroundColorResource(R.color.white);
             topChip.setChipBackgroundColorResource(R.color.chip);
@@ -402,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         topChip.setTextColor(Color.BLACK);
         if (currentSort == HOT) {
             Log.e("CLICk", "CLICKED HOT");
-            prefEdit.putInt(SettingsActivity.Companion.getSORT_METHOD(), HOT);
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, HOT);
             hotChip.setChipBackgroundColorResource(R.color.chip);
             hotChip.setTextColor(Color.WHITE);
             newChip.setChipBackgroundColorResource(R.color.white);
@@ -416,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         } else if (currentSort == NEW) {
             Log.e("CLICk", "CLICKED NEW");
-            prefEdit.putInt(SettingsActivity.Companion.getSORT_METHOD(), NEW);
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, NEW);
             hotChip.setChipBackgroundColorResource(R.color.white);
             newChip.setChipBackgroundColorResource(R.color.chip);
             newChip.setTextColor(Color.WHITE);
@@ -430,7 +430,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         } else if (currentSort == TOP) {
             Log.e("CLICk", "CLICKED TOP");
-            prefEdit.putInt(SettingsActivity.Companion.getSORT_METHOD(), TOP);
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, TOP);
             hotChip.setChipBackgroundColorResource(R.color.white);
             newChip.setChipBackgroundColorResource(R.color.white);
             topChip.setChipBackgroundColorResource(R.color.chip);

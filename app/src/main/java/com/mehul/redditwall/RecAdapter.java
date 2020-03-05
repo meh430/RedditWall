@@ -79,7 +79,7 @@ public class RecAdapter extends RecyclerView.Adapter<RecAdapter.ReccViewHolder> 
                         public void onClick(DialogInterface dialogInterface, int i) {
                             SharedPreferences preferences = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE);
                             SharedPreferences.Editor prefEdit = preferences.edit();
-                            prefEdit.putString(SettingsActivity.Companion.getDEFAULT(), current.getName());
+                            prefEdit.putString(SettingsActivity.DEFAULT, current.getName());
                             prefEdit.apply();
                             Toast.makeText(context, "Set " + current.getName() + " as default", Toast.LENGTH_SHORT).show();
                         }

@@ -57,7 +57,7 @@ public class SubAdapter extends RecyclerView.Adapter<SubAdapter.SubViewHolder> {
                         public void onClick(DialogInterface dialogInterface, int i) {
                             SharedPreferences preferences = con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE);
                             SharedPreferences.Editor prefEdit = preferences.edit();
-                            prefEdit.putString(SettingsActivity.Companion.getDEFAULT(), current.getSubName());
+                            prefEdit.putString(SettingsActivity.DEFAULT, current.getSubName());
                             prefEdit.apply();
                             Toast.makeText(con, "Set " + current.getSubName() + " as default", Toast.LENGTH_SHORT).show();
                         }

@@ -102,11 +102,11 @@ class SettingsActivity : AppCompatActivity() {
 
     companion object {
         //pref keys
-        val SORT_METHOD = "SORTIMG"
-        val IMG_WIDTH = "WIDTH"
-        val IMG_HEIGHT = "HEIGHT"
-        val DEFAULT = "DEFAULT"
-        val LOAD_SCALE = "LOAD"
-        val LOAD_GIF = "LOADGIF"
+        const val SORT_METHOD = "SORTIMG"
+        const val IMG_WIDTH = "WIDTH"
+        const val IMG_HEIGHT = "HEIGHT"
+        const val DEFAULT = "DEFAULT"
+        const val LOAD_SCALE = "LOAD"
+        const val LOAD_GIF = "LOADGIF"
     }
 }
