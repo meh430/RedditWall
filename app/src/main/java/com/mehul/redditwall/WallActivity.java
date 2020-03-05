@@ -147,8 +147,8 @@ public class WallActivity extends AppCompatActivity implements GestureDetector.O
         createNotificationChannel();
         DisplayMetrics disp = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(disp);
-        width = preferences.getInt(SettingsActivity.IMG_WIDTH, disp.widthPixels);
-        height = preferences.getInt(SettingsActivity.IMG_HEIGHT, disp.heightPixels);
+        width = preferences.getInt(SettingsActivity.Companion.getIMG_WIDTH(), disp.widthPixels);
+        height = preferences.getInt(SettingsActivity.Companion.getIMG_HEIGHT(), disp.heightPixels);
         filledStar = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_black);
         openStar = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_star_open);
 
@@ -456,7 +456,7 @@ public class WallActivity extends AppCompatActivity implements GestureDetector.O
             if (task != null) task.cancel(true);
             task = new LoadImages(this, (ProgressBar) findViewById(R.id.load_more), imageList);
             task.execute(preferences.getString(MainActivity.QUERY,
-                    preferences.getString(SettingsActivity.DEFAULT, "mobilewallpaper")));
+                    preferences.getString(SettingsActivity.Companion.getDEFAULT(), "mobilewallpaper")));
         } else if (!fromMain) {
             Toast.makeText(this, "Reached the end", Toast.LENGTH_SHORT).show();
         } else if (task != null && task.getStatus() == AsyncTask.Status.RUNNING) {

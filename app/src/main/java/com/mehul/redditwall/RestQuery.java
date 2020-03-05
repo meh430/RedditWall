@@ -55,7 +55,7 @@ class RestQuery {
             String AFTER;
             //https://www.reddit.com/r/memes/top/.json?t=all
             SharedPreferences preferences = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE);
-            sort = preferences.getInt(SettingsActivity.SORT_METHOD, MainActivity.HOT);
+            sort = preferences.getInt(SettingsActivity.Companion.getSORT_METHOD(), MainActivity.HOT);
             switch (sort) {
                 case MainActivity.HOT:
                     MODIFIER = "/hot";
@@ -147,7 +147,7 @@ class RestQuery {
 
     void getImages(String jsonResult) {
         int scale = (context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE).
-                getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2;
+                getInt(SettingsActivity.Companion.getLOAD_SCALE(), 2) + 1) * 2;
         if (imageTask.isCancelled()) {
             return;
         }
@@ -185,7 +185,7 @@ class RestQuery {
                 JSONObject image = preview.getJSONArray("images").getJSONObject(0);
                 JSONObject gif = null;
                 boolean isImage = true;
-                boolean canLoadGif = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE).getBoolean(SettingsActivity.LOAD_GIF, true);
+                boolean canLoadGif = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE).getBoolean(SettingsActivity.Companion.getLOAD_GIF(), true);
                 if (canLoadGif) {
                     if (image.has("variants") && image.getJSONObject("variants").has("gif")) {
                         isImage = false;

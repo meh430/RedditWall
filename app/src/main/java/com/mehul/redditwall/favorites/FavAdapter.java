@@ -35,7 +35,7 @@ public class FavAdapter extends RecyclerView.Adapter<FavAdapter.FavViewHolder> {
         width = displayMetrics.widthPixels;
         height = displayMetrics.heightPixels;
         scale = (context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE).
-                getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2;
+                getInt(SettingsActivity.Companion.getLOAD_SCALE(), 2) + 1) * 2;
     }
 
     @NonNull
