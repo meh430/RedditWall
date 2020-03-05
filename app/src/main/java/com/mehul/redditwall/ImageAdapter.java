@@ -3,6 +3,7 @@ package com.mehul.redditwall;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,9 +21,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     private ArrayList<BitURL> images;
     private LayoutInflater inflater;
     private Context context;
+    private AsyncTask<String, Void, Void> task1, task2;
     private int width, height;
 
-    ImageAdapter(Context context, ArrayList<BitURL> list) {
+    ImageAdapter(Context context, ArrayList<BitURL> list, AsyncTask<String, Void, Void> task1, AsyncTask<String, Void, Void> task2) {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         width = displayMetrics.widthPixels;
@@ -30,6 +32,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         inflater = LayoutInflater.from(context);
         this.images = list;
         this.context = context;
+        this.task1 = task1;
+        this.task2 = task2;
     }
 
     @NonNull
@@ -51,12 +55,23 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    if (task1 != null) {
+                        task1.cancel(true);
+                    }
+
+                    if (task2 != null) {
+                        task2.cancel(true);
+                    }
                     Intent wallIntent = new Intent(context, WallActivity.class);
                     wallIntent.putExtra(WallActivity.INDEX, position);
                     wallIntent.putExtra(WallActivity.WALL_URL, current.getUrl());
                     wallIntent.putExtra(WallActivity.GIF, current.getImg() == null);
                     wallIntent.putExtra(WallActivity.FROM_MAIN, true);
-                    wallIntent.putExtra(WallActivity.LIST, WallActivity.listToJson(images, null));
+                    ArrayList<BitURL> prevs = new ArrayList<>();
+                    for (int i = position >= 10 ? position - 10 : 0; i < images.size(); i++) {
+                        prevs.add(images.get(i));
+                    }
+                    wallIntent.putExtra(WallActivity.LIST, WallActivity.listToJson(prevs, null));
 
                     context.startActivity(wallIntent);
                 }

@@ -10,8 +10,10 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -34,7 +36,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 @SuppressLint("SetTextI18n")
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, GestureDetector.OnGestureListener {
     public static final String SharedPrefFile = "com.mehul.redditwall", SAVED = "SAVED", OVERRIDE = "OVERRIDE", QUERY = "QUERY";
     public static final int NEW = 0, HOT = 1, TOP = 2;
     public static String AFTER_NEW = "", AFTER_HOT = "", AFTER_TOP = "";
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Chip hotChip, newChip, topChip;
     private int currentSort;
     private SharedPreferences preferences;
+    private GestureDetector detector;
 
     //viewmodels
     public static SubViewModel subViewModel;
@@ -75,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         hotImages = new ArrayList<>();
         newImages = new ArrayList<>();
         topImages = new ArrayList<>();
+        detector = new GestureDetector(imageScroll.getContext(), this);
 
         subViewModel = new ViewModelProvider(this).get(SubViewModel.class);
 
@@ -84,13 +88,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int sortSelected = preferences.getInt(SettingsActivity.SORT_METHOD, HOT);
         switch (sortSelected) {
             case HOT:
-                adapter = new ImageAdapter(this, hotImages);
+                adapter = new ImageAdapter(this, hotImages, imageTask, scrollImageTask);
                 currentSort = HOT;
                 hotChip.setChipBackgroundColorResource(R.color.chip);
                 hotChip.setTextColor(Color.WHITE);
                 break;
             case NEW:
-                adapter = new ImageAdapter(this, newImages);
+                adapter = new ImageAdapter(this, newImages, imageTask, scrollImageTask);
                 currentSort = NEW;
                 newChip.setChipBackgroundColorResource(R.color.chip);
                 newChip.setTextColor(Color.WHITE);
@@ -98,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 topImages = new ArrayList<>();
                 currentSort = TOP;
-                adapter = new ImageAdapter(this, topImages);
+                adapter = new ImageAdapter(this, topImages, imageTask, scrollImageTask);
                 topChip.setChipBackgroundColorResource(R.color.chip);
                 topChip.setTextColor(Color.WHITE);
                 break;
@@ -358,6 +362,156 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 runQuery();
             }
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        this.detector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    public void switchSort() {
+        String temp;
+        switch (currentSort) {
+            case NEW:
+                temp = AFTER_NEW;
+                break;
+            case HOT:
+                temp = AFTER_HOT;
+                break;
+            case TOP:
+                temp = AFTER_TOP;
+                break;
+            default:
+                temp = null;
+                break;
+        }
+        if (imageTask != null && imageTask.first && imageTask.getStatus() == AsyncTask.Status.RUNNING && temp == null) {
+            Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if ((imageTask != null && imageTask.getStatus() == AsyncTask.Status.RUNNING)
+                || (scrollImageTask != null && scrollImageTask.getStatus() == AsyncTask.Status.RUNNING)) {
+            cancelThreads();
+        }
+        adapter.notifyDataSetChanged();
+        SharedPreferences.Editor prefEdit = preferences.edit();
+        hotChip.setTextColor(Color.BLACK);
+        newChip.setTextColor(Color.BLACK);
+        topChip.setTextColor(Color.BLACK);
+        if (currentSort == HOT) {
+            Log.e("CLICk", "CLICKED HOT");
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, HOT);
+            hotChip.setChipBackgroundColorResource(R.color.chip);
+            hotChip.setTextColor(Color.WHITE);
+            newChip.setChipBackgroundColorResource(R.color.white);
+            topChip.setChipBackgroundColorResource(R.color.white);
+            prefEdit.apply();
+            if (hotImages.size() > 0) {
+                adapter.setList(hotImages);
+            } else {
+                adapter.setList(hotImages);
+                runQuery();
+            }
+        } else if (currentSort == NEW) {
+            Log.e("CLICk", "CLICKED NEW");
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, NEW);
+            hotChip.setChipBackgroundColorResource(R.color.white);
+            newChip.setChipBackgroundColorResource(R.color.chip);
+            newChip.setTextColor(Color.WHITE);
+            topChip.setChipBackgroundColorResource(R.color.white);
+            prefEdit.apply();
+            if (newImages.size() > 0) {
+                adapter.setList(newImages);
+            } else {
+                adapter.setList(newImages);
+                runQuery();
+            }
+        } else if (currentSort == TOP) {
+            Log.e("CLICk", "CLICKED TOP");
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, TOP);
+            hotChip.setChipBackgroundColorResource(R.color.white);
+            newChip.setChipBackgroundColorResource(R.color.white);
+            topChip.setChipBackgroundColorResource(R.color.chip);
+            topChip.setTextColor(Color.WHITE);
+            prefEdit.apply();
+            if (topImages.size() > 0) {
+                adapter.setList(topImages);
+            } else {
+                adapter.setList(topImages);
+                runQuery();
+            }
+        }
+    }
+
+    //NEW = 0, HOT = 1, TOP = 2;
+    public void swipedRight() {
+        Log.e("R", "Right");
+        if (currentSort == NEW) {
+            currentSort = TOP;
+        } else {
+            currentSort--;
+        }
+
+        //load stuff here
+        switchSort();
+    }
+
+    public void swipedLeft() {
+        Log.e("L", "LEFT");
+        if (currentSort == TOP) {
+            currentSort = NEW;
+        } else {
+            currentSort++;
+        }
+
+        //load stuff here
+        switchSort();
+    }
+
+    @Override
+    public boolean onFling(MotionEvent evt1, MotionEvent evt2, float vX, float vY) {
+        boolean ret = false;
+        try {
+            float diffY = evt2.getY() - evt1.getY();
+            float diffX = evt2.getX() - evt1.getX();
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 100 && Math.abs(vX) > 100) {
+                    if (diffX > 0)
+                        swipedLeft();
+                    else
+                        swipedRight();
+                    ret = true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
+    @Override
+    public boolean onDown(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent motionEvent) {
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent motionEvent) {
     }
 
     private static class LoadImages extends AsyncTask<String, Void, Void> {

@@ -58,11 +58,8 @@ public class FavImageActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<FavImage> favs) {
                 adapter.setFavs(favs);
-                if (adapter.getItemCount() == 0) {
-                    findViewById(R.id.fav_empty).setVisibility(View.VISIBLE);
-                } else {
-                    findViewById(R.id.fav_empty).setVisibility(View.GONE);
-                }
+                findViewById(R.id.fav_empty).setVisibility(adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+
             }
         });
 
