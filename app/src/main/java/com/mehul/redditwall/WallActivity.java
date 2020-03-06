@@ -387,7 +387,7 @@ public class WallActivity extends AppCompatActivity implements GestureDetector.O
             index--;
             if (fromMain) {
                 BitURL curr = imageList.get(index);
-                imgUrl = curr.getUrl();
+                imgUrl = curr.getUrl$app_debug();
                 isGif = curr.hasGif();
             } else {
                 FavImage curr = favImages.get(index);
@@ -425,7 +425,7 @@ public class WallActivity extends AppCompatActivity implements GestureDetector.O
             index++;
             if (fromMain) {
                 BitURL curr = imageList.get(index);
-                imgUrl = curr.getUrl();
+                imgUrl = curr.getUrl$app_debug();
                 isGif = curr.hasGif();
             } else {
                 FavImage curr = favImages.get(index);
