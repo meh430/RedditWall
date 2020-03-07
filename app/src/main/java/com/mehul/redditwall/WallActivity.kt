@@ -1,6 +1,7 @@
 package com.mehul.redditwall
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -115,6 +116,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
 
+    @SuppressLint("NewApi")
     fun setWallpaper(view: View) {
         if (isGif) {
             Toast.makeText(this, "GIF support is coming soon", Toast.LENGTH_SHORT).show()
@@ -128,34 +130,36 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         builder.setTitle("Set Where?")
                 .setItems(R.array.location_options) { _, index ->
                     temp.show()
-                    when (index) {
-                        0 -> try {
+                    val wallLoc = if (index == 0) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            WallpaperManager.FLAG_SYSTEM
+                        } else {
+                            0
+                        }
+                    } else {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            WallpaperManager.FLAG_LOCK
+                        } else {
+                            0
+                        }
+                    }
+
+                    if (index == 0 || index == 1) {
+                        try {
                             assert(wall != null)
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                wall?.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM)
-                            } else {
+                            if (wallLoc == 0) {
                                 wall?.setBitmap(bitmap)
+
+                            } else {
+                                wall?.setBitmap(bitmap, null, true, wallLoc)
                             }
                             Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
                         } catch (e: Exception) {
                             Log.e("MainActivity", "Error setting wallpaper")
                             Toast.makeText(con, "failed to set wallpaper", Toast.LENGTH_SHORT).show()
                         }
-
-                        1 -> try {
-                            assert(wall != null)
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                wall?.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK)
-                            } else {
-                                wall?.setBitmap(bitmap)
-                            }
-                            Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
-                        } catch (e: Exception) {
-                            Log.e("MainActivity", "Error setting wallpaper")
-                            Toast.makeText(con, "failed to set wallpaper", Toast.LENGTH_SHORT).show()
-                        }
-
-                        2 -> try {
+                    } else {
+                        try {
                             assert(wall != null)
                             wall?.setBitmap(bitmap)
                             Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
@@ -163,7 +167,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                             Log.e("MainActivity", "Error setting wallpaper")
                             Toast.makeText(con, "failed to set wallpaper", Toast.LENGTH_SHORT).show()
                         }
-
                     }
                 }
         builder.create().show()
@@ -430,6 +433,56 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     override fun onLongPress(motionEvent: MotionEvent) {}
 
+    private class StartUp internal constructor(con: Context, w: Int, h: Int, g: Boolean, image: ImageView, menu: Menu, load: ProgressBar,
+                                               filled: Drawable, open: Drawable) : AsyncTask<String, Void, Boolean>() {
+        var imgView: WeakReference<ImageView> = WeakReference(image)
+        var starMenu: WeakReference<Menu> = WeakReference(menu)
+        var loading: WeakReference<ProgressBar> = WeakReference(load)
+        var fillStar: WeakReference<Drawable> = WeakReference(filled)
+        var openStar: WeakReference<Drawable> = WeakReference(open)
+        var context: WeakReference<Context> = WeakReference(con)
+        val width = w
+        val height = h
+        val gif = g
+
+        override fun onPreExecute() {
+            super.onPreExecute()
+            loading.get()?.visibility = View.VISIBLE
+            imgView.get()?.visibility = View.GONE
+        }
+
+        //get image url, check if exists in saved or not, load using glide?
+        override fun doInBackground(vararg string: String?): Boolean {
+            var saved = false
+            for (fav in MainActivity.favViewModel.favList) {
+                if (fav.favUrl == string[0]) {
+                    saved = true
+                    break
+                }
+            }
+
+            if (gif) {
+                Glide.with(context.get()!!).asGif().load(string[0]).override(width, height).centerCrop().into(imgView.get()!!)
+            } else {
+                Glide.with(context.get()!!).load(string[0]).override(width, height).centerCrop().into(imgView.get()!!)
+            }
+
+            return saved
+        }
+
+        override fun onPostExecute(result: Boolean) {
+            super.onPostExecute(result)
+            starMenu.get()?.getItem(0)?.icon = if (result) {
+                fillStar.get()
+            } else {
+                openStar.get()
+            }
+            loading.get()?.visibility = View.GONE
+            imgView.get()?.visibility = View.VISIBLE
+        }
+
+    }
+
     private class LoadImages internal constructor(con: Context?, load: ProgressBar?, imgs: ArrayList<BitURL>?) : AsyncTask<String, Void, Void>() {
         internal var context: WeakReference<Context?> = WeakReference(con)
         internal var load: WeakReference<ProgressBar?> = WeakReference(load)
@@ -459,13 +512,13 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     companion object {
-        private val PRIMARY_CHANNEL_ID = "primary_notification_channel"
-        private val NOTIFICATION_ID = 0
-        val WALL_URL = "WALLURL"
-        val GIF = "GIF"
-        val LIST = "LIST"
-        val INDEX = "INDEX"
-        val FROM_MAIN = "MAIN"
+        private const val PRIMARY_CHANNEL_ID = "primary_notification_channel"
+        private const val NOTIFICATION_ID = 0
+        const val WALL_URL = "WALLURL"
+        const val GIF = "GIF"
+        const val LIST = "LIST"
+        const val INDEX = "INDEX"
+        const val FROM_MAIN = "MAIN"
 
         fun listToJson(imgs: ArrayList<BitURL>?, favs: List<FavImage>?): String {
             return if (imgs != null) {

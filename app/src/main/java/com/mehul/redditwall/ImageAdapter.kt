@@ -77,6 +77,5 @@ class ImageAdapter internal constructor(private val context: Context,
 
     inner class ImageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val image: ImageView = view.findViewById(R.id.image_holder)
-
     }
 }
