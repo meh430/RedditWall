@@ -2,10 +2,7 @@ package com.mehul.redditwall
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.WallpaperManager
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -62,10 +59,12 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var filledStar: Drawable? = null
     private var openStar: Drawable? = null
     private var starred: Menu? = null
+    private var load: ProgressBar? = null
+    private var startUp: StartUp? = null
 
     //creating a notification using a builder
-    private//flag indicating that if the described PendingIntent already exists, then keep it but replace its extra data with what is in this new Intent
-    val notificationBuilder: NotificationCompat.Builder
+    //flag indicating that if the described PendingIntent already exists, then keep it but replace its extra data with what is in this new Intent
+    private val notificationBuilder: NotificationCompat.Builder
         get() {
             val notificationIntent = Intent()
             notificationIntent.action = Intent.ACTION_VIEW
@@ -83,36 +82,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wall)
-        wallPreview = findViewById(R.id.wall_holder)
-        detector = GestureDetector(this, this)
-        val incoming = intent
-        fromMain = incoming.getBooleanExtra(FROM_MAIN, true)
-        val jsonList = incoming.getStringExtra(LIST)
-        if (jsonList != null) {
-            if (fromMain) {
-                imageList = jsonToList(jsonList)
-            } else {
-                favImages = jsonFavToList(jsonList)
-            }
-        }
-        index = incoming.getIntExtra(INDEX, 0)
-        imgUrl = incoming.getStringExtra(WALL_URL)
-        isGif = incoming.getBooleanExtra(GIF, false)
-        preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-        createNotificationChannel()
-        val disp = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(disp)
-        width = preferences!!.getInt(SettingsActivity.IMG_WIDTH, disp.widthPixels)
-        height = preferences!!.getInt(SettingsActivity.IMG_HEIGHT, disp.heightPixels)
-        filledStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_black)
-        openStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_open)
-
-        if (isGif) {
-            Glide.with(this).asGif().load(imgUrl).override(width, height).centerCrop().into(wallPreview!!)
-        } else {
-            Glide.with(this).load(imgUrl).override(width, height).centerCrop().into(wallPreview!!)
-            //Picasso.get().load(imgUrl).resize(width, height).centerCrop().into(wallPreview);
-        }
     }
 
 
@@ -195,15 +164,33 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.wall_menu, menu)
-        for (img in MainActivity.favViewModel.favList) {
-            if (imgUrl!!.equals(img.favUrl, ignoreCase = true)) {
-                menu.getItem(0).icon = filledStar
-                return true
+        load = findViewById(R.id.load_more)
+        wallPreview = findViewById(R.id.wall_holder)
+        detector = GestureDetector(this, this)
+        val incoming = intent
+        fromMain = incoming.getBooleanExtra(FROM_MAIN, true)
+        val jsonList = incoming.getStringExtra(LIST)
+        if (jsonList != null) {
+            if (fromMain) {
+                imageList = jsonToList(jsonList)
+            } else {
+                favImages = jsonFavToList(jsonList)
             }
         }
-
-        menu.getItem(0).icon = openStar
+        index = incoming.getIntExtra(INDEX, 0)
+        imgUrl = incoming.getStringExtra(WALL_URL)
+        isGif = incoming.getBooleanExtra(GIF, false)
+        preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+        createNotificationChannel()
+        val disp = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(disp)
+        width = preferences!!.getInt(SettingsActivity.IMG_WIDTH, disp.widthPixels)
+        height = preferences!!.getInt(SettingsActivity.IMG_HEIGHT, disp.heightPixels)
+        filledStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_black)
+        openStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_open)
         starred = menu
+        startUp = StartUp(this, width, height, isGif, fromMain, wallPreview, starred, load, filledStar, openStar, MainActivity.favViewModel.favList)
+        startUp?.execute(imgUrl)
         return true
     }
 
@@ -214,7 +201,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
 
         //ask for storage permission if not granted
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), WRITE)
         } else {
             saveImage()
@@ -300,12 +288,18 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         super.onPause()
         if (task != null)
             task!!.cancel(true)
+
+        if (startUp != null)
+            startUp!!.cancel(true)
     }
 
     public override fun onDestroy() {
         super.onDestroy()
         if (task != null)
             task!!.cancel(true)
+
+        if (startUp != null)
+            startUp!!.cancel(true)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -327,23 +321,17 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 isGif = curr.isGif
             }
 
-            if (isGif) {
-                Glide.with(this).asGif().load(imgUrl).override(width, height).centerCrop().into(wallPreview!!)
+            if (startUp == null) {
+                startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
+                        starred, load, filledStar, openStar, MainActivity.favViewModel.favList)
+                startUp?.execute(imgUrl)
+            } else if (startUp!!.status == AsyncTask.Status.RUNNING) {
+                Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
             } else {
-                Glide.with(this).load(imgUrl).override(width, height).centerCrop().into(wallPreview!!)
-            }
-
-            if (fromMain) {
-                for (img in MainActivity.favViewModel.favList) {
-                    if (imgUrl!!.equals(img.favUrl, ignoreCase = true)) {
-                        starred!!.getItem(0).icon = filledStar
-                        return
-                    }
-                }
-
-                starred!!.getItem(0).icon = openStar
-            } else {
-                starred!!.getItem(0).icon = filledStar
+                startUp?.cancel(true)
+                startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
+                        starred, load, filledStar, openStar, MainActivity.favViewModel.favList)
+                startUp?.execute(imgUrl)
             }
         } else {
             Toast.makeText(this, "Reached the end", Toast.LENGTH_SHORT).show()
@@ -365,34 +353,36 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 isGif = curr.isGif
             }
 
-            if (isGif) {
-                Glide.with(this).asGif().load(imgUrl).override(width, height).centerCrop().into(wallPreview!!)
-            } else {
-                Glide.with(this).load(imgUrl).override(width, height).centerCrop().into(wallPreview!!)
-            }
-
-            if (fromMain) {
-                for (img in MainActivity.favViewModel.favList) {
-                    if (imgUrl!!.equals(img.favUrl, ignoreCase = true)) {
-                        starred!!.getItem(0).icon = filledStar
-                        return
-                    }
+            when {
+                startUp == null -> {
+                    startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
+                            starred, load, filledStar, openStar, MainActivity.favViewModel.favList)
+                    startUp?.execute(imgUrl)
                 }
-
-                starred!!.getItem(0).icon = openStar
-            } else {
-                starred!!.getItem(0).icon = filledStar
+                startUp!!.status == AsyncTask.Status.RUNNING -> Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
+                else -> {
+                    startUp?.cancel(true)
+                    startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
+                            starred, load, filledStar, openStar, MainActivity.favViewModel.favList)
+                    startUp?.execute(imgUrl)
+                }
             }
-        } else if ((task == null || task!!.status != AsyncTask.Status.RUNNING) && fromMain) {
-            Toast.makeText(this, "Reached the end", Toast.LENGTH_SHORT).show()
-            if (task != null) task!!.cancel(true)
-            task = LoadImages(this, findViewById<View>(R.id.load_more) as ProgressBar, imageList)
+
+        } else if (task == null && fromMain) {
+            Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
+            task = LoadImages(this, load, imageList)
             task!!.execute(preferences!!.getString(MainActivity.QUERY,
                     preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")))
-        } else if (!fromMain) {
+        } else if (task != null && task?.status == AsyncTask.Status.RUNNING && fromMain) {
+            Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
+        } else if (task != null && task?.status != AsyncTask.Status.RUNNING && fromMain) {
+            Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
+            task?.cancel(true)
+            task = LoadImages(this, load, imageList)
+            task!!.execute(preferences!!.getString(MainActivity.QUERY,
+                    preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")))
+        } else {
             Toast.makeText(this, "Reached the end", Toast.LENGTH_SHORT).show()
-        } else if (task != null && task!!.status == AsyncTask.Status.RUNNING) {
-            Toast.makeText(this, "Please wait", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -433,17 +423,15 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     override fun onLongPress(motionEvent: MotionEvent) {}
 
-    private class StartUp internal constructor(con: Context, w: Int, h: Int, g: Boolean, image: ImageView, menu: Menu, load: ProgressBar,
-                                               filled: Drawable, open: Drawable) : AsyncTask<String, Void, Boolean>() {
-        var imgView: WeakReference<ImageView> = WeakReference(image)
-        var starMenu: WeakReference<Menu> = WeakReference(menu)
-        var loading: WeakReference<ProgressBar> = WeakReference(load)
-        var fillStar: WeakReference<Drawable> = WeakReference(filled)
-        var openStar: WeakReference<Drawable> = WeakReference(open)
+    private class StartUp internal constructor(con: Context, val w: Int, val h: Int, val g: Boolean, val fm: Boolean, image: ImageView?, menu: Menu?, load: ProgressBar?,
+                                               filled: Drawable?, open: Drawable?, f: List<FavImage>) : AsyncTask<String, Void, Boolean>() {
+        var imgView: WeakReference<ImageView?> = WeakReference(image)
+        var starMenu: WeakReference<Menu?> = WeakReference(menu)
+        var loading: WeakReference<ProgressBar?> = WeakReference(load)
+        var fillStar: WeakReference<Drawable?> = WeakReference(filled)
+        var openStar: WeakReference<Drawable?> = WeakReference(open)
         var context: WeakReference<Context> = WeakReference(con)
-        val width = w
-        val height = h
-        val gif = g
+        var favs: WeakReference<List<FavImage>> = WeakReference(f)
 
         override fun onPreExecute() {
             super.onPreExecute()
@@ -452,19 +440,25 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
 
         //get image url, check if exists in saved or not, load using glide?
-        override fun doInBackground(vararg string: String?): Boolean {
+        override fun doInBackground(vararg string: String): Boolean {
             var saved = false
-            for (fav in MainActivity.favViewModel.favList) {
-                if (fav.favUrl == string[0]) {
-                    saved = true
-                    break
+            if (fm) {
+                for (fav in favs.get()!!) {
+                    if (fav.favUrl == string[0]) {
+                        saved = true
+                        break
+                    }
                 }
+            } else {
+                saved = true
             }
 
-            if (gif) {
-                Glide.with(context.get()!!).asGif().load(string[0]).override(width, height).centerCrop().into(imgView.get()!!)
-            } else {
-                Glide.with(context.get()!!).load(string[0]).override(width, height).centerCrop().into(imgView.get()!!)
+            (context.get() as Activity).runOnUiThread {
+                if (g) {
+                    Glide.with(context.get()!!).asGif().load(string[0]).override(w, h).centerCrop().into(imgView.get()!!)
+                } else {
+                    Glide.with(context.get()!!).load(string[0]).override(w, h).centerCrop().into(imgView.get()!!)
+                }
             }
 
             return saved
@@ -502,7 +496,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             return null
         }
 
-        override fun onPostExecute(result: Void) {
+        override fun onPostExecute(result: Void?) {
             super.onPostExecute(result)
             if (isCancelled) {
                 return
