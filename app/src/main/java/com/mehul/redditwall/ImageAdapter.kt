@@ -48,10 +48,12 @@ class ImageAdapter internal constructor(private val context: Context,
 
                 task2?.cancel(true)
                 val wallIntent = Intent(context, WallActivity::class.java)
-                wallIntent.putExtra(WallActivity.INDEX, position)
-                wallIntent.putExtra(WallActivity.WALL_URL, current.url)
-                wallIntent.putExtra(WallActivity.GIF, current.img == null)
-                wallIntent.putExtra(WallActivity.FROM_MAIN, true)
+                wallIntent.apply {
+                    putExtra(WallActivity.INDEX, position)
+                    putExtra(WallActivity.WALL_URL, current.url)
+                    putExtra(WallActivity.GIF, current.img == null)
+                    putExtra(WallActivity.FROM_MAIN, true)
+                }
                 val prevs = ArrayList<BitURL>()
                 for (i in (if (position >= 10) position - 10 else 0) until images!!.size) {
                     prevs.add(images!![i])

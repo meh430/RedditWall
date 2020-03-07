@@ -6,17 +6,18 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.MenuItem
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 
 class SettingsActivity : AppCompatActivity() {
-
     private var widthEdit: EditText? = null
     private var heightEdit: EditText? = null
     private var defaultEdit: EditText? = null
     private var scaleSeek: SeekBar? = null
     private var seekCount: TextView? = null
     private var preferences: SharedPreferences? = null
+    private var lambda: (Int, String) -> String = { num: Int, str: String -> "$num" + str }
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +49,7 @@ class SettingsActivity : AppCompatActivity() {
                     seekCount!!.text = "2X"
                 }
             }
+
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
 
@@ -108,5 +110,10 @@ class SettingsActivity : AppCompatActivity() {
         const val DEFAULT = "DEFAULT"
         const val LOAD_SCALE = "LOAD"
         const val LOAD_GIF = "LOADGIF"
+    }
+
+    fun clearCache(view: View) {
+        this.cacheDir.deleteRecursively()
+        Toast.makeText(this, "Deleted Cahce", Toast.LENGTH_SHORT).show()
     }
 }

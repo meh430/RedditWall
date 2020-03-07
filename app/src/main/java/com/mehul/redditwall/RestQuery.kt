@@ -19,7 +19,8 @@ import java.util.*
 import java.util.concurrent.ExecutionException
 
 //opens up https connection to get json data and return as a string
-internal class RestQuery(private val QUERY: String, private val context: Context, private val images: ArrayList<BitURL>, private val adapter: ImageAdapter?, private val progress: ProgressBar,
+internal class RestQuery(private val QUERY: String, private val context: Context?, private val images: ArrayList<BitURL>?,
+                         private val adapter: ImageAdapter?, private val progress: ProgressBar?,
                          private val imageTask: AsyncTask<String, Void, Void>) {
     private var sort: Int = 0
 
@@ -32,8 +33,8 @@ internal class RestQuery(private val QUERY: String, private val context: Context
             val MODIFIER: String
             val AFTER: String
             //https://www.reddit.com/r/memes/top/.json?t=all
-            val preferences = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-            sort = preferences.getInt(SettingsActivity.SORT_METHOD, MainActivity.HOT)
+            val preferences = context?.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+            sort = preferences!!.getInt(SettingsActivity.SORT_METHOD, MainActivity.HOT)
             when (sort) {
                 MainActivity.HOT -> {
                     MODIFIER = "/hot"
@@ -125,7 +126,8 @@ internal class RestQuery(private val QUERY: String, private val context: Context
     }
 
     fun getImages(jsonResult: String) {
-        val scale = (context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE).getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
+        val scale = (context?.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+        !!.getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
         if (imageTask.isCancelled) {
             return
         }
@@ -178,14 +180,14 @@ internal class RestQuery(private val QUERY: String, private val context: Context
                         val bitmap = Glide.with(context).asBitmap().load(url).override(width / scale, height / 4).centerCrop().submit().get()
                         //Bitmap bitmap = Picasso.get().load(url).resize(width / 12, height / 4).centerCrop().get();
 
-                        images.add(BitURL(bitmap, url))
+                        images?.add(BitURL(bitmap, url))
                     } else {
                         //Bitmap bitmap = Glide.with(context).asBitmap().load(url).override(width / 2, 500).centerCrop().submit().get();
-                        images.add(BitURL(null, url))
+                        images?.add(BitURL(null, url))
                     }
                     context.runOnUiThread {
                         adapter?.notifyDataSetChanged()
-                        progress.visibility = View.GONE
+                        progress?.visibility = View.GONE
                     }
                 } catch (e: InterruptedException) {
                     e.printStackTrace()

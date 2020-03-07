@@ -14,7 +14,12 @@ import java.util.*
 
 //TODO: manage threads properly
 class RecActivity : AppCompatActivity() {
-
+    private var task: LoadRecTask? = null
+    private val cancelThreads = {
+        if (task != null) {
+            task?.cancel(true)
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rec)
@@ -26,8 +31,18 @@ class RecActivity : AppCompatActivity() {
         val adapter = RecAdapter(this, recs)
         recycler.adapter = adapter
         recycler.layoutManager = LinearLayoutManager(this)
-        val task = LoadRecTask(loading, recs, adapter, error)
-        task.execute()
+        task = LoadRecTask(loading, recs, adapter, error)
+        task?.execute()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cancelThreads()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        cancelThreads()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
