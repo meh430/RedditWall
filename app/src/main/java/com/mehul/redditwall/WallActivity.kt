@@ -2,7 +2,10 @@ package com.mehul.redditwall
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.*
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.WallpaperManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -28,9 +31,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.mehul.redditwall.favorites.FavImage
+import com.mehul.redditwall.favorites.FavViewModel
 import org.json.JSONArray
 import org.json.JSONException
 import java.io.File
@@ -61,6 +66,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var starred: Menu? = null
     private var load: ProgressBar? = null
     private var startUp: StartUp? = null
+    private var favViewModel: FavViewModel? = null
+
 
     //creating a notification using a builder
     //flag indicating that if the described PendingIntent already exists, then keep it but replace its extra data with what is in this new Intent
@@ -82,6 +89,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wall)
+        favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
     }
 
 
@@ -146,17 +154,17 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             super.onBackPressed()
             return true
         } else if (item.itemId == R.id.fav_image) {
-            for (img in MainActivity.favViewModel.favList) {
+            for (img in favViewModel!!.favList) {
                 if (imgUrl!!.equals(img.favUrl, ignoreCase = true)) {
                     item.icon = openStar
-                    MainActivity.favViewModel.deleteFavImage(img)
+                    favViewModel?.deleteFavImage(img)
                     Toast.makeText(this, "Unfavorited", Toast.LENGTH_SHORT).show()
                     return true
                 }
             }
             item.icon = filledStar
             Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
-            MainActivity.favViewModel.insert(FavImage((Math.random() * 10000).toInt() + 1, imgUrl, isGif))
+            favViewModel?.insert(FavImage((Math.random() * 10000).toInt() + 1, imgUrl, isGif))
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -170,6 +178,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         val incoming = intent
         fromMain = incoming.getBooleanExtra(FROM_MAIN, true)
         val jsonList = incoming.getStringExtra(LIST)
+        //TODO: parse in separate thread
         if (jsonList != null) {
             if (fromMain) {
                 imageList = jsonToList(jsonList)
@@ -189,7 +198,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         filledStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_black)
         openStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_open)
         starred = menu
-        startUp = StartUp(this, width, height, isGif, fromMain, wallPreview, starred, load, filledStar, openStar, MainActivity.favViewModel.favList)
+        startUp = StartUp(this, width, height, isGif, fromMain, wallPreview, starred, load, filledStar, openStar, favViewModel?.favList)
         startUp?.execute(imgUrl)
         return true
     }
@@ -323,14 +332,14 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
             if (startUp == null) {
                 startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
-                        starred, load, filledStar, openStar, MainActivity.favViewModel.favList)
+                        starred, load, filledStar, openStar, favViewModel?.favList)
                 startUp?.execute(imgUrl)
             } else if (startUp!!.status == AsyncTask.Status.RUNNING) {
                 Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
             } else {
                 startUp?.cancel(true)
                 startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
-                        starred, load, filledStar, openStar, MainActivity.favViewModel.favList)
+                        starred, load, filledStar, openStar, favViewModel?.favList)
                 startUp?.execute(imgUrl)
             }
         } else {
@@ -356,14 +365,14 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             when {
                 startUp == null -> {
                     startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
-                            starred, load, filledStar, openStar, MainActivity.favViewModel.favList)
+                            starred, load, filledStar, openStar, favViewModel?.favList)
                     startUp?.execute(imgUrl)
                 }
                 startUp!!.status == AsyncTask.Status.RUNNING -> Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
                 else -> {
                     startUp?.cancel(true)
                     startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
-                            starred, load, filledStar, openStar, MainActivity.favViewModel.favList)
+                            starred, load, filledStar, openStar, favViewModel?.favList)
                     startUp?.execute(imgUrl)
                 }
             }
@@ -423,15 +432,17 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     override fun onLongPress(motionEvent: MotionEvent) {}
 
+    //TODO: replace with coroutines and parse json on separate thread as well
     private class StartUp internal constructor(con: Context, val w: Int, val h: Int, val g: Boolean, val fm: Boolean, image: ImageView?, menu: Menu?, load: ProgressBar?,
-                                               filled: Drawable?, open: Drawable?, f: List<FavImage>) : AsyncTask<String, Void, Boolean>() {
+                                               filled: Drawable?, open: Drawable?, f: List<FavImage>?) : AsyncTask<String, Void, Boolean>() {
         var imgView: WeakReference<ImageView?> = WeakReference(image)
         var starMenu: WeakReference<Menu?> = WeakReference(menu)
         var loading: WeakReference<ProgressBar?> = WeakReference(load)
         var fillStar: WeakReference<Drawable?> = WeakReference(filled)
         var openStar: WeakReference<Drawable?> = WeakReference(open)
         var context: WeakReference<Context> = WeakReference(con)
-        var favs: WeakReference<List<FavImage>> = WeakReference(f)
+        var favs: WeakReference<List<FavImage>?> = WeakReference(f)
+        lateinit var iurl: String
 
         override fun onPreExecute() {
             super.onPreExecute()
@@ -439,8 +450,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             imgView.get()?.visibility = View.GONE
         }
 
-        //get image url, check if exists in saved or not, load using glide?
         override fun doInBackground(vararg string: String): Boolean {
+            iurl = string[0]
             var saved = false
             if (fm) {
                 for (fav in favs.get()!!) {
@@ -451,14 +462,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 }
             } else {
                 saved = true
-            }
-
-            (context.get() as Activity).runOnUiThread {
-                if (g) {
-                    Glide.with(context.get()!!).asGif().load(string[0]).override(w, h).centerCrop().into(imgView.get()!!)
-                } else {
-                    Glide.with(context.get()!!).load(string[0]).override(w, h).centerCrop().into(imgView.get()!!)
-                }
             }
 
             return saved
@@ -473,6 +476,13 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             }
             loading.get()?.visibility = View.GONE
             imgView.get()?.visibility = View.VISIBLE
+
+            if (g) {
+                Glide.with(context.get()!!).asGif().load(iurl).override(w, h).centerCrop().into(imgView.get()!!)
+            } else {
+                Glide.with(context.get()!!).load(iurl).override(w, h).centerCrop().into(imgView.get()!!)
+            }
+
         }
 
     }
@@ -502,6 +512,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 return
             }
             load.get()?.visibility = View.GONE
+            Toast.makeText(context.get(), "Done Loading", Toast.LENGTH_SHORT).show()
         }
     }
 

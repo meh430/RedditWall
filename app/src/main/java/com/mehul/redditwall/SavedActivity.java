@@ -32,11 +32,13 @@ import java.util.Objects;
 public class SavedActivity extends AppCompatActivity {
     private SubAdapter adapter;
     private EditText saveText;
+    private SubViewModel subViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_saved);
+        subViewModel = new ViewModelProvider(this).get(SubViewModel.class);
         RecyclerView recycler = findViewById(R.id.saveScroll);
         saveText = findViewById(R.id.search);
         adapter = new SubAdapter(this);
@@ -56,14 +58,14 @@ public class SavedActivity extends AppCompatActivity {
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                         int position = viewHolder.getAdapterPosition();
                         SubSaved saved = adapter.getSubAtPosition(position);
-                        MainActivity.subViewModel.deleteSavedSub(saved);
+                        subViewModel.deleteSavedSub(saved);
                         adapter.notifyDataSetChanged();
                     }
                 });
         helper.attachToRecyclerView(recycler);
-        MainActivity.subViewModel = new ViewModelProvider(this).get(SubViewModel.class);
+        subViewModel = new ViewModelProvider(this).get(SubViewModel.class);
 
-        MainActivity.subViewModel.getAllSubs().observe(this, new Observer<List<SubSaved>>() {
+        subViewModel.getAllSubs().observe(this, new Observer<List<SubSaved>>() {
             @Override
             public void onChanged(List<SubSaved> subSaveds) {
                 adapter.setSubs(subSaveds);
@@ -94,7 +96,7 @@ public class SavedActivity extends AppCompatActivity {
             confirmSubs.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    MainActivity.subViewModel.deleteAll();
+                    subViewModel.deleteAll();
                     Toast.makeText(SavedActivity.this, "Deleted saved subs", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -136,14 +138,14 @@ public class SavedActivity extends AppCompatActivity {
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }
 
-        for (SubSaved saved : Objects.requireNonNull(MainActivity.subViewModel.getAllSubs().getValue())) {
+        for (SubSaved saved : Objects.requireNonNull(subViewModel.getAllSubs().getValue())) {
             if (saved.getSubName().equalsIgnoreCase(saveVal)) {
                 Toast.makeText(this, saved.getSubName() + " has already been saved", Toast.LENGTH_SHORT).show();
                 return;
             }
         }
 
-        MainActivity.subViewModel.insert(new SubSaved((int) (Math.random() * 10000) + 1, saveVal, new SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).format(new Date())));
+        subViewModel.insert(new SubSaved((int) (Math.random() * 10000) + 1, saveVal, new SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).format(new Date())));
         Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
     }
 }

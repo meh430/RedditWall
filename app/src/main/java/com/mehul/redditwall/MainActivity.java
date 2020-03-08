@@ -24,13 +24,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.chip.Chip;
-import com.mehul.redditwall.favorites.FavViewModel;
-import com.mehul.redditwall.savedsub.SubViewModel;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -53,16 +50,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SharedPreferences preferences;
     private GestureDetector detector;
 
-    //viewmodels
-    public static SubViewModel subViewModel;
-    public static FavViewModel favViewModel;
-
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        favViewModel = new ViewModelProvider(this).get(FavViewModel.class);
 
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -79,8 +71,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         newImages = new ArrayList<>();
         topImages = new ArrayList<>();
         detector = new GestureDetector(imageScroll.getContext(), this);
-
-        subViewModel = new ViewModelProvider(this).get(SubViewModel.class);
 
         preferences = getSharedPreferences(SharedPrefFile, MODE_PRIVATE);
         defaultLoad = preferences.getString(SettingsActivity.DEFAULT, "mobilewallpaper");

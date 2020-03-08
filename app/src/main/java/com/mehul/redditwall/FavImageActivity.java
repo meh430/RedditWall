@@ -24,11 +24,13 @@ import java.util.List;
 
 public class FavImageActivity extends AppCompatActivity {
     private FavAdapter adapter;
+    private FavViewModel favViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fav_image);
+        favViewModel = new ViewModelProvider(this).get(FavViewModel.class);
         RecyclerView recycler = findViewById(R.id.fav_scroll);
         adapter = new FavAdapter(this);
         recycler.setAdapter(adapter);
@@ -47,14 +49,14 @@ public class FavImageActivity extends AppCompatActivity {
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                         int position = viewHolder.getAdapterPosition();
                         FavImage saved = adapter.getFavAtPosition(position);
-                        MainActivity.favViewModel.deleteFavImage(saved);
+                        favViewModel.deleteFavImage(saved);
                         adapter.notifyDataSetChanged();
                     }
                 });
         helper.attachToRecyclerView(recycler);
-        MainActivity.favViewModel = new ViewModelProvider(this).get(FavViewModel.class);
+        favViewModel = new ViewModelProvider(this).get(FavViewModel.class);
 
-        MainActivity.favViewModel.getAllFav().observe(this, new Observer<List<FavImage>>() {
+        favViewModel.getAllFav().observe(this, new Observer<List<FavImage>>() {
             @Override
             public void onChanged(List<FavImage> favs) {
                 adapter.setFavs(favs);
@@ -82,7 +84,7 @@ public class FavImageActivity extends AppCompatActivity {
             confirmSubs.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    MainActivity.favViewModel.deleteAll();
+                    favViewModel.deleteAll();
                     Toast.makeText(FavImageActivity.this, "Deleted favorite images", Toast.LENGTH_SHORT).show();
                 }
             });

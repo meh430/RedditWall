@@ -114,6 +114,6 @@ class SettingsActivity : AppCompatActivity() {
 
     fun clearCache(view: View) {
         this.cacheDir.deleteRecursively()
-        Toast.makeText(this, "Deleted Cahce", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Deleted Cache", Toast.LENGTH_SHORT).show()
     }
 }

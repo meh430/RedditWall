@@ -45,7 +45,6 @@ class ImageAdapter internal constructor(private val context: Context,
             }
             holder.itemView.setOnClickListener {
                 task1?.cancel(true)
-
                 task2?.cancel(true)
                 val wallIntent = Intent(context, WallActivity::class.java)
                 wallIntent.apply {
@@ -58,6 +57,7 @@ class ImageAdapter internal constructor(private val context: Context,
                 for (i in (if (position >= 10) position - 10 else 0) until images!!.size) {
                     prevs.add(images!![i])
                 }
+                //TODO: move json parsing away from ui thread, causes skipepd frames
                 wallIntent.putExtra(WallActivity.LIST, WallActivity.listToJson(prevs, null))
 
                 context.startActivity(wallIntent)
