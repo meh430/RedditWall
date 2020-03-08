@@ -36,6 +36,10 @@ import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.mehul.redditwall.favorites.FavImage
 import com.mehul.redditwall.favorites.FavViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONException
 import java.io.File
@@ -43,6 +47,7 @@ import java.io.FileOutputStream
 import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.abs
 
 class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
@@ -56,8 +61,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var height: Int = 0
     private var fname: String? = null
     private var imgUrl: String? = null
-    private var imageList: ArrayList<BitURL>? = null
-    private var favImages: List<FavImage>? = null
+    private var imageList: ArrayList<BitURL> = ArrayList()
+    private var favImages: List<FavImage> = ArrayList()
     private var detector: GestureDetector? = null
     private var task: LoadImages? = null
     private var preferences: SharedPreferences? = null
@@ -67,6 +72,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var load: ProgressBar? = null
     private var startUp: StartUp? = null
     private var favViewModel: FavViewModel? = null
+    private val uiScope = CoroutineScope(Dispatchers.Main)
+    private var query: String? = null
 
 
     //creating a notification using a builder
@@ -90,6 +97,9 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wall)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
+        preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+        query = preferences!!.getString(MainActivity.QUERY,
+                preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper"))
     }
 
 
@@ -170,6 +180,58 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         return super.onOptionsItemSelected(item)
     }
 
+    private suspend fun jsonToList(json: String): ArrayList<BitURL> {
+        var ret = ArrayList<BitURL>()
+        withContext(Dispatchers.Default) {
+            try {
+                val list = JSONArray(json)
+                for (i in 0 until list.length()) {
+                    val curr = list.getJSONObject(i)
+                    var gif = false
+                    if (curr.getBoolean("gif")) {
+                        gif = true
+                    }
+                    val temp = BitURL(null, curr.getString("url"))
+                    temp.setGif(gif)
+                    withContext(Dispatchers.Main) {
+                        ret.add(temp)
+                    }
+                }
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }
+
+        return ret
+    }
+
+    private suspend fun jsonFavToList(json: String): ArrayList<FavImage> {
+        var ret = ArrayList<FavImage>()
+        withContext(Dispatchers.Default) {
+            Log.e("JSON", ret.toString())
+            try {
+                val list = JSONArray(json)
+                for (i in 0 until list.length()) {
+                    val curr = list.getJSONObject(i)
+                    Log.e("JSON", curr.toString())
+                    var gif = false
+                    if (curr.getBoolean("gif")) {
+                        gif = true
+                    }
+                    val temp = FavImage((Math.random() * 10000).toInt() + 1, curr.getString("url"), gif)
+                    withContext(Dispatchers.Main) {
+                        ret.add(temp)
+                    }
+                }
+            } catch (e: JSONException) {
+                Log.e("JSON", e.toString())
+                e.printStackTrace()
+            }
+        }
+
+        return ret
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.wall_menu, menu)
         load = findViewById(R.id.load_more)
@@ -179,11 +241,13 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         fromMain = incoming.getBooleanExtra(FROM_MAIN, true)
         val jsonList = incoming.getStringExtra(LIST)
         //TODO: parse in separate thread
-        if (jsonList != null) {
-            if (fromMain) {
-                imageList = jsonToList(jsonList)
-            } else {
-                favImages = jsonFavToList(jsonList)
+        uiScope.launch {
+            if (jsonList != null) {
+                if (fromMain) {
+                    imageList = jsonToList(jsonList)
+                } else {
+                    favImages = jsonFavToList(jsonList)
+                }
             }
         }
         index = incoming.getIntExtra(INDEX, 0)
@@ -312,13 +376,13 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        this.detector!!.onTouchEvent(event)
+        if (detector != null) this.detector!!.onTouchEvent(event)
         return super.onTouchEvent(event)
     }
 
     private fun swipedRight() {
         Log.e("R", "Right")
-        if (index - 1 >= 0) {
+        if ((index - 1) >= 0) {
             index--
             if (fromMain) {
                 val curr = imageList!![index]
@@ -380,16 +444,14 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         } else if (task == null && fromMain) {
             Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
             task = LoadImages(this, load, imageList)
-            task!!.execute(preferences!!.getString(MainActivity.QUERY,
-                    preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")))
+            task!!.execute(query)
         } else if (task != null && task?.status == AsyncTask.Status.RUNNING && fromMain) {
             Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
         } else if (task != null && task?.status != AsyncTask.Status.RUNNING && fromMain) {
             Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
             task?.cancel(true)
             task = LoadImages(this, load, imageList)
-            task!!.execute(preferences!!.getString(MainActivity.QUERY,
-                    preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")))
+            task!!.execute(query)
         } else {
             Toast.makeText(this, "Reached the end", Toast.LENGTH_SHORT).show()
         }

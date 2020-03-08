@@ -2,8 +2,6 @@ package com.mehul.redditwall
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.os.AsyncTask
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
@@ -11,12 +9,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import java.util.*
 
 class ImageAdapter internal constructor(private val context: Context,
-                                        private var images: ArrayList<BitURL>?,
-                                        private val task1: AsyncTask<String, Void, Void>?,
-                                        private val task2: AsyncTask<String, Void, Void>?) :
+                                        private var images: ArrayList<BitURL>?) :
         RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
     private val inflater: LayoutInflater
     private val width: Int
@@ -42,25 +37,6 @@ class ImageAdapter internal constructor(private val context: Context,
                 Glide.with(context).asGif().load(current.url).override(width / 2, height / 4).into(holder.image)
             } else {
                 holder.image.setImageBitmap(current.img)
-            }
-            holder.itemView.setOnClickListener {
-                task1?.cancel(true)
-                task2?.cancel(true)
-                val wallIntent = Intent(context, WallActivity::class.java)
-                wallIntent.apply {
-                    putExtra(WallActivity.INDEX, position)
-                    putExtra(WallActivity.WALL_URL, current.url)
-                    putExtra(WallActivity.GIF, current.img == null)
-                    putExtra(WallActivity.FROM_MAIN, true)
-                }
-                val prevs = ArrayList<BitURL>()
-                for (i in (if (position >= 10) position - 10 else 0) until images!!.size) {
-                    prevs.add(images!![i])
-                }
-                //TODO: move json parsing away from ui thread, causes skipepd frames
-                wallIntent.putExtra(WallActivity.LIST, WallActivity.listToJson(prevs, null))
-
-                context.startActivity(wallIntent)
             }
         }
     }

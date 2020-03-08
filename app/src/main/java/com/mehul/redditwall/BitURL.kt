@@ -23,4 +23,12 @@ class BitURL(@field:SerializedName("img")
     fun setGif(gif: Boolean) {
         containsGif = gif
     }
+
+    fun getUrl(): String {
+        return url
+    }
+
+    fun getImg(): Bitmap? {
+        return img
+    }
 }

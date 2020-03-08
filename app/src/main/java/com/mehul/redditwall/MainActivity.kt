@@ -1,0 +1,566 @@
+package com.mehul.redditwall
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
+import android.os.AsyncTask
+import android.os.Bundle
+import android.util.Log
+import android.view.*
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
+import com.google.gson.Gson
+import java.lang.ref.WeakReference
+import java.util.*
+
+@SuppressLint("SetTextI18n")
+class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.OnGestureListener {
+    private var queryString: String? = null
+    private var defaultLoad: String? = null
+    private var search: EditText? = null
+    private var hotImages: ArrayList<BitURL>? = null
+    private var topImages: ArrayList<BitURL>? = null
+    private var newImages: ArrayList<BitURL>? = null
+    private var adapter: ImageAdapter? = null
+    private var loading: ProgressBar? = null
+    private var bottomLoading: ProgressBar? = null
+    private var info: TextView? = null
+    private var imageTask: LoadImages? = null
+    private var scrollImageTask: LoadImages? = null
+    private var hotChip: Chip? = null
+    private var newChip: Chip? = null
+    private var topChip: Chip? = null
+    private var currentSort: Int = 0
+    private var preferences: SharedPreferences? = null
+    private var detector: GestureDetector? = null
+    private var currCon: Context? = null
+
+    @SuppressLint("SetTextI18n")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        hotChip = findViewById(R.id.hot_chip)
+        newChip = findViewById(R.id.new_chip)
+        topChip = findViewById(R.id.top_chip)
+        loading = findViewById(R.id.loading)
+        info = findViewById(R.id.info)
+        bottomLoading = findViewById(R.id.progressBar)
+        search = findViewById(R.id.search)
+        val imageScroll = findViewById<RecyclerView>(R.id.imageScroll)
+        imageScroll.layoutManager = GridLayoutManager(this, 2)
+        currCon = this
+        imageScroll.addOnItemTouchListener(RecyclerListener(this, imageScroll, object : RecyclerListener.OnItemClickListener {
+            override fun onLongItemClick(view: View?, position: Int) {}
+
+            override fun onItemClick(view: View, p: Int) {
+                var position = p
+                val currList: ArrayList<BitURL>?
+                cancelThreads()
+                when (currentSort) {
+                    HOT -> currList = hotImages
+                    NEW -> currList = newImages
+                    else -> currList = topImages
+                }
+                position = if (position <= 0) 0 else position
+                val current = currList!![position]
+                val wallIntent = Intent(currCon, WallActivity::class.java)
+                wallIntent.putExtra(WallActivity.WALL_URL, current.getUrl())
+                wallIntent.putExtra(WallActivity.GIF, current.getImg() == null)
+                wallIntent.putExtra(WallActivity.FROM_MAIN, true)
+
+                val prevs = ArrayList<BitURL>()
+                for (i in (if (position >= 10) position - 10 else 0) until currList.size) {
+                    prevs.add(currList[i])
+                }
+
+                val index = if (position >= 10) 10 else position
+                wallIntent.putExtra(WallActivity.INDEX, index)
+
+                //TODO: move json parsing away from ui thread, causes skipepd frames
+                wallIntent.putExtra(WallActivity.LIST, Gson().toJson(prevs))
+
+                currCon!!.startActivity(wallIntent)
+            }
+        }))
+        hotImages = ArrayList()
+        newImages = ArrayList()
+        topImages = ArrayList()
+        detector = GestureDetector(imageScroll.context, this)
+
+        preferences = getSharedPreferences(SharedPrefFile, Context.MODE_PRIVATE)
+        defaultLoad = preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")
+
+        val sortSelected = preferences!!.getInt(SettingsActivity.SORT_METHOD, HOT)
+        when (sortSelected) {
+            HOT -> {
+                adapter = ImageAdapter(this, hotImages)
+                currentSort = HOT
+                hotChip!!.setChipBackgroundColorResource(R.color.chip)
+                hotChip!!.setTextColor(Color.WHITE)
+            }
+            NEW -> {
+                adapter = ImageAdapter(this, newImages)
+                currentSort = NEW
+                newChip!!.setChipBackgroundColorResource(R.color.chip)
+                newChip!!.setTextColor(Color.WHITE)
+            }
+            else -> {
+                topImages = ArrayList()
+                currentSort = TOP
+                adapter = ImageAdapter(this, topImages)
+                topChip!!.setChipBackgroundColorResource(R.color.chip)
+                topChip!!.setTextColor(Color.WHITE)
+            }
+        }
+
+        imageScroll.adapter = adapter
+
+
+        hotChip!!.setOnClickListener(this)
+        newChip!!.setOnClickListener(this)
+        topChip!!.setOnClickListener(this)
+
+        val savedIntent = intent
+
+        if (savedIntent.getBooleanExtra(OVERRIDE, false)) {
+            defaultLoad = savedIntent.getStringExtra(SAVED)
+        } else {
+            defaultLoad = preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")
+        }
+
+        search!!.hint = defaultLoad
+
+        val connMgr: ConnectivityManager? = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        var networkInfo: NetworkInfo? = null
+        if (connMgr != null) {
+            networkInfo = connMgr.activeNetworkInfo
+        }
+        preferences!!.edit().putString(QUERY, defaultLoad).apply()
+        if (networkInfo != null && networkInfo.isConnected) {
+            imageTask = getTask(true)
+            imageTask!!.execute(defaultLoad)
+        } else {
+            info!!.visibility = View.VISIBLE
+            info!!.text = "No Network"
+        }
+
+        imageScroll.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (!recyclerView.canScrollVertically(1)) {
+                    if (imageTask != null && imageTask!!.status == AsyncTask.Status.RUNNING) {
+                        return
+                    }
+
+                    if (scrollImageTask == null) {
+                        cancelThreads()
+
+                        scrollImageTask = getTask(false)
+                        scrollImageTask!!.execute(if (queryString == null || queryString!!.isEmpty()) defaultLoad else queryString)
+                    } else if (scrollImageTask!!.status != AsyncTask.Status.RUNNING) {
+                        cancelThreads()
+
+                        scrollImageTask = getTask(false)
+                        scrollImageTask!!.execute(if (queryString == null || queryString!!.isEmpty()) defaultLoad else queryString)
+                    }
+                }
+            }
+        })
+    }
+
+    private fun getTask(first: Boolean): LoadImages {
+        return if (first) {
+            if (currentSort == NEW) {
+                LoadImages(this, loading, info, newImages, adapter, true)
+            } else if (currentSort == HOT) {
+                LoadImages(this, loading, info, hotImages, adapter, true)
+            } else {
+                LoadImages(this, loading, info, topImages, adapter, true)
+            }
+        } else {
+            if (currentSort == NEW) {
+                LoadImages(this, bottomLoading, info, newImages, adapter, false)
+            } else if (currentSort == HOT) {
+                LoadImages(this, bottomLoading, info, hotImages, adapter, false)
+            } else {
+                LoadImages(this, bottomLoading, info, topImages, adapter, false)
+            }
+        }
+    }
+
+    public override fun onStop() {
+        super.onStop()
+        Log.e("STOP", "STOP")
+    }
+
+    public override fun onDestroy() {
+        super.onDestroy()
+        Log.e("DESTROY", "DESTROY")
+        cancelThreads()
+    }
+
+    fun startSearch(view: View) {
+        if (imageTask != null && imageTask!!.first && imageTask!!.status == AsyncTask.Status.RUNNING) {
+            Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
+            return
+        }
+        cancelThreads()
+        queryString = ""
+        loading!!.visibility = View.VISIBLE
+        info!!.visibility = View.INVISIBLE
+        newImages!!.clear()
+        hotImages!!.clear()
+        topImages!!.clear()
+        adapter!!.notifyDataSetChanged()
+        queryString = search!!.text.toString()
+        val inputManager: InputMethodManager? = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+        inputManager?.hideSoftInputFromWindow(view.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS)
+
+        val connMgr: ConnectivityManager? = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        var networkInfo: NetworkInfo? = null
+        if (connMgr != null) {
+            networkInfo = connMgr.activeNetworkInfo
+        }
+
+        if (networkInfo != null && networkInfo.isConnected && queryString!!.length != 0) {
+            imageTask = getTask(true)
+            preferences!!.edit().putString(QUERY, queryString).apply()
+            imageTask!!.execute(queryString)
+        } else {
+            if (queryString!!.length == 0) {
+                imageTask = getTask(true)
+                imageTask!!.execute(defaultLoad)
+            } else {
+                info!!.visibility = View.VISIBLE
+                info!!.text = "No Network"
+            }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    //Launch activities from menu here
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == R.id.saved_subs) {
+            val launchSaved = Intent(this, SavedActivity::class.java)
+            startActivity(launchSaved)
+            return true
+        } else if (id == R.id.settings) {
+            val launchSettings = Intent(this, SettingsActivity::class.java)
+            startActivity(launchSettings)
+            return true
+        } else if (id == R.id.fav_pics) {
+            val launchFav = Intent(this, FavImageActivity::class.java)
+            startActivity(launchFav)
+        } else if (id == R.id.recc_subs) {
+            val launcRec = Intent(this, RecActivity::class.java)
+            startActivity(launcRec)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun cancelThreads() {
+
+        if (imageTask != null) {
+            loading!!.visibility = View.GONE
+            imageTask!!.cancel(true)
+        }
+
+        if (scrollImageTask != null) {
+            bottomLoading!!.visibility = View.GONE
+            scrollImageTask!!.cancel(true)
+        }
+    }
+
+    fun runQuery() {
+        imageTask = getTask(true)
+        imageTask!!.execute(if (queryString == null || queryString!!.length == 1 ||
+                queryString!!.equals("", ignoreCase = true))
+            defaultLoad
+        else
+            queryString)
+        Log.e("BRUH", "$queryString, $defaultLoad")
+    }
+
+    override fun onClick(view: View) {
+        val temp: String?
+        when (currentSort) {
+            NEW -> temp = AFTER_NEW
+            HOT -> temp = AFTER_HOT
+            TOP -> temp = AFTER_TOP
+            else -> temp = null
+        }
+        if (imageTask != null && imageTask!!.first && imageTask!!.status == AsyncTask.Status.RUNNING && temp == null) {
+            Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (imageTask != null && imageTask!!.status == AsyncTask.Status.RUNNING || scrollImageTask != null && scrollImageTask!!.status == AsyncTask.Status.RUNNING) {
+            cancelThreads()
+        }
+        adapter!!.notifyDataSetChanged()
+        val prefEdit = preferences!!.edit()
+        hotChip!!.setTextColor(Color.BLACK)
+        newChip!!.setTextColor(Color.BLACK)
+        topChip!!.setTextColor(Color.BLACK)
+        if (view == hotChip) {
+            currentSort = HOT
+            Log.e("CLICk", "CLICKED HOT")
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, HOT)
+            hotChip!!.setChipBackgroundColorResource(R.color.chip)
+            hotChip!!.setTextColor(Color.WHITE)
+            newChip!!.setChipBackgroundColorResource(R.color.white)
+            topChip!!.setChipBackgroundColorResource(R.color.white)
+            prefEdit.apply()
+            if (hotImages!!.size > 0) {
+                adapter!!.setList(hotImages!!)
+            } else {
+                adapter!!.setList(hotImages!!)
+                runQuery()
+            }
+        } else if (view == newChip) {
+            currentSort = NEW
+            Log.e("CLICk", "CLICKED NEW")
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, NEW)
+            hotChip!!.setChipBackgroundColorResource(R.color.white)
+            newChip!!.setChipBackgroundColorResource(R.color.chip)
+            newChip!!.setTextColor(Color.WHITE)
+            topChip!!.setChipBackgroundColorResource(R.color.white)
+            prefEdit.apply()
+            if (newImages!!.size > 0) {
+                adapter!!.setList(newImages!!)
+            } else {
+                adapter!!.setList(newImages!!)
+                runQuery()
+            }
+        } else if (view == topChip) {
+            currentSort = TOP
+            Log.e("CLICk", "CLICKED TOP")
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, TOP)
+            hotChip!!.setChipBackgroundColorResource(R.color.white)
+            newChip!!.setChipBackgroundColorResource(R.color.white)
+            topChip!!.setChipBackgroundColorResource(R.color.chip)
+            topChip!!.setTextColor(Color.WHITE)
+            prefEdit.apply()
+            if (topImages!!.size > 0) {
+                adapter!!.setList(topImages!!)
+            } else {
+                adapter!!.setList(topImages!!)
+                runQuery()
+            }
+        }
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        this.detector!!.onTouchEvent(event)
+        return super.onTouchEvent(event)
+    }
+
+    fun switchSort() {
+        val temp: String?
+        when (currentSort) {
+            NEW -> temp = AFTER_NEW
+            HOT -> temp = AFTER_HOT
+            TOP -> temp = AFTER_TOP
+            else -> temp = null
+        }
+        if (imageTask != null && imageTask!!.first && imageTask!!.status == AsyncTask.Status.RUNNING && temp == null) {
+            Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (imageTask != null && imageTask!!.status == AsyncTask.Status.RUNNING || scrollImageTask != null && scrollImageTask!!.status == AsyncTask.Status.RUNNING) {
+            cancelThreads()
+        }
+        adapter!!.notifyDataSetChanged()
+        val prefEdit = preferences!!.edit()
+        hotChip!!.setTextColor(Color.BLACK)
+        newChip!!.setTextColor(Color.BLACK)
+        topChip!!.setTextColor(Color.BLACK)
+        if (currentSort == HOT) {
+            Log.e("CLICk", "CLICKED HOT")
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, HOT)
+            hotChip!!.setChipBackgroundColorResource(R.color.chip)
+            hotChip!!.setTextColor(Color.WHITE)
+            newChip!!.setChipBackgroundColorResource(R.color.white)
+            topChip!!.setChipBackgroundColorResource(R.color.white)
+            prefEdit.apply()
+            if (hotImages!!.size > 0) {
+                adapter!!.setList(hotImages!!)
+            } else {
+                adapter!!.setList(hotImages!!)
+                runQuery()
+            }
+        } else if (currentSort == NEW) {
+            Log.e("CLICk", "CLICKED NEW")
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, NEW)
+            hotChip!!.setChipBackgroundColorResource(R.color.white)
+            newChip!!.setChipBackgroundColorResource(R.color.chip)
+            newChip!!.setTextColor(Color.WHITE)
+            topChip!!.setChipBackgroundColorResource(R.color.white)
+            prefEdit.apply()
+            if (newImages!!.size > 0) {
+                adapter!!.setList(newImages!!)
+            } else {
+                adapter!!.setList(newImages!!)
+                runQuery()
+            }
+        } else if (currentSort == TOP) {
+            Log.e("CLICk", "CLICKED TOP")
+            prefEdit.putInt(SettingsActivity.SORT_METHOD, TOP)
+            hotChip!!.setChipBackgroundColorResource(R.color.white)
+            newChip!!.setChipBackgroundColorResource(R.color.white)
+            topChip!!.setChipBackgroundColorResource(R.color.chip)
+            topChip!!.setTextColor(Color.WHITE)
+            prefEdit.apply()
+            if (topImages!!.size > 0) {
+                adapter!!.setList(topImages!!)
+            } else {
+                adapter!!.setList(topImages!!)
+                runQuery()
+            }
+        }
+    }
+
+    //NEW = 0, HOT = 1, TOP = 2;
+    fun swipedRight() {
+        Log.e("R", "Right")
+        if (currentSort == NEW) {
+            currentSort = TOP
+        } else {
+            currentSort--
+        }
+
+        //load stuff here
+        switchSort()
+    }
+
+    fun swipedLeft() {
+        Log.e("L", "LEFT")
+        if (currentSort == TOP) {
+            currentSort = NEW
+        } else {
+            currentSort++
+        }
+
+        //load stuff here
+        switchSort()
+    }
+
+    override fun onFling(evt1: MotionEvent, evt2: MotionEvent, vX: Float, vY: Float): Boolean {
+        var ret = false
+        try {
+            val diffY = evt2.y - evt1.y
+            val diffX = evt2.x - evt1.x
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 100 && Math.abs(vX) > 100) {
+                    if (diffX > 0)
+                        swipedLeft()
+                    else
+                        swipedRight()
+                    ret = true
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return ret
+    }
+
+    override fun onDown(motionEvent: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onShowPress(motionEvent: MotionEvent) {}
+
+    override fun onSingleTapUp(motionEvent: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onScroll(motionEvent: MotionEvent, motionEvent1: MotionEvent, v: Float, v1: Float): Boolean {
+        return false
+    }
+
+    override fun onLongPress(motionEvent: MotionEvent) {}
+
+    private class LoadImages internal constructor(con: Context, bLoad: ProgressBar?, inf: TextView?, imgs: ArrayList<BitURL>?, adapt: ImageAdapter?, internal var first: Boolean) : AsyncTask<String, Void, Void>() {
+        internal var context: WeakReference<Context> = WeakReference(con)
+        internal var bLoad: WeakReference<ProgressBar?> = WeakReference(bLoad)
+        internal var inf: WeakReference<TextView?> = WeakReference(inf)
+        internal var imgs: WeakReference<ArrayList<BitURL>?> = WeakReference(imgs)
+        internal var adapt: WeakReference<ImageAdapter?> = WeakReference(adapt)
+
+        override fun onPreExecute() {
+            super.onPreExecute()
+            bLoad.get()?.visibility = View.VISIBLE
+            inf.get()?.visibility = View.GONE
+        }
+
+        override fun doInBackground(vararg strings: String): Void? {
+            if (isCancelled) {
+                return null
+            }
+            val rq = RestQuery(strings[0], context.get(), imgs.get(),
+                    adapt.get(), bLoad.get(), this)
+            val json = rq.getQueryJson(first)
+
+            if (json == null) {
+                cancel(true)
+                return null
+            }
+
+            rq.getImages(json)
+            return null
+        }
+
+        override fun onPostExecute(result: Void) {
+            super.onPostExecute(result)
+            if (isCancelled) {
+                adapt.get()?.notifyDataSetChanged()
+                return
+            }
+            adapt.get()?.notifyDataSetChanged()
+            bLoad.get()?.visibility = View.GONE
+
+            if (first && imgs.get()?.size == 0) {
+                inf.get()?.visibility = View.VISIBLE
+                inf.get()?.text = "Subreddit does not exist or it has no images"
+            }
+        }
+    }
+
+    companion object {
+        const val SharedPrefFile = "com.mehul.redditwall"
+        const val SAVED = "SAVED"
+        const val OVERRIDE = "OVERRIDE"
+        const val QUERY = "QUERY"
+        const val NEW = 0
+        const val HOT = 1
+        const val TOP = 2
+        var AFTER_NEW = ""
+        var AFTER_HOT = ""
+        var AFTER_TOP = ""
+    }
+}
