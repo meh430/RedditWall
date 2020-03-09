@@ -50,6 +50,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
 
+@Suppress("PrivatePropertyName")
 class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var notifyManager: NotificationManager? = null
     private var wallPreview: ImageView? = null
@@ -104,7 +105,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
 
     @SuppressLint("NewApi")
-    fun setWallpaper(view: View) {
+    fun setWallpaper() {
         if (isGif) {
             Toast.makeText(this, "GIF support is coming soon", Toast.LENGTH_SHORT).show()
             return
@@ -181,7 +182,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     private suspend fun jsonToList(json: String): ArrayList<BitURL> {
-        var ret = ArrayList<BitURL>()
+        val ret = ArrayList<BitURL>()
         withContext(Dispatchers.Default) {
             try {
                 val list = JSONArray(json)
@@ -206,7 +207,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     private suspend fun jsonFavToList(json: String): ArrayList<FavImage> {
-        var ret = ArrayList<FavImage>()
+        val ret = ArrayList<FavImage>()
         withContext(Dispatchers.Default) {
             Log.e("JSON", ret.toString())
             try {
@@ -240,7 +241,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         val incoming = intent
         fromMain = incoming.getBooleanExtra(FROM_MAIN, true)
         val jsonList = incoming.getStringExtra(LIST)
-        //TODO: parse in separate thread
         uiScope.launch {
             if (jsonList != null) {
                 if (fromMain) {
@@ -267,7 +267,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         return true
     }
 
-    fun downloadImage(view: View) {
+    fun downloadImage() {
         if (isGif) {
             Toast.makeText(this, "GIF support is coming soon", Toast.LENGTH_SHORT).show()
             return
@@ -282,6 +282,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun saveImage() {
         val bitmap = (wallPreview!!.drawable as BitmapDrawable).bitmap
         Toast.makeText(this, "Downloading...", Toast.LENGTH_SHORT).show()
@@ -385,26 +386,28 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         if ((index - 1) >= 0) {
             index--
             if (fromMain) {
-                val curr = imageList!![index]
+                val curr = imageList[index]
                 imgUrl = curr.url
                 isGif = curr.hasGif()
             } else {
-                val curr = favImages!![index]
+                val curr = favImages[index]
                 imgUrl = curr.favUrl
                 isGif = curr.isGif
             }
 
-            if (startUp == null) {
-                startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
-                        starred, load, filledStar, openStar, favViewModel?.favList)
-                startUp?.execute(imgUrl)
-            } else if (startUp!!.status == AsyncTask.Status.RUNNING) {
-                Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
-            } else {
-                startUp?.cancel(true)
-                startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
-                        starred, load, filledStar, openStar, favViewModel?.favList)
-                startUp?.execute(imgUrl)
+            when {
+                startUp == null -> {
+                    startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
+                            starred, load, filledStar, openStar, favViewModel?.favList)
+                    startUp?.execute(imgUrl)
+                }
+                startUp!!.status == AsyncTask.Status.RUNNING -> Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
+                else -> {
+                    startUp?.cancel(true)
+                    startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
+                            starred, load, filledStar, openStar, favViewModel?.favList)
+                    startUp?.execute(imgUrl)
+                }
             }
         } else {
             Toast.makeText(this, "Reached the end", Toast.LENGTH_SHORT).show()
@@ -413,15 +416,15 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     private fun swipedLeft() {
         Log.e("L", "LEFT")
-        val inBound = if (fromMain) index + 1 < imageList!!.size else index + 1 < favImages!!.size
+        val inBound = if (fromMain) index + 1 < imageList.size else index + 1 < favImages.size
         if (inBound) {
             index++
             if (fromMain) {
-                val curr = imageList!![index]
+                val curr = imageList[index]
                 imgUrl = curr.url
                 isGif = curr.hasGif()
             } else {
-                val curr = favImages!![index]
+                val curr = favImages[index]
                 imgUrl = curr.favUrl
                 isGif = curr.isGif
             }
@@ -595,50 +598,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 Log.e("FAVS", Gson().toJson(favs))
                 Gson().toJson(favs)
             }
-        }
-
-        fun jsonToList(json: String): ArrayList<BitURL> {
-            val ret = ArrayList<BitURL>()
-            try {
-                val list = JSONArray(json)
-                for (i in 0 until list.length()) {
-                    val curr = list.getJSONObject(i)
-                    var gif = false
-                    if (curr.getBoolean("gif")) {
-                        gif = true
-                    }
-                    val temp = BitURL(null, curr.getString("url"))
-                    temp.setGif(gif)
-                    ret.add(temp)
-                }
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-
-            return ret
-        }
-
-        fun jsonFavToList(json: String): List<FavImage> {
-            val ret = ArrayList<FavImage>()
-            Log.e("JSON", ret.toString())
-            try {
-                val list = JSONArray(json)
-                for (i in 0 until list.length()) {
-                    val curr = list.getJSONObject(i)
-                    Log.e("JSON", curr.toString())
-                    var gif = false
-                    if (curr.getBoolean("gif")) {
-                        gif = true
-                    }
-                    val temp = FavImage((Math.random() * 10000).toInt() + 1, curr.getString("url"), gif)
-                    ret.add(temp)
-                }
-            } catch (e: JSONException) {
-                Log.e("JSON", e.toString())
-                e.printStackTrace()
-            }
-
-            return ret
         }
     }
 }

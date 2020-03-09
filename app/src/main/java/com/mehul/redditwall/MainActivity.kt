@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.mehul.redditwall
 
 import android.annotation.SuppressLint
@@ -24,6 +26,7 @@ import com.google.android.material.chip.Chip
 import com.google.gson.Gson
 import java.lang.ref.WeakReference
 import java.util.*
+import kotlin.math.abs
 
 @SuppressLint("SetTextI18n")
 class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.OnGestureListener {
@@ -67,28 +70,27 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
         imageScroll.addOnItemTouchListener(RecyclerListener(this, imageScroll, object : RecyclerListener.OnItemClickListener {
             override fun onLongItemClick(view: View?, position: Int) {}
 
-            override fun onItemClick(view: View, p: Int) {
-                var position = p
-                val currList: ArrayList<BitURL>?
-                cancelThreads()
-                when (currentSort) {
-                    HOT -> currList = hotImages
-                    NEW -> currList = newImages
-                    else -> currList = topImages
+            override fun onItemClick(view: View, position: Int) {
+                var p = position
+                val currList: ArrayList<BitURL>? = when (currentSort) {
+                    HOT -> hotImages
+                    NEW -> newImages
+                    else -> topImages
                 }
-                position = if (position <= 0) 0 else position
-                val current = currList!![position]
+                cancelThreads()
+                p = if (p <= 0) 0 else p
+                val current = currList!![p]
                 val wallIntent = Intent(currCon, WallActivity::class.java)
                 wallIntent.putExtra(WallActivity.WALL_URL, current.getUrl())
                 wallIntent.putExtra(WallActivity.GIF, current.getImg() == null)
                 wallIntent.putExtra(WallActivity.FROM_MAIN, true)
 
                 val prevs = ArrayList<BitURL>()
-                for (i in (if (position >= 10) position - 10 else 0) until currList.size) {
+                for (i in (if (p >= 10) p - 10 else 0) until currList.size) {
                     prevs.add(currList[i])
                 }
 
-                val index = if (position >= 10) 10 else position
+                val index = if (p >= 10) 10 else p
                 wallIntent.putExtra(WallActivity.INDEX, index)
 
                 //TODO: move json parsing away from ui thread, causes skipepd frames
@@ -105,8 +107,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
         preferences = getSharedPreferences(SharedPrefFile, Context.MODE_PRIVATE)
         defaultLoad = preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")
 
-        val sortSelected = preferences!!.getInt(SettingsActivity.SORT_METHOD, HOT)
-        when (sortSelected) {
+        when (preferences!!.getInt(SettingsActivity.SORT_METHOD, HOT)) {
             HOT -> {
                 adapter = ImageAdapter(this, hotImages)
                 currentSort = HOT
@@ -137,10 +138,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
 
         val savedIntent = intent
 
-        if (savedIntent.getBooleanExtra(OVERRIDE, false)) {
-            defaultLoad = savedIntent.getStringExtra(SAVED)
+        defaultLoad = if (savedIntent.getBooleanExtra(OVERRIDE, false)) {
+            savedIntent.getStringExtra(SAVED)
         } else {
-            defaultLoad = preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")
+            preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")
         }
 
         search!!.hint = defaultLoad
@@ -185,20 +186,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
 
     private fun getTask(first: Boolean): LoadImages {
         return if (first) {
-            if (currentSort == NEW) {
-                LoadImages(this, loading, info, newImages, adapter, true)
-            } else if (currentSort == HOT) {
-                LoadImages(this, loading, info, hotImages, adapter, true)
-            } else {
-                LoadImages(this, loading, info, topImages, adapter, true)
+            when (currentSort) {
+                NEW -> LoadImages(this, loading, info, newImages, adapter, true)
+                HOT -> LoadImages(this, loading, info, hotImages, adapter, true)
+                else -> LoadImages(this, loading, info, topImages, adapter, true)
             }
         } else {
-            if (currentSort == NEW) {
-                LoadImages(this, bottomLoading, info, newImages, adapter, false)
-            } else if (currentSort == HOT) {
-                LoadImages(this, bottomLoading, info, hotImages, adapter, false)
-            } else {
-                LoadImages(this, bottomLoading, info, topImages, adapter, false)
+            when (currentSort) {
+                NEW -> LoadImages(this, bottomLoading, info, newImages, adapter, false)
+                HOT -> LoadImages(this, bottomLoading, info, hotImages, adapter, false)
+                else -> LoadImages(this, bottomLoading, info, topImages, adapter, false)
             }
         }
     }
@@ -239,12 +236,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
             networkInfo = connMgr.activeNetworkInfo
         }
 
-        if (networkInfo != null && networkInfo.isConnected && queryString!!.length != 0) {
+        if (networkInfo != null && networkInfo.isConnected && queryString!!.isNotEmpty()) {
             imageTask = getTask(true)
             preferences!!.edit().putString(QUERY, queryString).apply()
             imageTask!!.execute(queryString)
         } else {
-            if (queryString!!.length == 0) {
+            if (queryString!!.isEmpty()) {
                 imageTask = getTask(true)
                 imageTask!!.execute(defaultLoad)
             } else {
@@ -261,21 +258,27 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
 
     //Launch activities from menu here
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == R.id.saved_subs) {
-            val launchSaved = Intent(this, SavedActivity::class.java)
-            startActivity(launchSaved)
-            return true
-        } else if (id == R.id.settings) {
-            val launchSettings = Intent(this, SettingsActivity::class.java)
-            startActivity(launchSettings)
-            return true
-        } else if (id == R.id.fav_pics) {
-            val launchFav = Intent(this, FavImageActivity::class.java)
-            startActivity(launchFav)
-        } else if (id == R.id.recc_subs) {
-            val launcRec = Intent(this, RecActivity::class.java)
-            startActivity(launcRec)
+        when (item.itemId) {
+            R.id.saved_subs -> {
+                val launchSaved = Intent(this, SavedActivity::class.java)
+                startActivity(launchSaved)
+                return true
+            }
+            R.id.settings -> {
+                val launchSettings = Intent(this, SettingsActivity::class.java)
+                startActivity(launchSettings)
+                return true
+            }
+            R.id.fav_pics -> {
+                val launchFav = Intent(this, FavImageActivity::class.java)
+                startActivity(launchFav)
+                return true
+            }
+            R.id.recc_subs -> {
+                val launchRec = Intent(this, RecActivity::class.java)
+                startActivity(launchRec)
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -293,7 +296,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
         }
     }
 
-    fun runQuery() {
+    private fun runQuery() {
         imageTask = getTask(true)
         imageTask!!.execute(if (queryString == null || queryString!!.length == 1 ||
                 queryString!!.equals("", ignoreCase = true))
@@ -304,12 +307,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
     }
 
     override fun onClick(view: View) {
-        val temp: String?
-        when (currentSort) {
-            NEW -> temp = AFTER_NEW
-            HOT -> temp = AFTER_HOT
-            TOP -> temp = AFTER_TOP
-            else -> temp = null
+        val temp: String? = when (currentSort) {
+            NEW -> AFTER_NEW
+            HOT -> AFTER_HOT
+            TOP -> AFTER_TOP
+            else -> null
         }
         if (imageTask != null && imageTask!!.first && imageTask!!.status == AsyncTask.Status.RUNNING && temp == null) {
             Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
@@ -377,13 +379,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
         return super.onTouchEvent(event)
     }
 
-    fun switchSort() {
-        val temp: String?
-        when (currentSort) {
-            NEW -> temp = AFTER_NEW
-            HOT -> temp = AFTER_HOT
-            TOP -> temp = AFTER_TOP
-            else -> temp = null
+    private fun switchSort() {
+        val temp: String? = when (currentSort) {
+            NEW -> AFTER_NEW
+            HOT -> AFTER_HOT
+            TOP -> AFTER_TOP
+            else -> null
         }
         if (imageTask != null && imageTask!!.first && imageTask!!.status == AsyncTask.Status.RUNNING && temp == null) {
             Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
@@ -444,7 +445,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
     }
 
     //NEW = 0, HOT = 1, TOP = 2;
-    fun swipedRight() {
+    private fun swipedRight() {
         Log.e("R", "Right")
         if (currentSort == NEW) {
             currentSort = TOP
@@ -456,7 +457,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
         switchSort()
     }
 
-    fun swipedLeft() {
+    private fun swipedLeft() {
         Log.e("L", "LEFT")
         if (currentSort == TOP) {
             currentSort = NEW
@@ -473,8 +474,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
         try {
             val diffY = evt2.y - evt1.y
             val diffX = evt2.x - evt1.x
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 100 && Math.abs(vX) > 100) {
+            if (abs(diffX) > abs(diffY)) {
+                if (abs(diffX) > abs(diffY) && abs(diffX) > 100 && abs(vX) > 100) {
                     if (diffX > 0)
                         swipedLeft()
                     else

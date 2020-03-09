@@ -19,6 +19,7 @@ import java.util.*
 import java.util.concurrent.ExecutionException
 
 //opens up https connection to get json data and return as a string
+@Suppress("LocalVariableName")
 internal class RestQuery(private val QUERY: String, private val context: Context?, private val images: ArrayList<BitURL>?,
                          private val adapter: ImageAdapter?, private val progress: ProgressBar?,
                          private val imageTask: AsyncTask<String, Void, Void>) {
