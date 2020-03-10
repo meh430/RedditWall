@@ -325,8 +325,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
     }
 
-    public override fun onPause() {
-        super.onPause()
+    public override fun onStop() {
+        super.onStop()
         if (task != null)
             task!!.cancel(true)
 

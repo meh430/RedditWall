@@ -132,4 +132,15 @@ class FavImageActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.clear_menu, menu)
         return true
     }
+
+
+    override fun onStop() {
+        super.onStop()
+        favJob?.cancel()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        favJob?.cancel()
+    }
 }
