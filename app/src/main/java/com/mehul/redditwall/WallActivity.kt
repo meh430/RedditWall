@@ -63,7 +63,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var fname: String? = null
     private var imgUrl: String? = null
     private var imageList: ArrayList<BitURL> = ArrayList()
-    private var favImages: List<FavImage> = ArrayList()
     private var detector: GestureDetector? = null
     private var task: LoadImages? = null
     private var preferences: SharedPreferences? = null
@@ -83,8 +82,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         get() {
             val notificationIntent = Intent()
             notificationIntent.action = Intent.ACTION_VIEW
-            notificationIntent.setDataAndType(Uri.parse(
-                    getExternalFilesDir(null)?.absolutePath.toString() + "/RedditWalls/" + fname), "image/*")
+            notificationIntent.setDataAndType(Uri.parse(Environment.getExternalStorageDirectory()
+                    .toString() + "/RedditWalls/" + fname), "image/*")
             val notificationPendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID,
                     notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             val notifyBuilder = NotificationCompat.Builder(this, PRIMARY_CHANNEL_ID)
@@ -105,7 +104,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
 
     @SuppressLint("NewApi")
-    fun setWallpaper() {
+    fun setWallpaper(view: View) {
         if (isGif) {
             Toast.makeText(this, "GIF support is coming soon", Toast.LENGTH_SHORT).show()
             return
@@ -206,33 +205,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         return ret
     }
 
-    private suspend fun jsonFavToList(json: String): ArrayList<FavImage> {
-        val ret = ArrayList<FavImage>()
-        withContext(Dispatchers.Default) {
-            Log.e("JSON", ret.toString())
-            try {
-                val list = JSONArray(json)
-                for (i in 0 until list.length()) {
-                    val curr = list.getJSONObject(i)
-                    Log.e("JSON", curr.toString())
-                    var gif = false
-                    if (curr.getBoolean("gif")) {
-                        gif = true
-                    }
-                    val temp = FavImage((Math.random() * 10000).toInt() + 1, curr.getString("url"), gif)
-                    withContext(Dispatchers.Main) {
-                        ret.add(temp)
-                    }
-                }
-            } catch (e: JSONException) {
-                Log.e("JSON", e.toString())
-                e.printStackTrace()
-            }
-        }
-
-        return ret
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.wall_menu, menu)
         load = findViewById(R.id.load_more)
@@ -243,11 +215,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         val jsonList = incoming.getStringExtra(LIST)
         uiScope.launch {
             if (jsonList != null) {
-                if (fromMain) {
-                    imageList = jsonToList(jsonList)
-                } else {
-                    favImages = jsonFavToList(jsonList)
-                }
+                imageList = jsonToList(jsonList)
             }
         }
         index = incoming.getIntExtra(INDEX, 0)
@@ -267,7 +235,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         return true
     }
 
-    fun downloadImage() {
+    fun downloadImage(view: View) {
         if (isGif) {
             Toast.makeText(this, "GIF support is coming soon", Toast.LENGTH_SHORT).show()
             return
@@ -290,7 +258,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         val myDir = File("$root/RedditWalls")
         myDir.mkdirs()
         fname = SimpleDateFormat("MM-dd-yyyy 'at' hh-mm-ss", Locale.CANADA).format(Date())
-                .replace(" ".toRegex(), "") + ".jpg"
+                .replace(" ", "") + ".jpg"
         val file = File(myDir, fname!!)
         if (file.exists())
             file.delete()
@@ -304,7 +272,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -385,15 +352,9 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         Log.e("R", "Right")
         if ((index - 1) >= 0) {
             index--
-            if (fromMain) {
-                val curr = imageList[index]
-                imgUrl = curr.url
-                isGif = curr.hasGif()
-            } else {
-                val curr = favImages[index]
-                imgUrl = curr.favUrl
-                isGif = curr.isGif
-            }
+            val curr = imageList[index]
+            imgUrl = curr.url
+            isGif = curr.hasGif()
 
             when {
                 startUp == null -> {
@@ -416,18 +377,12 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     private fun swipedLeft() {
         Log.e("L", "LEFT")
-        val inBound = if (fromMain) index + 1 < imageList.size else index + 1 < favImages.size
+        val inBound = index + 1 < imageList.size
         if (inBound) {
             index++
-            if (fromMain) {
-                val curr = imageList[index]
-                imgUrl = curr.url
-                isGif = curr.hasGif()
-            } else {
-                val curr = favImages[index]
-                imgUrl = curr.favUrl
-                isGif = curr.isGif
-            }
+            val curr = imageList[index]
+            imgUrl = curr.url
+            isGif = curr.hasGif()
 
             when {
                 startUp == null -> {
@@ -552,7 +507,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     }
 
-    private class LoadImages internal constructor(con: Context?, load: ProgressBar?, imgs: ArrayList<BitURL>?) : AsyncTask<String, Void, Void>() {
+    private class LoadImages internal constructor(con: Context?, load: ProgressBar?, imgs: ArrayList<BitURL>?) : AsyncTask<String, Void, Void?>() {
         internal var context: WeakReference<Context?> = WeakReference(con)
         internal var load: WeakReference<ProgressBar?> = WeakReference(load)
         internal var imgs: WeakReference<ArrayList<BitURL>?> = WeakReference(imgs)
@@ -590,14 +545,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         const val INDEX = "INDEX"
         const val FROM_MAIN = "MAIN"
 
-        fun listToJson(imgs: ArrayList<BitURL>?, favs: List<FavImage>?): String {
-            return if (imgs != null) {
-                Log.e("IMGS", Gson().toJson(imgs))
-                Gson().toJson(imgs)
-            } else {
-                Log.e("FAVS", Gson().toJson(favs))
-                Gson().toJson(favs)
-            }
+        fun listToJson(imgs: ArrayList<BitURL>?): String {
+            return Gson().toJson(imgs)
         }
     }
 }

@@ -6,6 +6,7 @@
     tools:context=".FavImageActivity">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:padding="6dp"
         android:id="@+id/fav_scroll"
         android:layout_centerInParent="true"
         android:layout_width="match_parent"
@@ -22,6 +23,13 @@
         android:text="You do not have any favorite images, find an image you like and click the star icon on the top right to add a favorite"
         android:textColor="#FFFFFF"
         android:textSize="22sp"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/fav_loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:visibility="gone" />
 
 </RelativeLayout>

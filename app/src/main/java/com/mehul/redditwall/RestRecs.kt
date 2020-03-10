@@ -1,6 +1,9 @@
 package com.mehul.redditwall
 
 import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONException
 import java.io.BufferedReader
@@ -13,11 +16,11 @@ import java.util.*
 object RestRecs {
     private val ENDPOINT = "https://reddtwalls-8176.restdb.io/rest/recommendations"
 
-    val recsJSON: String?
-        get() {
+    suspend fun getRecsJSON(): String {
+        var jsonString = ""
+        withContext(Dispatchers.IO) {
             var connection: HttpURLConnection? = null
             var reader: BufferedReader? = null
-            var jsonString = ""
             try {
                 connection = URL(ENDPOINT).openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
@@ -31,14 +34,17 @@ object RestRecs {
 
                 var line: String? = reader.readLine()
                 while (line != null) {
-
+                    if (!isActive) {
+                        content.append("")
+                        break
+                    }
                     content.append(line)
                     content.append("\n")
                     line = reader.readLine()
                 }
 
                 if (content.isEmpty()) {
-                    return null
+                    jsonString = ""
                 }
 
                 jsonString = content.toString()
@@ -55,22 +61,27 @@ object RestRecs {
 
                 }
             }
-            Log.e("RECC", jsonString)
-            return jsonString
         }
+        Log.e("RECC", jsonString)
+        return jsonString
+    }
 
-    fun parseJSON(json: String): ArrayList<Recommendation> {
+    suspend fun parseJSON(json: String): ArrayList<Recommendation> {
         val ret = ArrayList<Recommendation>()
-        try {
-            val reccList = JSONArray(json)
-            for (i in 0 until reccList.length()) {
-                val curr = reccList.getJSONObject(i)
-                ret.add(Recommendation(curr.getString("Name"),
-                        curr.getString("Description"),
-                        curr.getString("Url").replace("amp;".toRegex(), "")))
+        withContext(Dispatchers.Default) {
+            try {
+                val reccList = JSONArray(json)
+                for (i in 0 until reccList.length()) {
+                    if (!isActive)
+                        break
+                    val curr = reccList.getJSONObject(i)
+                    ret.add(Recommendation(curr.getString("Name"),
+                            curr.getString("Description"),
+                            curr.getString("Url").replace("amp;".toRegex(), "")))
+                }
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-        } catch (e: JSONException) {
-            e.printStackTrace()
         }
 
         return ret

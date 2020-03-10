@@ -12,14 +12,11 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 
 import com.bumptech.glide.Glide
-import com.mehul.redditwall.MainActivity
-import com.mehul.redditwall.R
-import com.mehul.redditwall.SettingsActivity
-import com.mehul.redditwall.WallActivity
+import com.mehul.redditwall.*
 
-class FavAdapter(private val con: Context) : RecyclerView.Adapter<FavAdapter.FavViewHolder>() {
+class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerView.Adapter<FavAdapter.FavViewHolder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(con)
-    private var favs: List<FavImage>? = null
+    private var favs = lis
     private val width: Int
     private val height: Int
     private val scale: Int
@@ -39,53 +36,48 @@ class FavAdapter(private val con: Context) : RecyclerView.Adapter<FavAdapter.Fav
     }
 
     override fun onBindViewHolder(holder: FavViewHolder, position: Int) {
-        if (favs != null) {
-            val current = favs!![position]
-            holder.bindTo(current)
-            holder.itemView.apply {
-                isLongClickable = true
-                isClickable = true
+        val current = favs[position]
+        holder.bindTo(current)
+        holder.itemView.apply {
+            isLongClickable = true
+            isClickable = true
+        }
+        holder.itemView.setOnClickListener {
+            //launch wall activity
+            val wallIntent = Intent(con, WallActivity::class.java)
+            wallIntent.apply {
+                putExtra(WallActivity.WALL_URL, current.url)
+                putExtra(WallActivity.GIF, current.hasGif())
+                putExtra(WallActivity.INDEX, position)
+                putExtra(WallActivity.FROM_MAIN, false)
+                putExtra(WallActivity.LIST, WallActivity.listToJson(favs))
             }
-            holder.itemView.setOnClickListener {
-                //launch wall activity
-                val wallIntent = Intent(con, WallActivity::class.java)
-                wallIntent.apply {
-                    putExtra(WallActivity.WALL_URL, current.favUrl)
-                    putExtra(WallActivity.GIF, current.isGif)
-                    putExtra(WallActivity.INDEX, position)
-                    putExtra(WallActivity.FROM_MAIN, false)
-                    putExtra(WallActivity.LIST, WallActivity.listToJson(null, favs))
-                }
-                con.startActivity(wallIntent)
-            }
+            con.startActivity(wallIntent)
         }
     }
 
-    fun setFavs(favs: List<FavImage>) {
+    fun setFavs(favs: ArrayList<BitURL>) {
         this.favs = favs
         notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
-        return if (favs != null)
-            favs!!.size
-        else
-            0
+        return favs.size
     }
 
-    fun getFavAtPosition(position: Int): FavImage {
-        return favs!![position]
+    fun getFavAtPosition(position: Int): BitURL {
+        return favs[position]
     }
 
     inner class FavViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val img: ImageView = itemView.findViewById(R.id.image_holder)
 
-        fun bindTo(saved: FavImage) {
-            val url = saved.favUrl
-            if (saved.isGif) {
+        fun bindTo(saved: BitURL) {
+            val url = saved.url
+            if (saved.hasGif()) {
                 Glide.with(con).asGif().load(url).override(width / scale, height / 4).centerCrop().into(img)
             } else {
-                Glide.with(con).load(url).override(width / 2, height / 4).centerCrop().into(img)
+                img.setImageBitmap(saved.getImg())
             }
         }
     }

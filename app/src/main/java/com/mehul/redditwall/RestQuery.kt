@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutionException
 @Suppress("LocalVariableName")
 internal class RestQuery(private val QUERY: String, private val context: Context?, private val images: ArrayList<BitURL>?,
                          private val adapter: ImageAdapter?, private val progress: ProgressBar?,
-                         private val imageTask: AsyncTask<String, Void, Void>) {
+                         private val imageTask: AsyncTask<String, Void, Void?>) {
     private var sort: Int = 0
 
     fun getQueryJson(first: Boolean): String? {
@@ -179,11 +179,9 @@ internal class RestQuery(private val QUERY: String, private val context: Context
                     val url = source.getString("url").replace("amp;".toRegex(), "")
                     if (isImage) {
                         val bitmap = Glide.with(context).asBitmap().load(url).override(width / scale, height / 4).centerCrop().submit().get()
-                        //Bitmap bitmap = Picasso.get().load(url).resize(width / 12, height / 4).centerCrop().get();
 
                         images?.add(BitURL(bitmap, url))
                     } else {
-                        //Bitmap bitmap = Glide.with(context).asBitmap().load(url).override(width / 2, 500).centerCrop().submit().get();
                         images?.add(BitURL(null, url))
                     }
                     context.runOnUiThread {

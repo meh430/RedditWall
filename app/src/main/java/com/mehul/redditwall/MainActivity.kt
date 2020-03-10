@@ -30,6 +30,7 @@ import kotlin.math.abs
 
 @SuppressLint("SetTextI18n")
 class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.OnGestureListener {
+    //(con: Context, bLoad: ProgressBar?, inf: TextView?, imgs: ArrayList<BitURL>?, adapt: ImageAdapter?, internal var first: Boolean)
     private var queryString: String? = null
     private var defaultLoad: String? = null
     private var search: EditText? = null
@@ -506,8 +507,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
 
     override fun onLongPress(motionEvent: MotionEvent) {}
 
-    private class LoadImages internal constructor(con: Context, bLoad: ProgressBar?, inf: TextView?, imgs: ArrayList<BitURL>?, adapt: ImageAdapter?, internal var first: Boolean) : AsyncTask<String, Void, Void>() {
-        internal var context: WeakReference<Context> = WeakReference(con)
+    private class LoadImages internal constructor(con: Context?, bLoad: ProgressBar?, inf: TextView?, imgs: ArrayList<BitURL>?, adapt: ImageAdapter?, internal var first: Boolean) : AsyncTask<String, Void, Void?>() {
+        internal var context: WeakReference<Context?> = WeakReference(con)
         internal var bLoad: WeakReference<ProgressBar?> = WeakReference(bLoad)
         internal var inf: WeakReference<TextView?> = WeakReference(inf)
         internal var imgs: WeakReference<ArrayList<BitURL>?> = WeakReference(imgs)
@@ -536,7 +537,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
             return null
         }
 
-        override fun onPostExecute(result: Void) {
+        override fun onPostExecute(result: Void?) {
             super.onPostExecute(result)
             if (isCancelled) {
                 adapt.get()?.notifyDataSetChanged()
