@@ -9,10 +9,11 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -24,33 +25,31 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
-import java.lang.ref.WeakReference
-import java.util.*
-import kotlin.math.abs
+import kotlinx.coroutines.*
 
 @SuppressLint("SetTextI18n")
-class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.OnGestureListener {
-    //(con: Context, bLoad: ProgressBar?, inf: TextView?, imgs: ArrayList<BitURL>?, adapt: ImageAdapter?, internal var first: Boolean)
-    private var queryString: String? = null
-    private var defaultLoad: String? = null
+class MainActivity : AppCompatActivity(), View.OnClickListener {
+    private var queryString = ""
+    private var defaultLoad = ""
     private var search: EditText? = null
-    private var hotImages: ArrayList<BitURL>? = null
-    private var topImages: ArrayList<BitURL>? = null
-    private var newImages: ArrayList<BitURL>? = null
+    private var hotImages = ArrayList<BitURL>()
+    private var topImages = ArrayList<BitURL>()
+    private var newImages = ArrayList<BitURL>()
     private var adapter: ImageAdapter? = null
     private var loading: ProgressBar? = null
     private var bottomLoading: ProgressBar? = null
     private var info: TextView? = null
-    private var imageTask: LoadImages? = null
-    private var scrollImageTask: LoadImages? = null
+    private var imageJob: Job? = null
+    private var scrollJob: Job? = null
+    private var uiScope = CoroutineScope(Dispatchers.Main)
     private var hotChip: Chip? = null
     private var newChip: Chip? = null
     private var topChip: Chip? = null
     private var currentSort: Int = 0
     private var preferences: SharedPreferences? = null
-    private var detector: GestureDetector? = null
     private var currCon: Context? = null
 
+    @InternalCoroutinesApi
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,10 +81,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
                 p = if (p <= 0) 0 else p
                 val current = currList!![p]
                 val wallIntent = Intent(currCon, WallActivity::class.java)
-                wallIntent.putExtra(WallActivity.WALL_URL, current.getUrl())
-                wallIntent.putExtra(WallActivity.GIF, current.getImg() == null)
-                wallIntent.putExtra(WallActivity.FROM_MAIN, true)
-
+                wallIntent.apply {
+                    putExtra(WallActivity.WALL_URL, current.getUrl())
+                    putExtra(WallActivity.GIF, current.getImg() == null)
+                    putExtra(WallActivity.FROM_MAIN, true)
+                }
                 val prevs = ArrayList<BitURL>()
                 for (i in (if (p >= 10) p - 10 else 0) until currList.size) {
                     prevs.add(currList[i])
@@ -93,8 +93,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
 
                 val index = if (p >= 10) 10 else p
                 wallIntent.putExtra(WallActivity.INDEX, index)
-
-                //TODO: move json parsing away from ui thread, causes skipepd frames
                 wallIntent.putExtra(WallActivity.LIST, Gson().toJson(prevs))
 
                 currCon!!.startActivity(wallIntent)
@@ -103,10 +101,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
         hotImages = ArrayList()
         newImages = ArrayList()
         topImages = ArrayList()
-        detector = GestureDetector(imageScroll.context, this)
-
         preferences = getSharedPreferences(SharedPrefFile, Context.MODE_PRIVATE)
-        defaultLoad = preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")
+        defaultLoad = preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper").toString()
 
         when (preferences!!.getInt(SettingsActivity.SORT_METHOD, HOT)) {
             HOT -> {
@@ -139,11 +135,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
 
         val savedIntent = intent
 
-        defaultLoad = if (savedIntent.getBooleanExtra(OVERRIDE, false)) {
+        defaultLoad = (if (savedIntent.getBooleanExtra(OVERRIDE, false)) {
             savedIntent.getStringExtra(SAVED)
         } else {
             preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")
-        }
+        }).toString()
 
         search!!.hint = defaultLoad
 
@@ -154,8 +150,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
         }
         preferences!!.edit().putString(QUERY, defaultLoad).apply()
         if (networkInfo != null && networkInfo.isConnected) {
-            imageTask = getTask(true)
-            imageTask!!.execute(defaultLoad)
+            imageJob = uiScope.launch {
+                loadImages(getCon(), defaultLoad, true, getList())
+            }
         } else {
             info!!.visibility = View.VISIBLE
             info!!.text = "No Network"
@@ -164,41 +161,35 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
         imageScroll.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
-                if (!recyclerView.canScrollVertically(1)) {
-                    if (imageTask != null && imageTask!!.status == AsyncTask.Status.RUNNING) {
-                        return
+
+                if (imageJob != null && imageJob!!.isActive) {
+                    return
+                }
+
+                if (scrollJob == null) {
+                    cancelThreads()
+                    scrollJob = uiScope.launch {
+                        loadImages(getCon(), if (queryString.isEmpty()) defaultLoad else queryString, false, getList())
                     }
+                } else if (!scrollJob!!.isActive) {
+                    cancelThreads()
 
-                    if (scrollImageTask == null) {
-                        cancelThreads()
-
-                        scrollImageTask = getTask(false)
-                        scrollImageTask!!.execute(if (queryString == null || queryString!!.isEmpty()) defaultLoad else queryString)
-                    } else if (scrollImageTask!!.status != AsyncTask.Status.RUNNING) {
-                        cancelThreads()
-
-                        scrollImageTask = getTask(false)
-                        scrollImageTask!!.execute(if (queryString == null || queryString!!.isEmpty()) defaultLoad else queryString)
+                    scrollJob = uiScope.launch {
+                        loadImages(getCon(), if (queryString.isEmpty()) defaultLoad else queryString, false, getList())
                     }
                 }
             }
         })
     }
 
-    private fun getTask(first: Boolean): LoadImages {
-        return if (first) {
-            when (currentSort) {
-                NEW -> LoadImages(this, loading, info, newImages, adapter, true)
-                HOT -> LoadImages(this, loading, info, hotImages, adapter, true)
-                else -> LoadImages(this, loading, info, topImages, adapter, true)
-            }
-        } else {
-            when (currentSort) {
-                NEW -> LoadImages(this, bottomLoading, info, newImages, adapter, false)
-                HOT -> LoadImages(this, bottomLoading, info, hotImages, adapter, false)
-                else -> LoadImages(this, bottomLoading, info, topImages, adapter, false)
-            }
-        }
+    private fun getList(): ArrayList<BitURL> = when (currentSort) {
+        NEW -> newImages
+        HOT -> hotImages
+        else -> topImages
+    }
+
+    private fun getCon(): Context {
+        return this
     }
 
     public override fun onStop() {
@@ -212,8 +203,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
         cancelThreads()
     }
 
+    @InternalCoroutinesApi
     fun startSearch(view: View) {
-        if (imageTask != null && imageTask!!.first && imageTask!!.status == AsyncTask.Status.RUNNING) {
+        if (imageJob != null && imageJob!!.isActive) {
             Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
             return
         }
@@ -221,9 +213,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
         queryString = ""
         loading!!.visibility = View.VISIBLE
         info!!.visibility = View.INVISIBLE
-        newImages!!.clear()
-        hotImages!!.clear()
-        topImages!!.clear()
+        newImages.clear()
+        hotImages.clear()
+        topImages.clear()
         adapter!!.notifyDataSetChanged()
         queryString = search!!.text.toString()
         val inputManager: InputMethodManager? = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -237,14 +229,18 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
             networkInfo = connMgr.activeNetworkInfo
         }
 
-        if (networkInfo != null && networkInfo.isConnected && queryString!!.isNotEmpty()) {
-            imageTask = getTask(true)
+        if (networkInfo != null && networkInfo.isConnected && queryString.isNotEmpty()) {
             preferences!!.edit().putString(QUERY, queryString).apply()
-            imageTask!!.execute(queryString)
+            imageJob = uiScope.launch {
+                loadImages(getCon(), queryString, true, getList())
+            }
+
         } else {
-            if (queryString!!.isEmpty()) {
-                imageTask = getTask(true)
-                imageTask!!.execute(defaultLoad)
+            if (queryString.isEmpty()) {
+                imageJob = uiScope.launch {
+                    loadImages(getCon(), defaultLoad, true, getList())
+                }
+
             } else {
                 info!!.visibility = View.VISIBLE
                 info!!.text = "No Network"
@@ -286,27 +282,30 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
 
     private fun cancelThreads() {
 
-        if (imageTask != null) {
+        if (imageJob != null) {
             loading!!.visibility = View.GONE
-            imageTask!!.cancel(true)
+            imageJob!!.cancel()
         }
 
-        if (scrollImageTask != null) {
+        if (scrollJob != null) {
             bottomLoading!!.visibility = View.GONE
-            scrollImageTask!!.cancel(true)
+            scrollJob!!.cancel()
         }
     }
 
+    @InternalCoroutinesApi
     private fun runQuery() {
-        imageTask = getTask(true)
-        imageTask!!.execute(if (queryString == null || queryString!!.length == 1 ||
-                queryString!!.equals("", ignoreCase = true))
-            defaultLoad
-        else
-            queryString)
+        imageJob = uiScope.launch {
+            loadImages(getCon(), if (queryString.isEmpty())
+                defaultLoad
+            else
+                queryString, true, getList())
+        }
+
         Log.e("BRUH", "$queryString, $defaultLoad")
     }
 
+    @InternalCoroutinesApi
     override fun onClick(view: View) {
         val temp: String? = when (currentSort) {
             NEW -> AFTER_NEW
@@ -314,14 +313,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
             TOP -> AFTER_TOP
             else -> null
         }
-        if (imageTask != null && imageTask!!.first && imageTask!!.status == AsyncTask.Status.RUNNING && temp == null) {
+        if (imageJob != null && imageJob!!.isActive && temp == null) {
             Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (imageTask != null && imageTask!!.status == AsyncTask.Status.RUNNING || scrollImageTask != null && scrollImageTask!!.status == AsyncTask.Status.RUNNING) {
+        if (imageJob != null && imageJob!!.isActive || scrollJob != null && scrollJob!!.isActive) {
             cancelThreads()
         }
+
         adapter!!.notifyDataSetChanged()
         val prefEdit = preferences!!.edit()
         hotChip!!.setTextColor(Color.BLACK)
@@ -336,10 +336,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
             newChip!!.setChipBackgroundColorResource(R.color.white)
             topChip!!.setChipBackgroundColorResource(R.color.white)
             prefEdit.apply()
-            if (hotImages!!.size > 0) {
-                adapter!!.setList(hotImages!!)
+            if (hotImages.size > 0) {
+                adapter!!.setList(hotImages)
             } else {
-                adapter!!.setList(hotImages!!)
+                adapter!!.setList(hotImages)
                 runQuery()
             }
         } else if (view == newChip) {
@@ -351,10 +351,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
             newChip!!.setTextColor(Color.WHITE)
             topChip!!.setChipBackgroundColorResource(R.color.white)
             prefEdit.apply()
-            if (newImages!!.size > 0) {
-                adapter!!.setList(newImages!!)
+            if (newImages.size > 0) {
+                adapter!!.setList(newImages)
             } else {
-                adapter!!.setList(newImages!!)
+                adapter!!.setList(newImages)
                 runQuery()
             }
         } else if (view == topChip) {
@@ -366,191 +366,49 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, GestureDetector.
             topChip!!.setChipBackgroundColorResource(R.color.chip)
             topChip!!.setTextColor(Color.WHITE)
             prefEdit.apply()
-            if (topImages!!.size > 0) {
-                adapter!!.setList(topImages!!)
+            if (topImages.size > 0) {
+                adapter!!.setList(topImages)
             } else {
-                adapter!!.setList(topImages!!)
+                adapter!!.setList(topImages)
                 runQuery()
             }
         }
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        this.detector!!.onTouchEvent(event)
-        return super.onTouchEvent(event)
-    }
-
-    private fun switchSort() {
-        val temp: String? = when (currentSort) {
-            NEW -> AFTER_NEW
-            HOT -> AFTER_HOT
-            TOP -> AFTER_TOP
-            else -> null
-        }
-        if (imageTask != null && imageTask!!.first && imageTask!!.status == AsyncTask.Status.RUNNING && temp == null) {
-            Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        if (imageTask != null && imageTask!!.status == AsyncTask.Status.RUNNING || scrollImageTask != null && scrollImageTask!!.status == AsyncTask.Status.RUNNING) {
-            cancelThreads()
-        }
-        adapter!!.notifyDataSetChanged()
-        val prefEdit = preferences!!.edit()
-        hotChip!!.setTextColor(Color.BLACK)
-        newChip!!.setTextColor(Color.BLACK)
-        topChip!!.setTextColor(Color.BLACK)
-        if (currentSort == HOT) {
-            Log.e("CLICk", "CLICKED HOT")
-            prefEdit.putInt(SettingsActivity.SORT_METHOD, HOT)
-            hotChip!!.setChipBackgroundColorResource(R.color.chip)
-            hotChip!!.setTextColor(Color.WHITE)
-            newChip!!.setChipBackgroundColorResource(R.color.white)
-            topChip!!.setChipBackgroundColorResource(R.color.white)
-            prefEdit.apply()
-            if (hotImages!!.size > 0) {
-                adapter!!.setList(hotImages!!)
-            } else {
-                adapter!!.setList(hotImages!!)
-                runQuery()
+    @InternalCoroutinesApi
+    private suspend fun loadImages(con: Context, query: String, first: Boolean, images: ArrayList<BitURL>) {
+        withContext(Dispatchers.Default) {
+            withContext(Dispatchers.Main) {
+                if (first) {
+                    loading?.visibility = View.VISIBLE
+                } else {
+                    bottomLoading?.visibility = View.VISIBLE
+                }
+                info?.visibility = View.GONE
             }
-        } else if (currentSort == NEW) {
-            Log.e("CLICk", "CLICKED NEW")
-            prefEdit.putInt(SettingsActivity.SORT_METHOD, NEW)
-            hotChip!!.setChipBackgroundColorResource(R.color.white)
-            newChip!!.setChipBackgroundColorResource(R.color.chip)
-            newChip!!.setTextColor(Color.WHITE)
-            topChip!!.setChipBackgroundColorResource(R.color.white)
-            prefEdit.apply()
-            if (newImages!!.size > 0) {
-                adapter!!.setList(newImages!!)
-            } else {
-                adapter!!.setList(newImages!!)
-                runQuery()
-            }
-        } else if (currentSort == TOP) {
-            Log.e("CLICk", "CLICKED TOP")
-            prefEdit.putInt(SettingsActivity.SORT_METHOD, TOP)
-            hotChip!!.setChipBackgroundColorResource(R.color.white)
-            newChip!!.setChipBackgroundColorResource(R.color.white)
-            topChip!!.setChipBackgroundColorResource(R.color.chip)
-            topChip!!.setTextColor(Color.WHITE)
-            prefEdit.apply()
-            if (topImages!!.size > 0) {
-                adapter!!.setList(topImages!!)
-            } else {
-                adapter!!.setList(topImages!!)
-                runQuery()
-            }
-        }
-    }
-
-    //NEW = 0, HOT = 1, TOP = 2;
-    private fun swipedRight() {
-        Log.e("R", "Right")
-        if (currentSort == NEW) {
-            currentSort = TOP
-        } else {
-            currentSort--
-        }
-
-        //load stuff here
-        switchSort()
-    }
-
-    private fun swipedLeft() {
-        Log.e("L", "LEFT")
-        if (currentSort == TOP) {
-            currentSort = NEW
-        } else {
-            currentSort++
-        }
-
-        //load stuff here
-        switchSort()
-    }
-
-    override fun onFling(evt1: MotionEvent, evt2: MotionEvent, vX: Float, vY: Float): Boolean {
-        var ret = false
-        try {
-            val diffY = evt2.y - evt1.y
-            val diffX = evt2.x - evt1.x
-            if (abs(diffX) > abs(diffY)) {
-                if (abs(diffX) > abs(diffY) && abs(diffX) > 100 && abs(vX) > 100) {
-                    if (diffX > 0)
-                        swipedLeft()
-                    else
-                        swipedRight()
-                    ret = true
+            var loaded = false
+            withContext(Dispatchers.IO) {
+                val json = QueryRequest.getQueryJson(query, first, con)
+                withContext(Dispatchers.Default) {
+                    loaded = QueryRequest.loadImgsFromJSON(json, adapter, con, images, loading, first)
                 }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
 
-        return ret
-    }
+            withContext(Dispatchers.Main) {
+                adapter?.notifyDataSetChanged()
+                if (first) {
+                    loading?.visibility = View.GONE
+                } else {
+                    bottomLoading?.visibility = View.GONE
+                }
 
-    override fun onDown(motionEvent: MotionEvent): Boolean {
-        return false
-    }
-
-    override fun onShowPress(motionEvent: MotionEvent) {}
-
-    override fun onSingleTapUp(motionEvent: MotionEvent): Boolean {
-        return false
-    }
-
-    override fun onScroll(motionEvent: MotionEvent, motionEvent1: MotionEvent, v: Float, v1: Float): Boolean {
-        return false
-    }
-
-    override fun onLongPress(motionEvent: MotionEvent) {}
-
-    private class LoadImages internal constructor(con: Context?, bLoad: ProgressBar?, inf: TextView?, imgs: ArrayList<BitURL>?, adapt: ImageAdapter?, internal var first: Boolean) : AsyncTask<String, Void, Void?>() {
-        internal var context: WeakReference<Context?> = WeakReference(con)
-        internal var bLoad: WeakReference<ProgressBar?> = WeakReference(bLoad)
-        internal var inf: WeakReference<TextView?> = WeakReference(inf)
-        internal var imgs: WeakReference<ArrayList<BitURL>?> = WeakReference(imgs)
-        internal var adapt: WeakReference<ImageAdapter?> = WeakReference(adapt)
-
-        override fun onPreExecute() {
-            super.onPreExecute()
-            bLoad.get()?.visibility = View.VISIBLE
-            inf.get()?.visibility = View.GONE
-        }
-
-        override fun doInBackground(vararg strings: String): Void? {
-            if (isCancelled) {
-                return null
-            }
-            val rq = RestQuery(strings[0], context.get(), imgs.get(),
-                    adapt.get(), bLoad.get(), this)
-            val json = rq.getQueryJson(first)
-
-            if (json == null) {
-                cancel(true)
-                return null
-            }
-
-            rq.getImages(json)
-            return null
-        }
-
-        override fun onPostExecute(result: Void?) {
-            super.onPostExecute(result)
-            if (isCancelled) {
-                adapt.get()?.notifyDataSetChanged()
-                return
-            }
-            adapt.get()?.notifyDataSetChanged()
-            bLoad.get()?.visibility = View.GONE
-
-            if (first && imgs.get()?.size == 0) {
-                inf.get()?.visibility = View.VISIBLE
-                inf.get()?.text = "Subreddit does not exist or it has no images"
+                if (first && !loaded) {
+                    info?.visibility = View.VISIBLE
+                    info?.text = "Subreddit does not exist or it has no images"
+                }
             }
         }
+
     }
 
     companion object {

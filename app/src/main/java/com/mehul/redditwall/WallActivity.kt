@@ -80,6 +80,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     //flag indicating that if the described PendingIntent already exists, then keep it but replace its extra data with what is in this new Intent
     private val notificationBuilder: NotificationCompat.Builder
         get() {
+            //TODO: replace deprecated methods with scoped storage solutions
             val notificationIntent = Intent()
             notificationIntent.action = Intent.ACTION_VIEW
             notificationIntent.setDataAndType(Uri.parse(Environment.getExternalStorageDirectory()

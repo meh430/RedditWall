@@ -132,7 +132,6 @@ internal class RestQuery(private val QUERY: String, private val context: Context
         if (imageTask.isCancelled) {
             return
         }
-        //TODO: change with lite mode
         val displayMetrics = DisplayMetrics()
         (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
         val width = displayMetrics.widthPixels

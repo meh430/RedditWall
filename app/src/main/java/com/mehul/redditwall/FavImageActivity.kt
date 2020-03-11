@@ -99,6 +99,10 @@ class FavImageActivity : AppCompatActivity() {
                     .getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
 
             for (fav in favs) {
+                if (!isActive) {
+                    break
+                }
+
                 var bitmap: Bitmap? = null
                 withContext(Dispatchers.IO) {
                     if (!fav.isGif) {

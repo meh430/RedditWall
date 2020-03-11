@@ -144,9 +144,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/sorting"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="6dp"
                 android:layout_marginTop="-4dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="6dp"
                 android:scrollbars="vertical"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
