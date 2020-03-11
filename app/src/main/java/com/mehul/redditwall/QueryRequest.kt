@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.View
 import android.widget.ProgressBar
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
@@ -197,13 +198,15 @@ internal class QueryRequest {
                                 }
                             }
 
-                            /*withContext(Dispatchers.Main) {
-                                //set adapter list
-                                if(first) {
-                                    load?.visibility = View.GONE
+                            withContext(Dispatchers.Main) {
+                                if (i % 4 == 0) {
+                                    //set adapter list
+                                    if (first) {
+                                        load?.visibility = View.GONE
+                                    }
+                                    adapter?.notifyDataSetChanged()
                                 }
-                                adapter?.notifyDataSetChanged()
-                            }*/
+                            }
                         } catch (e: InterruptedException) {
                             e.printStackTrace()
                         } catch (e: ExecutionException) {

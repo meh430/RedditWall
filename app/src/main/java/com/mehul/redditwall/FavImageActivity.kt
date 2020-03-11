@@ -53,7 +53,9 @@ class FavImageActivity : AppCompatActivity() {
                     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                         val position = viewHolder.adapterPosition
                         val saved = favImages?.get(position)
-                        favViewModel!!.deleteFavImage(saved)
+                        if (saved != null) {
+                            favViewModel!!.deleteFavImage(saved)
+                        }
                         adapter!!.notifyDataSetChanged()
                     }
                 })
@@ -61,6 +63,7 @@ class FavImageActivity : AppCompatActivity() {
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
         val con = this
         favViewModel!!.allFav.observe(this, Observer { favs ->
+            favImages = favs
             loading?.visibility = View.VISIBLE
             favJob = uiScope.launch {
                 loadFavBits(favs, con)
@@ -120,6 +123,8 @@ class FavImageActivity : AppCompatActivity() {
                 temp.setGif(fav.isGif)
                 withContext(Dispatchers.Main) {
                     bits.add(temp)
+                    adapter!!.setFavs(bits)
+                    loading?.visibility = View.GONE
                 }
             }
 

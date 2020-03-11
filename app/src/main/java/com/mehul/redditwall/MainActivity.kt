@@ -159,23 +159,25 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         imageScroll.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-
-                if (imageJob != null && imageJob!!.isActive) {
-                    return
-                }
-
-                if (scrollJob == null) {
-                    cancelThreads()
-                    scrollJob = uiScope.launch {
-                        loadImages(getCon(), if (queryString.isEmpty()) defaultLoad else queryString, false, getList())
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0) {
+                    //down
+                    if (imageJob != null && imageJob!!.isActive) {
+                        return
                     }
-                } else if (!scrollJob!!.isActive) {
-                    cancelThreads()
 
-                    scrollJob = uiScope.launch {
-                        loadImages(getCon(), if (queryString.isEmpty()) defaultLoad else queryString, false, getList())
+                    if (scrollJob == null) {
+                        cancelThreads()
+                        scrollJob = uiScope.launch {
+                            loadImages(getCon(), if (queryString.isEmpty()) defaultLoad else queryString, false, getList())
+                        }
+                    } else if (!scrollJob!!.isActive) {
+                        cancelThreads()
+
+                        scrollJob = uiScope.launch {
+                            loadImages(getCon(), if (queryString.isEmpty()) defaultLoad else queryString, false, getList())
+                        }
                     }
                 }
             }
