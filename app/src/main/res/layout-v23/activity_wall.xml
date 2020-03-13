@@ -14,9 +14,9 @@
 
     <ImageView
         android:id="@+id/wall_holder"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:contentDescription="IMAGE"
@@ -26,7 +26,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/set_wall"
+        android:weightSum="2"
         android:layout_centerHorizontal="true"
         android:layout_margin="6dp"
         android:orientation="horizontal"
@@ -37,22 +38,36 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:layout_weight="1"
-            android:background="@drawable/rounded_button"
             android:foreground="@drawable/ripple"
-            android:onClick="setWallpaper"
-            android:text="SET WALLPAPER"
+            android:background="@drawable/rounded_button_2"
+            android:onClick="downloadImage"
+            android:text="Download"
             android:textColor="@android:color/white" />
 
         <Button
-            android:onClick="downloadImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:layout_weight="1"
-            android:background="@drawable/rounded_button_2"
             android:foreground="@drawable/ripple"
-            android:text="DOWNLOAD IMAGE"
+            android:background="@drawable/rounded_button"
+            android:onClick="launchPost"
+            android:text="Visit Post"
             android:textColor="@android:color/white" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/set_wall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="14dp"
+        android:background="@drawable/rounded_button_3"
+        android:foreground="@drawable/ripple"
+        android:onClick="setWallpaper"
+        android:text="Set Wallpaper"
+        android:textColor="@android:color/white" />
 </RelativeLayout>

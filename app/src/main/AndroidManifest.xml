@@ -17,7 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".PostActivity"></activity>
+        <activity
+            android:name=".PostActivity"
+            android:label="Post Comments"
+            android:parentActivityName=".WallActivity" />
         <activity
             android:name=".RecActivity"
             android:label="Recommendations"

@@ -35,9 +35,12 @@ class PostActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id: Int = item.getItemId()
+        val id: Int = item.itemId
         if (id == R.id.refresh_web) {
             post?.loadUrl(postLink)
+            return true
+        } else if (id == android.R.id.home) {
+            super.onBackPressed()
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -52,6 +55,9 @@ class PostActivity : AppCompatActivity() {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (post?.canGoBack()!!) {
                 post?.goBack()
+                return true
+            } else {
+                super.onBackPressed()
                 return true
             }
         }

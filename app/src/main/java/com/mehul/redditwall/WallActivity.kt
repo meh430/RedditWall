@@ -52,6 +52,7 @@ import kotlin.math.abs
 
 @Suppress("PrivatePropertyName")
 class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
+    private var jsonList: String? = ""
     private var notifyManager: NotificationManager? = null
     private var wallPreview: ImageView? = null
     private var isGif: Boolean = false
@@ -209,10 +210,10 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         detector = GestureDetector(this, this)
         val incoming = intent
         fromMain = incoming.getBooleanExtra(FROM_MAIN, true)
-        val jsonList = incoming.getStringExtra(LIST)
+        jsonList = incoming.getStringExtra(LIST)
         uiScope.launch {
             if (jsonList != null) {
-                imageList = jsonToList(jsonList)
+                imageList = jsonToList(jsonList!!)
             }
         }
         index = incoming.getIntExtra(INDEX, 0)
@@ -235,9 +236,10 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     fun launchPost(view: View) {
+        //from main, jsonList, currindex, imgUrl, isGif
         val currPost = imageList[index]
         val postIntent = Intent(this, PostActivity::class.java)
-        postIntent.putExtra(currPost.postLink, PostActivity.POST_LINK)
+        postIntent.putExtra(PostActivity.POST_LINK, currPost.postLink)
         startActivity(postIntent)
     }
 
@@ -246,7 +248,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             Toast.makeText(this, "GIF support is coming soon", Toast.LENGTH_SHORT).show()
             return
         }
-
         //ask for storage permission if not granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {

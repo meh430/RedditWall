@@ -403,9 +403,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private suspend fun loadImages(con: Context, query: String, first: Boolean, images: ArrayList<BitURL>) {
         if (first) {
             loading?.visibility = View.VISIBLE
-        } /*else {
-            bottomLoading?.visibility = View.VISIBLE
-        }*/
+        }
+
         info?.visibility = View.GONE
 
 
