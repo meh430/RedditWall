@@ -14,10 +14,12 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -83,7 +85,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 val wallIntent = Intent(currCon, WallActivity::class.java)
                 wallIntent.apply {
                     putExtra(WallActivity.WALL_URL, current.getUrl())
-                    putExtra(WallActivity.GIF, current.getImg() == null)
+                    putExtra(WallActivity.GIF, current.hasGif())
                     putExtra(WallActivity.FROM_MAIN, true)
                 }
                 val prevs = ArrayList<BitURL>()
@@ -162,7 +164,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
-                    //down
                     if (imageJob != null && imageJob!!.isActive) {
                         return
                     }
@@ -179,8 +180,29 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                             loadImages(getCon(), if (queryString.isEmpty()) defaultLoad else queryString, false, getList())
                         }
                     }
+                } else {
+                    bottomLoading?.visibility = View.INVISIBLE
                 }
             }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                val isRunning = scrollJob?.isActive ?: false
+
+                if (!recyclerView.canScrollVertically(1) && isRunning) {
+                    bottomLoading?.visibility = View.VISIBLE
+                } else {
+                    bottomLoading?.visibility = View.INVISIBLE
+                }
+            }
+        })
+
+        search!!.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                startSearch(findViewById(R.id.search_button))
+                return@OnEditorActionListener true
+            }
+            false
         })
     }
 
@@ -379,38 +401,33 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     @InternalCoroutinesApi
     private suspend fun loadImages(con: Context, query: String, first: Boolean, images: ArrayList<BitURL>) {
-        withContext(Dispatchers.Default) {
-            withContext(Dispatchers.Main) {
-                if (first) {
-                    loading?.visibility = View.VISIBLE
-                } else {
-                    bottomLoading?.visibility = View.VISIBLE
-                }
-                info?.visibility = View.GONE
-            }
-            var loaded = false
-            withContext(Dispatchers.IO) {
-                val json = QueryRequest.getQueryJson(query, first, con)
-                withContext(Dispatchers.Default) {
-                    loaded = QueryRequest.loadImgsFromJSON(json, adapter, con, images, loading, first)
-                }
-            }
+        if (first) {
+            loading?.visibility = View.VISIBLE
+        } /*else {
+            bottomLoading?.visibility = View.VISIBLE
+        }*/
+        info?.visibility = View.GONE
 
-            withContext(Dispatchers.Main) {
-                adapter?.notifyDataSetChanged()
-                if (first) {
-                    loading?.visibility = View.GONE
-                } else {
-                    bottomLoading?.visibility = View.GONE
-                }
 
-                if (first && !loaded) {
-                    info?.visibility = View.VISIBLE
-                    info?.text = "Subreddit does not exist or it has no images"
-                }
+        withContext(Dispatchers.IO) {
+            val json = QueryRequest.getQueryJson(query, first, con)
+            withContext(Dispatchers.Default) {
+                QueryRequest.loadImgsFromJSON(json, adapter, con, images, if (first) loading else bottomLoading, first)
             }
         }
 
+        adapter?.notifyDataSetChanged()
+        if (first) {
+            loading?.visibility = View.GONE
+        } else {
+            bottomLoading?.visibility = View.INVISIBLE
+        }
+
+        if (first && adapter?.itemCount == 0) {
+            Log.e("LIST", getList().toString())
+            info?.visibility = View.VISIBLE
+            info?.text = "Subreddit does not exist or it has no images"
+        }
     }
 
     companion object {

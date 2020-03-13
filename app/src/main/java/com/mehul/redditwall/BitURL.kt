@@ -6,7 +6,9 @@ import com.google.gson.annotations.SerializedName
 
 class BitURL(@field:SerializedName("img")
              internal val img: Bitmap?, @field:SerializedName("url")
-             internal val url: String) {
+             internal val url: String,
+             @field:SerializedName("post")
+             internal val postLink: String) {
     @SerializedName("gif")
     private var containsGif = false
 

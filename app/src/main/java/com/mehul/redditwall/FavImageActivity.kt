@@ -29,7 +29,7 @@ class FavImageActivity : AppCompatActivity() {
     private var adapter: FavAdapter? = null
     private var favViewModel: FavViewModel? = null
     private var loading: ProgressBar? = null
-    private var favImages: List<FavImage>? = null
+    private var favImages: List<FavImage> = ArrayList()
     private var uiScope = CoroutineScope(Dispatchers.Main)
     private var favJob: Job? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,10 +52,8 @@ class FavImageActivity : AppCompatActivity() {
 
                     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                         val position = viewHolder.adapterPosition
-                        val saved = favImages?.get(position)
-                        if (saved != null) {
-                            favViewModel!!.deleteFavImage(saved)
-                        }
+                        val saved = favImages.get(position)
+                        favViewModel!!.deleteFavImage(saved)
                         adapter!!.notifyDataSetChanged()
                     }
                 })
@@ -83,7 +81,9 @@ class FavImageActivity : AppCompatActivity() {
                 favViewModel!!.deleteAll()
                 Toast.makeText(this@FavImageActivity, "Deleted favorite images", Toast.LENGTH_SHORT).show()
             }
-            confirmSubs.setNegativeButton("No") { _, _ -> Toast.makeText(this@FavImageActivity, "Cancelled", Toast.LENGTH_SHORT).show() }
+            confirmSubs.setNegativeButton("No") { _, _ ->
+                Toast.makeText(this@FavImageActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+            }
             confirmSubs.show()
             return true
         }
@@ -110,7 +110,8 @@ class FavImageActivity : AppCompatActivity() {
                 withContext(Dispatchers.IO) {
                     if (!fav.isGif) {
                         try {
-                            bitmap = Glide.with(con).asBitmap().load(fav.favUrl).override(width / scale, height / 4).centerCrop().submit().get()
+                            bitmap = Glide.with(con).asBitmap().load(fav.favUrl)
+                                    .override(width / scale, height / 4).centerCrop().submit().get()
                         } catch (e: InterruptedException) {
                             e.printStackTrace()
                         } catch (e: ExecutionException) {
@@ -118,7 +119,7 @@ class FavImageActivity : AppCompatActivity() {
                         }
                     }
                 }
-                val temp = BitURL(bitmap, fav.favUrl)
+                val temp = BitURL(bitmap, fav.favUrl, fav.postLink)
                 Log.e("BITMAP", bitmap.toString())
                 temp.setGif(fav.isGif)
                 withContext(Dispatchers.Main) {
@@ -137,11 +138,23 @@ class FavImageActivity : AppCompatActivity() {
         }
     }
 
+    private fun getCon(): Context {
+        return this
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.clear_menu, menu)
         return true
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (adapter?.itemCount != favImages.size) {
+            favJob = uiScope.launch {
+                loadFavBits(favImages, getCon())
+            }
+        }
+    }
 
     override fun onStop() {
         super.onStop()

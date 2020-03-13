@@ -133,8 +133,7 @@ internal class QueryRequest {
 
         @InternalCoroutinesApi
         suspend fun loadImgsFromJSON(jsonResult: String?, adapter: ImageAdapter?, context: Context,
-                                     images: ArrayList<BitURL>, load: ProgressBar?, first: Boolean): Boolean {
-            var loaded = false
+                                     images: ArrayList<BitURL>, load: ProgressBar?, first: Boolean) {
             withContext(Dispatchers.Default) {
                 val scale = (context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
                 !!.getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
@@ -161,6 +160,7 @@ internal class QueryRequest {
                         if (!data.has("preview")) {
                             continue
                         }
+                        val postLink = data.getString("permalink")
                         val preview = data.getJSONObject("preview")
                         val image = preview.getJSONArray("images").getJSONObject(0)
                         var gif: JSONObject? = null
@@ -190,21 +190,29 @@ internal class QueryRequest {
                                 }
 
                                 withContext(Dispatchers.Main) {
-                                    images.add(BitURL(bitmap, url))
+                                    images.add(BitURL(bitmap, url, "https://www.reddit.com$postLink"))
+                                    if (first && i % 5 == 0) {
+                                        load?.visibility = View.GONE
+                                    } else if (!first && i % 5 == 0) {
+                                        load?.visibility = View.INVISIBLE
+                                    }
+
+                                    if (i % 5 == 0) {
+                                        adapter?.notifyDataSetChanged()
+                                    }
                                 }
                             } else {
                                 withContext(Dispatchers.Main) {
-                                    images.add(BitURL(null, url))
-                                }
-                            }
-
-                            withContext(Dispatchers.Main) {
-                                if (i % 4 == 0) {
-                                    //set adapter list
-                                    if (first) {
+                                    images.add(BitURL(null, url, "https://www.reddit.com$postLink"))
+                                    if (first && i % 5 == 0) {
                                         load?.visibility = View.GONE
+                                    } else if (!first && i % 5 == 0) {
+                                        load?.visibility = View.INVISIBLE
                                     }
-                                    adapter?.notifyDataSetChanged()
+
+                                    if (i % 5 == 0) {
+                                        adapter?.notifyDataSetChanged()
+                                    }
                                 }
                             }
                         } catch (e: InterruptedException) {
@@ -218,10 +226,8 @@ internal class QueryRequest {
                     e.printStackTrace()
                 }
 
-                loaded = images.isNotEmpty()
             }
 
-            return loaded
         }
     }
 }

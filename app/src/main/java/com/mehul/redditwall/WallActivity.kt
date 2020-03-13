@@ -32,7 +32,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.Glide
+import com.bumptech.glide.Glide.with
 import com.google.gson.Gson
 import com.mehul.redditwall.favorites.FavImage
 import com.mehul.redditwall.favorites.FavViewModel
@@ -74,10 +74,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var favViewModel: FavViewModel? = null
     private val uiScope = CoroutineScope(Dispatchers.Main)
     private var query: String? = null
-
-
-    //creating a notification using a builder
-    //flag indicating that if the described PendingIntent already exists, then keep it but replace its extra data with what is in this new Intent
     private val notificationBuilder: NotificationCompat.Builder
         get() {
             //TODO: replace deprecated methods with scoped storage solutions
@@ -88,7 +84,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             val notificationPendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID,
                     notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             val notifyBuilder = NotificationCompat.Builder(this, PRIMARY_CHANNEL_ID)
-            notifyBuilder.setContentIntent(notificationPendingIntent).setAutoCancel(true).setContentTitle("You've been notified!")
+            notifyBuilder.setContentIntent(notificationPendingIntent).setAutoCancel(true).setContentTitle("Image has been downloaded!")
                     .setContentText("View the Image!").setSmallIcon(R.drawable.ic_download).setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setDefaults(NotificationCompat.DEFAULT_ALL)
             return notifyBuilder
@@ -175,7 +171,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             }
             item.icon = filledStar
             Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
-            favViewModel?.insert(FavImage((Math.random() * 10000).toInt() + 1, imgUrl, isGif))
+            favViewModel?.insert(FavImage((Math.random() * 10000).toInt() + 1, imgUrl, isGif, imageList[index].postLink))
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -192,7 +188,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                     if (curr.getBoolean("gif")) {
                         gif = true
                     }
-                    val temp = BitURL(null, curr.getString("url"))
+                    val temp = BitURL(null, curr.getString("url"), curr.getString("post"))
                     temp.setGif(gif)
                     withContext(Dispatchers.Main) {
                         ret.add(temp)
@@ -231,9 +227,18 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         filledStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_black)
         openStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_open)
         starred = menu
-        startUp = StartUp(this, width, height, isGif, fromMain, wallPreview, starred, load, filledStar, openStar, favViewModel?.favList)
+        //TODO: Replace this monstrosity with coroutines
+        startUp = StartUp(this, width, height, isGif, fromMain,
+                wallPreview, starred, load, filledStar, openStar, favViewModel?.favList)
         startUp?.execute(imgUrl)
         return true
+    }
+
+    fun launchPost(view: View) {
+        val currPost = imageList[index]
+        val postIntent = Intent(this, PostActivity::class.java)
+        postIntent.putExtra(currPost.postLink, PostActivity.POST_LINK)
+        startActivity(postIntent)
     }
 
     fun downloadImage(view: View) {
@@ -363,7 +368,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                             starred, load, filledStar, openStar, favViewModel?.favList)
                     startUp?.execute(imgUrl)
                 }
-                startUp!!.status == AsyncTask.Status.RUNNING -> Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
+                startUp!!.status == AsyncTask.Status.RUNNING ->
+                    Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
                 else -> {
                     startUp?.cancel(true)
                     startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
@@ -391,7 +397,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                             starred, load, filledStar, openStar, favViewModel?.favList)
                     startUp?.execute(imgUrl)
                 }
-                startUp!!.status == AsyncTask.Status.RUNNING -> Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
+                startUp!!.status == AsyncTask.Status.RUNNING ->
+                    Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
                 else -> {
                     startUp?.cancel(true)
                     startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
@@ -454,8 +461,10 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     override fun onLongPress(motionEvent: MotionEvent) {}
 
     //TODO: replace with coroutines and parse json on separate thread as well
-    private class StartUp internal constructor(con: Context, val w: Int, val h: Int, val g: Boolean, val fm: Boolean, image: ImageView?, menu: Menu?, load: ProgressBar?,
-                                               filled: Drawable?, open: Drawable?, f: List<FavImage>?) : AsyncTask<String, Void, Boolean>() {
+    private class StartUp internal constructor(con: Context, val w: Int, val h: Int, val g: Boolean,
+                                               val fm: Boolean, image: ImageView?, menu: Menu?, load: ProgressBar?,
+                                               filled: Drawable?, open: Drawable?,
+                                               f: List<FavImage>?) : AsyncTask<String, Void, Boolean>() {
         var imgView: WeakReference<ImageView?> = WeakReference(image)
         var starMenu: WeakReference<Menu?> = WeakReference(menu)
         var loading: WeakReference<ProgressBar?> = WeakReference(load)
@@ -499,16 +508,15 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             imgView.get()?.visibility = View.VISIBLE
 
             if (g) {
-                Glide.with(context.get()!!).asGif().load(iurl).override(w, h).centerCrop().into(imgView.get()!!)
+                with(context.get()!!).asGif().load(iurl).override(w, h).centerCrop().into(imgView.get()!!)
             } else {
-                Glide.with(context.get()!!).load(iurl).override(w, h).centerCrop().into(imgView.get()!!)
+                with(context.get()!!).load(iurl).override(w, h).centerCrop().into(imgView.get()!!)
             }
-
         }
-
     }
 
-    private class LoadImages internal constructor(con: Context?, load: ProgressBar?, imgs: ArrayList<BitURL>?) : AsyncTask<String, Void, Void?>() {
+    private class LoadImages internal constructor(con: Context?, load: ProgressBar?, imgs: ArrayList<BitURL>?)
+        : AsyncTask<String, Void, Void?>() {
         internal var context: WeakReference<Context?> = WeakReference(con)
         internal var load: WeakReference<ProgressBar?> = WeakReference(load)
         internal var imgs: WeakReference<ArrayList<BitURL>?> = WeakReference(imgs)

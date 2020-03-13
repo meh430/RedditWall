@@ -6,7 +6,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {FavImage.class}, version = 1, exportSchema = false)
+@Database(entities = {FavImage.class}, version = 2, exportSchema = false)
 public abstract class FavRoomDatabase extends RoomDatabase {
     private static FavRoomDatabase SINGLETON;
 

@@ -155,11 +155,13 @@ internal class RestQuery(private val QUERY: String, private val context: Context
                 if (!data.has("preview")) {
                     continue
                 }
+                val postLink = json.getString("permalink")
                 val preview = data.getJSONObject("preview")
                 val image = preview.getJSONArray("images").getJSONObject(0)
                 var gif: JSONObject? = null
                 var isImage = true
-                val canLoadGif = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE).getBoolean(SettingsActivity.LOAD_GIF, true)
+                val canLoadGif = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+                        .getBoolean(SettingsActivity.LOAD_GIF, true)
                 if (canLoadGif) {
                     if (image.has("variants") && image.getJSONObject("variants").has("gif")) {
                         isImage = false
@@ -177,11 +179,11 @@ internal class RestQuery(private val QUERY: String, private val context: Context
                 try {
                     val url = source.getString("url").replace("amp;".toRegex(), "")
                     if (isImage) {
-                        val bitmap = Glide.with(context).asBitmap().load(url).override(width / scale, height / 4).centerCrop().submit().get()
-
-                        images?.add(BitURL(bitmap, url))
+                        val bitmap = Glide.with(context).asBitmap().load(url)
+                                .override(width / scale, height / 4).centerCrop().submit().get()
+                        images?.add(BitURL(bitmap, url, "https://www.reddit.com$postLink"))
                     } else {
-                        images?.add(BitURL(null, url))
+                        images?.add(BitURL(null, url, "https://www.reddit.com$postLink"))
                     }
                     context.runOnUiThread {
                         adapter?.notifyDataSetChanged()
