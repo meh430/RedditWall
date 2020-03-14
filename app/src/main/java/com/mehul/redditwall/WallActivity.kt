@@ -36,6 +36,8 @@ import com.bumptech.glide.Glide.with
 import com.google.gson.Gson
 import com.mehul.redditwall.favorites.FavImage
 import com.mehul.redditwall.favorites.FavViewModel
+import com.mehul.redditwall.history.HistViewModel
+import com.mehul.redditwall.history.HistoryItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,7 +58,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var notifyManager: NotificationManager? = null
     private var wallPreview: ImageView? = null
     private var isGif: Boolean = false
-    private var fromMain: Boolean = false
+    private var fromFav: Boolean = false
     private val WRITE = 1231
     private var index: Int = 0
     private var width: Int = 0
@@ -73,6 +75,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var load: ProgressBar? = null
     private var startUp: StartUp? = null
     private var favViewModel: FavViewModel? = null
+    private var histViewModel: HistViewModel? = null
     private val uiScope = CoroutineScope(Dispatchers.Main)
     private var query: String? = null
     private val notificationBuilder: NotificationCompat.Builder
@@ -94,6 +97,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wall)
+        histViewModel = ViewModelProvider(this).get(HistViewModel::class.java)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
         query = preferences!!.getString(MainActivity.QUERY,
@@ -131,14 +135,20 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
                     if (index == 0 || index == 1) {
                         try {
+                            var wallSource = 0
                             assert(wall != null)
                             if (wallLoc == 0) {
                                 wall?.setBitmap(bitmap)
-
+                                wallSource = HistoryItem.BOTH
                             } else {
                                 wall?.setBitmap(bitmap, null, true, wallLoc)
+                                wallSource = if (wallLoc == WallpaperManager.FLAG_LOCK) HistoryItem.LOCK_SCREEN else HistoryItem.HOME_SCREEN
                             }
                             Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
+                            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query!!,
+                                    SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).format(Date()),
+                                    wallSource, imgUrl!!, imageList[index].postLink)
+                            histViewModel?.insert(histItem)
                         } catch (e: Exception) {
                             Log.e("MainActivity", "Error setting wallpaper")
                             Toast.makeText(con, "failed to set wallpaper", Toast.LENGTH_SHORT).show()
@@ -148,13 +158,17 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                             assert(wall != null)
                             wall?.setBitmap(bitmap)
                             Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
+                            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query!!,
+                                    SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).format(Date()),
+                                    HistoryItem.BOTH, imgUrl!!, imageList[index].postLink)
+                            histViewModel?.insert(histItem)
                         } catch (e: Exception) {
                             Log.e("MainActivity", "Error setting wallpaper")
                             Toast.makeText(con, "failed to set wallpaper", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
-        builder.create().show()
+        builder.create().show()//date, source, url, post
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -209,7 +223,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         wallPreview = findViewById(R.id.wall_holder)
         detector = GestureDetector(this, this)
         val incoming = intent
-        fromMain = incoming.getBooleanExtra(FROM_MAIN, true)
+        fromFav = incoming.getBooleanExtra(FROM_FAV, true)
         jsonList = incoming.getStringExtra(LIST)
         uiScope.launch {
             if (jsonList != null) {
@@ -229,7 +243,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         openStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_open)
         starred = menu
         //TODO: Replace this monstrosity with coroutines
-        startUp = StartUp(this, width, height, isGif, fromMain,
+        startUp = StartUp(this, width, height, isGif, fromFav,
                 wallPreview, starred, load, filledStar, openStar, favViewModel?.favList)
         startUp?.execute(imgUrl)
         return true
@@ -276,6 +290,10 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             out.close()
             MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
             sendNotification()
+            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query!!,
+                    SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).format(Date()),
+                    HistoryItem.DOWNLOADED, imgUrl!!, imageList[index].postLink)
+            histViewModel?.insert(histItem)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -365,7 +383,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
             when {
                 startUp == null -> {
-                    startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
+                    startUp = StartUp(this, width, height, isGif, fromFav, wallPreview,
                             starred, load, filledStar, openStar, favViewModel!!.favList)
                     startUp?.execute(imgUrl)
                 }
@@ -373,7 +391,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                     Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
                 else -> {
                     startUp?.cancel(true)
-                    startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
+                    startUp = StartUp(this, width, height, isGif, fromFav, wallPreview,
                             starred, load, filledStar, openStar, favViewModel!!.favList)
                     startUp?.execute(imgUrl)
                 }
@@ -394,7 +412,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
             when {
                 startUp == null -> {
-                    startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
+                    startUp = StartUp(this, width, height, isGif, fromFav, wallPreview,
                             starred, load, filledStar, openStar, favViewModel!!.favList)
                     startUp?.execute(imgUrl)
                 }
@@ -402,19 +420,19 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                     Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
                 else -> {
                     startUp?.cancel(true)
-                    startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
+                    startUp = StartUp(this, width, height, isGif, fromFav, wallPreview,
                             starred, load, filledStar, openStar, favViewModel!!.favList)
                     startUp?.execute(imgUrl)
                 }
             }
 
-        } else if (task == null && fromMain) {
+        } else if (task == null && fromFav) {
             Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
             task = LoadImages(this, load, imageList)
             task!!.execute(query)
-        } else if (task != null && task?.status == AsyncTask.Status.RUNNING && fromMain) {
+        } else if (task != null && task?.status == AsyncTask.Status.RUNNING && fromFav) {
             Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
-        } else if (task != null && task?.status != AsyncTask.Status.RUNNING && fromMain) {
+        } else if (task != null && task?.status != AsyncTask.Status.RUNNING && fromFav) {
             Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
             task?.cancel(true)
             task = LoadImages(this, load, imageList)
@@ -484,7 +502,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         override fun doInBackground(vararg string: String): Boolean {
             iurl = string[0]
             var saved = false
-            if (fm) {
+            if (!fm) {
                 for (fav in favs.get()!!) {
                     if (fav?.favUrl == string[0]) {
                         saved = true
@@ -553,7 +571,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         const val GIF = "GIF"
         const val LIST = "LIST"
         const val INDEX = "INDEX"
-        const val FROM_MAIN = "MAIN"
+        const val FROM_FAV = "FAV_IMAGES"
 
         fun listToJson(imgs: ArrayList<BitURL>?): String {
             return Gson().toJson(imgs)

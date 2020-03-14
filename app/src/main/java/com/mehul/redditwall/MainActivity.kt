@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 wallIntent.apply {
                     putExtra(WallActivity.WALL_URL, current.getUrl())
                     putExtra(WallActivity.GIF, current.hasGif())
-                    putExtra(WallActivity.FROM_MAIN, true)
+                    putExtra(WallActivity.FROM_FAV, false)
                 }
                 val prevs = ArrayList<BitURL>()
                 for (i in (if (p >= 10) p - 10 else 0) until currList.size) {
@@ -299,6 +299,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             R.id.recc_subs -> {
                 val launchRec = Intent(this, RecActivity::class.java)
                 startActivity(launchRec)
+                return true
+            }
+            R.id.history -> {
+                val launchHist = Intent(this, HistoryActivity::class.java)
+                startActivity(launchHist)
                 return true
             }
         }

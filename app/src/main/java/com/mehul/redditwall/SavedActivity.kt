@@ -21,6 +21,7 @@ import com.mehul.redditwall.savedsub.SubViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class SavedActivity : AppCompatActivity() {
     private var adapter: SubAdapter? = null
     private var saveText: EditText? = null
@@ -50,20 +51,24 @@ class SavedActivity : AppCompatActivity() {
                         adapter!!.notifyDataSetChanged()
                     }
                 })
+
         helper.attachToRecyclerView(recycler)
         subViewModel = ViewModelProvider(this).get(SubViewModel::class.java)
         subViewModel!!.allSubs!!.observe(this, Observer { subSaveds ->
-            adapter!!.setSubs(subSaveds)
-            if (adapter!!.itemCount == 0) {
-                findViewById<View>(R.id.sub_empty).visibility = View.VISIBLE
+            val subs = subSaveds?.sortedWith(compareBy
+            { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+            adapter!!.setSubs(subs)
+            findViewById<View>(R.id.sub_empty).visibility = if (adapter!!.itemCount == 0) {
+                View.VISIBLE
             } else {
-                findViewById<View>(R.id.sub_empty).visibility = View.GONE
+                View.GONE
             }
         })
-        if (adapter!!.itemCount == 0) {
-            findViewById<View>(R.id.sub_empty).visibility = View.VISIBLE
+
+        findViewById<View>(R.id.sub_empty).visibility = if (adapter!!.itemCount == 0) {
+            View.VISIBLE
         } else {
-            findViewById<View>(R.id.sub_empty).visibility = View.GONE
+            View.GONE
         }
     }
 

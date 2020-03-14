@@ -18,6 +18,10 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".HistoryActivity"
+            android:label="History"
+            android:parentActivityName=".MainActivity" />
+        <activity
             android:name=".PostActivity"
             android:label="Post Comments"
             android:parentActivityName=".WallActivity" />

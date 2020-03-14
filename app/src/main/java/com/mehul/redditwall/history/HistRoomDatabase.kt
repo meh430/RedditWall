@@ -1,23 +1,23 @@
-package com.mehul.redditwall.savedsub
+package com.mehul.redditwall.history
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [SubSaved::class], version = 3, exportSchema = false)
-abstract class SubRoomDatabase : RoomDatabase() {
-    abstract fun subDao(): SubDAO?
+@Database(entities = [HistoryItem::class], version = 1, exportSchema = false)
+abstract class HistRoomDatabase : RoomDatabase() {
+    abstract fun historyDAO(): HistoryDAO?
 
     companion object {
-        private var SINGLETON: SubRoomDatabase? = null
-        fun getDatabase(context: Context): SubRoomDatabase? {
+        private var SINGLETON: HistRoomDatabase? = null
+        fun getDatabase(context: Context): HistRoomDatabase? {
             if (SINGLETON == null) {
-                synchronized(SubRoomDatabase::class.java) {
+                synchronized(HistRoomDatabase::class.java) {
                     if (SINGLETON == null) {
                         // Create database here
                         SINGLETON = Room.databaseBuilder(context.applicationContext,
-                                        SubRoomDatabase::class.java, "sub_database") // Wipes and rebuilds instead of migrating
+                                        HistRoomDatabase::class.java, "hist_database") // Wipes and rebuilds instead of migrating
                                 // if no Migration object.
                                 .fallbackToDestructiveMigration()
                                 .build()

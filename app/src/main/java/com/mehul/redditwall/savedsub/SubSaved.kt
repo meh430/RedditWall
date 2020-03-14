@@ -8,11 +8,18 @@ import androidx.room.PrimaryKey
 class SubSaved(@field:PrimaryKey(autoGenerate = true) var id: Int,
                @field:ColumnInfo(name = "sub_name") var subName: String,
                @field:ColumnInfo(name = "sub_date") var subDate: String) {
+    @field:ColumnInfo(name = "sub_int_date")
+    var internalDate: String = subDate
+
     init {
         convertDate()
     }
 
     private fun convertDate() {
+        if (!subDate.contains("at")) {
+            return
+        }
+
         val tempDate = subDate.trim().split(" at ")
         val date = tempDate[0].trim().split("-")
         val time = tempDate[1].trim().split(":")

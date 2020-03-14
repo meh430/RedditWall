@@ -49,7 +49,7 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
                 putExtra(WallActivity.WALL_URL, current.url)
                 putExtra(WallActivity.GIF, current.hasGif())
                 putExtra(WallActivity.INDEX, position)
-                putExtra(WallActivity.FROM_MAIN, false)
+                putExtra(WallActivity.FROM_FAV, true)
                 putExtra(WallActivity.LIST, WallActivity.listToJson(favs))
             }
             con.startActivity(wallIntent)
