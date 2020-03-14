@@ -162,8 +162,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             super.onBackPressed()
             return true
         } else if (item.itemId == R.id.fav_image) {
-            for (img in favViewModel!!.favList) {
-                if (imgUrl!!.equals(img.favUrl, ignoreCase = true)) {
+            for (img in favViewModel!!.favList!!) {
+                if (imgUrl!!.equals(img?.favUrl, ignoreCase = true)) {
                     item.icon = openStar
                     favViewModel?.deleteFavImage(img)
                     Toast.makeText(this, "Unfavorited", Toast.LENGTH_SHORT).show()
@@ -172,7 +172,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             }
             item.icon = filledStar
             Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
-            favViewModel?.insert(FavImage((Math.random() * 10000).toInt() + 1, imgUrl, isGif, imageList[index].postLink))
+            favViewModel?.insert(FavImage((Math.random() * 10000).toInt() + 1, imgUrl!!, isGif, imageList[index].postLink))
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -366,7 +366,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             when {
                 startUp == null -> {
                     startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
-                            starred, load, filledStar, openStar, favViewModel?.favList)
+                            starred, load, filledStar, openStar, favViewModel!!.favList)
                     startUp?.execute(imgUrl)
                 }
                 startUp!!.status == AsyncTask.Status.RUNNING ->
@@ -374,7 +374,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 else -> {
                     startUp?.cancel(true)
                     startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
-                            starred, load, filledStar, openStar, favViewModel?.favList)
+                            starred, load, filledStar, openStar, favViewModel!!.favList)
                     startUp?.execute(imgUrl)
                 }
             }
@@ -395,7 +395,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             when {
                 startUp == null -> {
                     startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
-                            starred, load, filledStar, openStar, favViewModel?.favList)
+                            starred, load, filledStar, openStar, favViewModel!!.favList)
                     startUp?.execute(imgUrl)
                 }
                 startUp!!.status == AsyncTask.Status.RUNNING ->
@@ -403,7 +403,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 else -> {
                     startUp?.cancel(true)
                     startUp = StartUp(this, width, height, isGif, fromMain, wallPreview,
-                            starred, load, filledStar, openStar, favViewModel?.favList)
+                            starred, load, filledStar, openStar, favViewModel!!.favList)
                     startUp?.execute(imgUrl)
                 }
             }
@@ -465,14 +465,14 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private class StartUp internal constructor(con: Context, val w: Int, val h: Int, val g: Boolean,
                                                val fm: Boolean, image: ImageView?, menu: Menu?, load: ProgressBar?,
                                                filled: Drawable?, open: Drawable?,
-                                               f: List<FavImage>?) : AsyncTask<String, Void, Boolean>() {
+                                               f: List<FavImage?>?) : AsyncTask<String, Void, Boolean>() {
         var imgView: WeakReference<ImageView?> = WeakReference(image)
         var starMenu: WeakReference<Menu?> = WeakReference(menu)
         var loading: WeakReference<ProgressBar?> = WeakReference(load)
         var fillStar: WeakReference<Drawable?> = WeakReference(filled)
         var openStar: WeakReference<Drawable?> = WeakReference(open)
         var context: WeakReference<Context> = WeakReference(con)
-        var favs: WeakReference<List<FavImage>?> = WeakReference(f)
+        var favs: WeakReference<List<FavImage?>?> = WeakReference(f)
         lateinit var iurl: String
 
         override fun onPreExecute() {
@@ -486,7 +486,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             var saved = false
             if (fm) {
                 for (fav in favs.get()!!) {
-                    if (fav.favUrl == string[0]) {
+                    if (fav?.favUrl == string[0]) {
                         saved = true
                         break
                     }

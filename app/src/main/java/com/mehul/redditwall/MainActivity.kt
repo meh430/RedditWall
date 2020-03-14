@@ -229,11 +229,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     @InternalCoroutinesApi
     fun startSearch(view: View) {
+        cancelThreads()
+
         if (imageJob != null && imageJob!!.isActive) {
             Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
             return
         }
-        cancelThreads()
         queryString = ""
         loading!!.visibility = View.VISIBLE
         info!!.visibility = View.INVISIBLE

@@ -191,26 +191,26 @@ internal class QueryRequest {
 
                                 withContext(Dispatchers.Main) {
                                     images.add(BitURL(bitmap, url, "https://www.reddit.com$postLink"))
-                                    if (first && i % 5 == 0) {
+                                    if (first && i % 5 == 0 && i != 0) {
                                         load?.visibility = View.GONE
-                                    } else if (!first && i % 5 == 0) {
+                                    } else if (!first && i % 4 == 0 && i != 0) {
                                         load?.visibility = View.INVISIBLE
                                     }
 
-                                    if (i % 5 == 0) {
+                                    if (i % 4 == 0 && i != 0) {
                                         adapter?.notifyDataSetChanged()
                                     }
                                 }
                             } else {
                                 withContext(Dispatchers.Main) {
                                     images.add(BitURL(null, url, "https://www.reddit.com$postLink"))
-                                    if (first && i % 5 == 0) {
+                                    if (first && i % 4 == 0 && i != 0) {
                                         load?.visibility = View.GONE
-                                    } else if (!first && i % 5 == 0) {
+                                    } else if (!first && i % 4 == 0 && i != 0) {
                                         load?.visibility = View.INVISIBLE
                                     }
 
-                                    if (i % 5 == 0) {
+                                    if (i % 4 == 0 && i != 0) {
                                         adapter?.notifyDataSetChanged()
                                     }
                                 }
@@ -225,9 +225,7 @@ internal class QueryRequest {
                 } catch (e: JSONException) {
                     e.printStackTrace()
                 }
-
             }
-
         }
     }
 }

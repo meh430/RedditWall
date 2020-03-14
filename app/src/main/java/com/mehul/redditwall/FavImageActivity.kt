@@ -29,7 +29,7 @@ class FavImageActivity : AppCompatActivity() {
     private var adapter: FavAdapter? = null
     private var favViewModel: FavViewModel? = null
     private var loading: ProgressBar? = null
-    private var favImages: List<FavImage> = ArrayList()
+    private var favImages: List<FavImage?>? = ArrayList()
     private var uiScope = CoroutineScope(Dispatchers.Main)
     private var favJob: Job? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +52,7 @@ class FavImageActivity : AppCompatActivity() {
 
                     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                         val position = viewHolder.adapterPosition
-                        val saved = favImages.get(position)
+                        val saved = favImages?.get(position)
                         favViewModel!!.deleteFavImage(saved)
                         adapter!!.notifyDataSetChanged()
                     }
@@ -60,7 +60,7 @@ class FavImageActivity : AppCompatActivity() {
         helper.attachToRecyclerView(recycler)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
         val con = this
-        favViewModel!!.allFav.observe(this, Observer { favs ->
+        favViewModel!!.allFav?.observe(this, Observer { favs ->
             favImages = favs
             loading?.visibility = View.VISIBLE
             favJob = uiScope.launch {
@@ -90,7 +90,7 @@ class FavImageActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private suspend fun loadFavBits(favs: List<FavImage>, con: Context) {
+    private suspend fun loadFavBits(favs: List<FavImage?>?, con: Context) {
         val bits = ArrayList<BitURL>()
 
         withContext(Dispatchers.Default) {
@@ -101,14 +101,14 @@ class FavImageActivity : AppCompatActivity() {
             val scale = (con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
                     .getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
 
-            for (fav in favs) {
+            for (fav in favs!!) {
                 if (!isActive) {
                     break
                 }
 
                 var bitmap: Bitmap? = null
                 withContext(Dispatchers.IO) {
-                    if (!fav.isGif) {
+                    if (!fav!!.isGif) {
                         try {
                             bitmap = Glide.with(con).asBitmap().load(fav.favUrl)
                                     .override(width / scale, height / 4).centerCrop().submit().get()
@@ -119,7 +119,7 @@ class FavImageActivity : AppCompatActivity() {
                         }
                     }
                 }
-                val temp = BitURL(bitmap, fav.favUrl, fav.postLink)
+                val temp = BitURL(bitmap, fav!!.favUrl, fav.postLink)
                 Log.e("BITMAP", bitmap.toString())
                 temp.setGif(fav.isGif)
                 withContext(Dispatchers.Main) {
@@ -149,7 +149,7 @@ class FavImageActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (adapter?.itemCount != favImages.size) {
+        if (adapter?.itemCount != favImages?.size) {
             favJob = uiScope.launch {
                 loadFavBits(favImages, getCon())
             }
