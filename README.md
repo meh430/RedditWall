@@ -21,9 +21,9 @@ An app that pulls images from a specified subreddit to set as device wallpaper
 - View a list of curated subreddit recommendations stored in a remote database to get wallpapers from
 - View history of downloaded or set wallpapers
 ### Dark Mode Screenshots
-<img src="screens/dark_home.png" height="662" width="447"><img src="screens/preview.png" height="662" width="447"><img src="screens/dark_rec.png" height="662" width="447"><img src="screens/dark_fav.png" height="662" width="447"><img src="screens/fav_fab.png" height="662" width="447"><img src="screens/dark_saved.png" height="662" width="447"><img src="screens/dark_hist.png" height="662" width="447">
+<img src="screens/dark_home.png" height="331" width="223"><img src="screens/preview.png" height="331" width="223"><img src="screens/dark_rec.png" height="331" width="223"><img src="screens/dark_fav.png" height="331" width="223"><img src="screens/fav_fab.png" height="331" width="223"><img src="screens/dark_saved.png" height="331" width="223"><img src="screens/dark_hist.png" height="331" width="223">
 ### Light Mode Screenshots
-<img src="screens/light_home.png" height="662" width="447"><img src="screens/light_rec.png" height="662" width="447"><img src="screens/light_saved.png" height="662" width="447"><img src="screens/light_hist.png" height="662" width="447">
+<img src="screens/light_home.png" height="331" width="223"><img src="screens/light_rec.png" height="331" width="223"><img src="screens/light_saved.png" height="331" width="223"><img src="screens/light_hist.png" height="331" width="223">
 
 ## Features in Progress/Planned Features
 - Ability to specify a download path in settings
