@@ -1,0 +1,22 @@
+<!--suppress ALL -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <item
+        android:id="@+id/delete_all"
+        android:icon="@drawable/ic_delete"
+        android:orderInCategory="50"
+        android:title="CLEAR" />
+
+    <item
+        android:id="@+id/down_all"
+        android:icon="@drawable/ic_down_white"
+        android:orderInCategory="60"
+        android:title="DOWNLOAD ALL" />
+
+    <item
+        android:id="@+id/random"
+        android:icon="@drawable/ic_shuffle"
+        android:orderInCategory="70"
+        android:title="RANDOM" />
+</menu>
