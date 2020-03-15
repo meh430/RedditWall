@@ -2,6 +2,7 @@ package com.mehul.redditwall
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -9,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 
 class SettingsActivity : AppCompatActivity() {
     private var widthEdit: EditText? = null
@@ -17,12 +19,14 @@ class SettingsActivity : AppCompatActivity() {
     private var scaleSeek: SeekBar? = null
     private var seekCount: TextView? = null
     private var preferences: SharedPreferences? = null
-    private var lambda: (Int, String) -> String = { num: Int, str: String -> "$num" + str }
+    private var dark = false
+    private var stateChanged = false
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+        supportActionBar?.elevation = 0F
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
         seekCount = findViewById(R.id.scale_count)
         scaleSeek = findViewById(R.id.scale_seek)
@@ -30,15 +34,31 @@ class SettingsActivity : AppCompatActivity() {
         heightEdit = findViewById(R.id.height_edit)
         defaultEdit = findViewById(R.id.default_edit)
         val gifSwitch = findViewById<Switch>(R.id.gif_switch)
+        val darkSwitch = findViewById<Switch>(R.id.dark_switch)
+        val downloadOrigin = findViewById<Switch>(R.id.download_origin)
+        dark = preferences!!.getBoolean(DARK, false)
+        darkSwitch.isChecked = dark
         gifSwitch.isChecked = preferences!!.getBoolean(LOAD_GIF, true)
+        downloadOrigin.isChecked = preferences!!.getBoolean(DOWNLOAD_ORIGIN, false)
         scaleSeek!!.progress = preferences!!.getInt(LOAD_SCALE, 0)
         seekCount!!.text = ((scaleSeek!!.progress + 1) * 2).toString() + "X"
         gifSwitch.setOnCheckedChangeListener { _, b ->
+            preferences!!.edit().putBoolean(LOAD_GIF, b).apply()
+
+        }
+        darkSwitch.setOnCheckedChangeListener { _, b ->
+            dark = b
+            stateChanged = true
             if (b) {
-                preferences!!.edit().putBoolean(LOAD_GIF, true).apply()
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                delegate.applyDayNight()
             } else {
-                preferences!!.edit().putBoolean(LOAD_GIF, false).apply()
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                delegate.applyDayNight()
             }
+        }
+        downloadOrigin.setOnCheckedChangeListener { _, b ->
+            preferences!!.edit().putBoolean(DOWNLOAD_ORIGIN, b).apply()
         }
         scaleSeek = findViewById(R.id.scale_seek)
         scaleSeek!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -71,6 +91,7 @@ class SettingsActivity : AppCompatActivity() {
         var valid = true
         val preferenceEditor = preferences!!.edit()
         preferenceEditor.putInt(LOAD_SCALE, scaleSeek!!.progress)
+        preferenceEditor.putBoolean(DARK, dark)
         val disp = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(disp)
         var width = disp.widthPixels
@@ -96,11 +117,25 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
+            //if dark
+            if (stateChanged) {
+                val main = Intent(this, MainActivity::class.java)
+                startActivity(main)
+            }
             super.onBackPressed()
             return true
         }
         return super.onOptionsItemSelected(item)
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        if (stateChanged) {
+            val main = Intent(this, MainActivity::class.java)
+            startActivity(main)
+        }
+    }
+
 
     companion object {
         //pref keys
@@ -110,6 +145,8 @@ class SettingsActivity : AppCompatActivity() {
         const val DEFAULT = "DEFAULT"
         const val LOAD_SCALE = "LOAD"
         const val LOAD_GIF = "LOADGIF"
+        const val DARK = "DARK"
+        const val DOWNLOAD_ORIGIN = "DOWNLOAD_ORIGINAL"
     }
 
     fun clearCache(view: View) {

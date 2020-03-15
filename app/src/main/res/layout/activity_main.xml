@@ -127,7 +127,7 @@
                 android:gravity="center"
                 android:layout_margin="16dp"
                 android:text="LOADING..."
-                android:textColor="#FFFFFF"
+                android:textColor="@color/textColor"
                 android:textSize="26sp"
                 android:visibility="gone" />
 

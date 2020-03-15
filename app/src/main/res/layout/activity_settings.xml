@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
                 android:text="Set Default Subreddit:"
-                android:textColor="@android:color/white"
+                android:textColor="@color/textColor"
                 android:textSize="16sp" />
 
             <EditText
@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
                 android:text="Set Preferred Resolution:"
-                android:textColor="@android:color/white"
+                android:textColor="@color/textColor"
                 android:textSize="16sp" />
 
             <LinearLayout
@@ -76,7 +76,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="X"
-                    android:textColor="@android:color/white"
+                    android:textColor="@color/textColor"
                     android:textSize="24sp" />
 
                 <EditText
@@ -98,7 +98,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
                 android:text="Set image scale down: "
-                android:textColor="@android:color/white"
+                android:textColor="@color/textColor"
                 android:textSize="16sp" />
 
             <LinearLayout
@@ -107,14 +107,12 @@
                 android:orientation="horizontal">
 
                 <SeekBar
-
                     android:id="@+id/scale_seek"
-                    android:layout_margin="12dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_margin="12dp"
                     android:layout_weight="2"
-                    android:max="3"
-                    android:theme="@style/ThemeOverlay.AppCompat.DayNight" />
+                    android:max="3" />
 
                 <TextView
                     android:id="@+id/scale_count"
@@ -124,7 +122,7 @@
                     android:layout_weight="0.5"
                     android:gravity="center"
                     android:text="2x"
-                    android:textColor="@color/white"
+                    android:textColor="@color/textColor"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -135,7 +133,30 @@
                 android:layout_margin="12dp"
                 android:switchPadding="10dp"
                 android:text="Load gifs from reddit"
-                android:textColor="@android:color/white"
+                android:textColor="@color/textColor"
+                android:textSize="16sp"
+                android:theme="@style/ThemeOverlay.AppCompat.DayNight" />
+
+
+            <Switch
+                android:id="@+id/download_origin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:switchPadding="10dp"
+                android:text="Download original image"
+                android:textColor="@color/textColor"
+                android:textSize="16sp"
+                android:theme="@style/ThemeOverlay.AppCompat.DayNight" />
+
+            <Switch
+                android:id="@+id/dark_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:switchPadding="10dp"
+                android:text="Toggle dark mode"
+                android:textColor="@color/textColor"
                 android:textSize="16sp"
                 android:theme="@style/ThemeOverlay.AppCompat.DayNight" />
         </LinearLayout>

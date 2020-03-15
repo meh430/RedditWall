@@ -23,7 +23,7 @@
         android:layout_margin="16dp"
         android:gravity="center"
         android:text="You do not have any favorite images, find an image you like and click the star icon on the top right to add a favorite"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/textColor"
         android:textSize="22sp"
         android:visibility="gone" />
 

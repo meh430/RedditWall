@@ -2,6 +2,7 @@ package com.mehul.redditwall
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -35,6 +36,7 @@ class FavImageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fav_image)
+        supportActionBar?.elevation = 0F
         loading = findViewById(R.id.fav_loading)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
         val recycler = findViewById<RecyclerView>(R.id.fav_scroll)
@@ -91,8 +93,25 @@ class FavImageActivity : AppCompatActivity() {
                     return@OnActionSelectedListener false // false will close it without animation
                 }
                 R.id.random -> {
-                    val randomNum = (0..favImages!!.size).random()
-                    recycler.findViewHolderForAdapterPosition(randomNum)?.itemView?.performClick()
+                    if (favImages!!.isEmpty()) {
+                        Toast.makeText(con, "No items", Toast.LENGTH_SHORT).show()
+                        return@OnActionSelectedListener false
+                    }
+
+                    var randomNum = (0..favImages!!.size).random()
+                    if (randomNum == favImages!!.size) randomNum = favImages!!.size - 1
+                    val current = adapter!!.getFavAtPosition(randomNum)
+
+                    val wallIntent = Intent(con, WallActivity::class.java)
+                    wallIntent.apply {
+                        putExtra(WallActivity.WALL_URL, current.url)
+                        putExtra(WallActivity.GIF, current.hasGif())
+                        putExtra(WallActivity.INDEX, randomNum)
+                        putExtra(WallActivity.FROM_FAV, true)
+                        putExtra(WallActivity.LIST, WallActivity.listToJson(adapter!!.getFavs()))
+                        putExtra(WallActivity.FAV_LIST, favImages!![randomNum]?.favName)
+                    }
+                    con.startActivity(wallIntent)
                     return@OnActionSelectedListener false
                 }
             }

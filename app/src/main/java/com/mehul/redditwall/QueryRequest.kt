@@ -43,15 +43,15 @@ internal class QueryRequest {
                     when (sort) {
                         MainActivity.HOT -> {
                             MODIFIER = "/hot"
-                            AFTER = MainActivity.AFTER_HOT
+                            AFTER = MainActivity.AFTER_HOT ?: ""
                         }
                         MainActivity.NEW -> {
                             MODIFIER = "/new"
-                            AFTER = MainActivity.AFTER_NEW
+                            AFTER = MainActivity.AFTER_NEW ?: ""
                         }
                         MainActivity.TOP -> {
                             MODIFIER = "/top"
-                            AFTER = MainActivity.AFTER_TOP
+                            AFTER = MainActivity.AFTER_TOP ?: ""
                         }
                         else -> {
                             AFTER = ""
@@ -191,7 +191,7 @@ internal class QueryRequest {
 
                                 withContext(Dispatchers.Main) {
                                     images.add(BitURL(bitmap, url, "https://www.reddit.com$postLink"))
-                                    if (first && i % 5 == 0 && i != 0) {
+                                    if (first && i % 4 == 0 && i != 0) {
                                         load?.visibility = View.GONE
                                     } else if (!first && i % 4 == 0 && i != 0) {
                                         load?.visibility = View.INVISIBLE

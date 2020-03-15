@@ -2,9 +2,10 @@ package com.mehul.redditwall
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -19,7 +20,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.history.HistAdapter
@@ -37,7 +37,6 @@ class HistoryActivity : AppCompatActivity() {
     private var histJob: Job? = null
     private var adapter: HistAdapter? = null
     private var histViewModel: HistViewModel? = null
-    private var images: ArrayList<Bitmap?> = ArrayList()
     private var histories: List<HistoryItem?> = ArrayList()
     private var loading: ProgressBar? = null
 
@@ -47,6 +46,14 @@ class HistoryActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         val sortIcon: Drawable = ContextCompat.getDrawable(applicationContext, R.drawable.ic_sort)!!
+        val dark = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+                .getBoolean(SettingsActivity.DARK, false)
+        if (dark) {
+            sortIcon.setTint(Color.WHITE)
+        } else {
+            sortIcon.setTint(Color.BLACK)
+        }
+
         toolbar.overflowIcon = sortIcon
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
@@ -56,6 +63,7 @@ class HistoryActivity : AppCompatActivity() {
         adapter = HistAdapter(this)
         recycler.adapter = adapter
         recycler.layoutManager = LinearLayoutManager(this)
+        adapter!!.setHistories(histories)
         val helper = ItemTouchHelper(
                 object : ItemTouchHelper.SimpleCallback(0,
                         ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -69,36 +77,35 @@ class HistoryActivity : AppCompatActivity() {
                         val position = viewHolder.adapterPosition
                         val saved = adapter!!.getHistory(position)
                         histViewModel!!.deleteHist(saved)
-                        adapter!!.notifyDataSetChanged()
+                        histories = histViewModel!!.allHist!!.value!!
                     }
                 })
 
         helper.attachToRecyclerView(recycler)
         histViewModel = ViewModelProvider(this).get(HistViewModel::class.java)
         val con = this
-        histViewModel!!.allHist!!.observe(this, Observer { histories ->
-            this.histories = histories!!
+        histViewModel!!.allHist!!.observe(this, Observer { hists ->
 
-            val hists = when (currSort) {
+            this.histories = when (currSort) {
                 R.id.alpha -> {
-                    histories.sortedWith(compareBy { it?.subName }).asReversed()
+                    hists!!.sortedWith(compareBy { it?.subName }).asReversed()
                 }
                 R.id.oldest -> {
-                    histories.sortedWith(compareBy
+                    hists!!.sortedWith(compareBy
                     { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
 
                 }
                 else -> {
-                    histories.sortedWith(compareBy
+                    hists!!.sortedWith(compareBy
                     { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
                 }
             }
+            adapter!!.setHistories(histories)
 
-            loading?.visibility = View.VISIBLE
-
-            histJob = uiScope.launch {
-                loadImages(hists, con)
+            uiScope.launch {
+                json = convertToJSON(histories)
             }
+            findViewById<View>(R.id.hist_empty).visibility = if (adapter!!.itemCount == 0) View.VISIBLE else View.GONE
         })
         val currCon = this
         recycler.addOnItemTouchListener(RecyclerListener(this, recycler, object : RecyclerListener.OnItemClickListener {
@@ -116,6 +123,7 @@ class HistoryActivity : AppCompatActivity() {
 
                 wallIntent.putExtra(WallActivity.INDEX, position)
                 wallIntent.putExtra(WallActivity.LIST, json)
+                Log.e("JSON", json)
 
                 currCon.startActivity(wallIntent)
             }
@@ -128,22 +136,28 @@ class HistoryActivity : AppCompatActivity() {
                 R.id.delete_all -> {
                     val confirmDelete = AlertDialog.Builder(this)
                     confirmDelete.setTitle("Are you sure?")
-                    confirmDelete.setMessage("Do you want to clear your favorites?")
+                    confirmDelete.setMessage("Do you want to clear history?")
                     confirmDelete.setPositiveButton("Yes") { _, _ ->
                         histViewModel!!.deleteAll()
-                        Toast.makeText(this@HistoryActivity, "Deleted favorite images", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@HistoryActivity, "Cleared history", Toast.LENGTH_SHORT).show()
                     }
                     confirmDelete.setNegativeButton("No") { _, _ ->
                         Toast.makeText(this@HistoryActivity, "Cancelled", Toast.LENGTH_SHORT).show()
                     }
                     confirmDelete.show()
-                    return@OnActionSelectedListener false // false will close it without animation
+                    return@OnActionSelectedListener false
                 }
                 R.id.down_all -> {
                     Toast.makeText(con, "TODO", Toast.LENGTH_SHORT).show()
-                    return@OnActionSelectedListener false // false will close it without animation
+                    return@OnActionSelectedListener false
                 }
                 R.id.random -> {
+                    if (histories.isEmpty()) {
+                        Toast.makeText(con, "No items", Toast.LENGTH_SHORT).show()
+                        return@OnActionSelectedListener false
+                    }
+
+
                     val randomNum = (0..histories.size).random()
                     cancelThreads()
                     val current = histories[randomNum]
@@ -153,9 +167,9 @@ class HistoryActivity : AppCompatActivity() {
                         putExtra(WallActivity.GIF, false)
                         putExtra(WallActivity.FROM_FAV, false)
                     }
-
                     wallIntent.putExtra(WallActivity.INDEX, randomNum)
                     wallIntent.putExtra(WallActivity.LIST, json)
+                    Log.e("JSON", json)
 
                     currCon.startActivity(wallIntent)
                     return@OnActionSelectedListener false
@@ -180,26 +194,6 @@ class HistoryActivity : AppCompatActivity() {
         cancelThreads()
     }
 
-    override fun onResume() {
-        super.onResume()
-        val con = this
-        if (histories.size != images.size) {
-            histJob = uiScope.launch {
-                loadImages(histories, con)
-            }
-        }
-    }
-
-    override fun onRestart() {
-        super.onRestart()
-        val con = this
-        if (histories.size != images.size) {
-            histJob = uiScope.launch {
-                loadImages(histories, con)
-            }
-        }
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         currSort = item.itemId
         when (item.itemId) {
@@ -208,21 +202,26 @@ class HistoryActivity : AppCompatActivity() {
                 return true
             }
             R.id.alpha -> {
-                histories = histories.sortedWith(compareBy { it?.subName }).asReversed()
-                adapter?.setHistories(histories)
+                histories = histories.sortedWith(compareBy { it?.subName })
             }
             R.id.recent -> {
                 histories = histories.sortedWith(compareBy
                 { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
-                adapter?.setHistories(histories)
 
             }
             R.id.oldest -> {
                 histories = histories.sortedWith(compareBy
                 { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
-                adapter?.setHistories(histories)
             }
         }
+
+        if (item.itemId != android.R.id.home) {
+            adapter?.setHistories(histories)
+            uiScope.launch {
+                json = convertToJSON(histories)
+            }
+        }
+
         return super.onOptionsItemSelected(item)
     }
 
@@ -231,33 +230,14 @@ class HistoryActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    private suspend fun loadImages(hists: List<HistoryItem?>, con: Context) {
-        loading?.visibility = View.VISIBLE
-        withContext(Dispatchers.IO) {
-            for (hist in hists) {
-                val bitmap = Glide.with(con).asBitmap().load(hist!!.url)
-                        .override(200, 325).centerCrop().submit().get()
-                withContext(Dispatchers.Main) {
-                    images.add(bitmap)
-                }
-            }
-
-            withContext(Dispatchers.Default) {
-                json = convertToJSON(hists)
-            }
-        }
-        adapter!!.setHistories(hists)
-        adapter!!.setImages(images)
-        loading?.visibility = View.GONE
-        findViewById<View>(R.id.hist_empty).visibility = if (adapter!!.itemCount == 0) View.VISIBLE else View.GONE
-    }
-
     private suspend fun convertToJSON(hists: List<HistoryItem?>): String {
         var json = ""
         withContext(Dispatchers.Default) {
             val bits = ArrayList<BitURL>()
-            for (i in hists.indices) {
-                bits.add(BitURL(images[i], hists[i]!!.url, hists[i]!!.postLink))
+            for (i in hists) {
+                val temp = BitURL(null, i!!.url, i.postLink)
+                temp.setGif(false)
+                bits.add(temp)
             }
             json = Gson().toJson(bits)
         }

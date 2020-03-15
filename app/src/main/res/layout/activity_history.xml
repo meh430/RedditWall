@@ -44,7 +44,7 @@
                 android:layout_margin="16dp"
                 android:gravity="center"
                 android:text="No history. Set or download some wallpapers to see a log of them here"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/textColor"
                 android:textSize="22sp"
                 android:visibility="gone" />
 

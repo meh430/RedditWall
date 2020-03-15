@@ -58,6 +58,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var notifyManager: NotificationManager? = null
     private var wallPreview: ImageView? = null
     private var isGif: Boolean = false
+    private var downloadOriginal = false
     private var fromFav: Boolean = false
     private val WRITE = 1231
     private var index: Int = 0
@@ -73,11 +74,11 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var openStar: Drawable? = null
     private var starred: Menu? = null
     private var load: ProgressBar? = null
-    private var startUp: StartUp? = null
     private var favViewModel: FavViewModel? = null
     private var histViewModel: HistViewModel? = null
     private val uiScope = CoroutineScope(Dispatchers.Main)
     private var query: String? = null
+    private var currentBitmap: Bitmap? = null
     private val notificationBuilder: NotificationCompat.Builder
         get() {
             //TODO: replace deprecated methods with scoped storage solutions
@@ -97,6 +98,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wall)
+        supportActionBar?.elevation = 0F
         histViewModel = ViewModelProvider(this).get(HistViewModel::class.java)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
@@ -112,7 +114,11 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         val con = this
         val temp = Toast.makeText(this, "Setting wallpaper...", Toast.LENGTH_LONG)
         val wall: WallpaperManager? = this.applicationContext.getSystemService(Context.WALLPAPER_SERVICE) as WallpaperManager
-        val bitmap = (wallPreview!!.drawable as BitmapDrawable).bitmap
+        if (wallPreview?.drawable == null) {
+            Toast.makeText(this, "LOADING...", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val bitmap = (wallPreview?.drawable as BitmapDrawable).bitmap
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Set Where?")
                 .setItems(R.array.location_options) { _, index ->
@@ -233,6 +239,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         imgUrl = incoming.getStringExtra(WALL_URL)
         isGif = incoming.getBooleanExtra(GIF, false)
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+        downloadOriginal = preferences!!.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
         createNotificationChannel()
         val disp = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(disp)
@@ -248,10 +255,11 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         filledStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_black)
         openStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_open)
         starred = menu
+        val con = this
         //TODO: Replace this monstrosity with coroutines
-        startUp = StartUp(this, width, height, isGif, fromFav,
-                wallPreview, starred, load, filledStar, openStar, favViewModel?.favList)
-        startUp?.execute(imgUrl)
+        uiScope.launch {
+            startUp(con)
+        }
         return true
     }
 
@@ -279,7 +287,15 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     @Suppress("DEPRECATION")
     private fun saveImage() {
-        val bitmap = (wallPreview!!.drawable as BitmapDrawable).bitmap
+        if (wallPreview?.drawable == null) {
+            Toast.makeText(this, "LOADING...", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val bitmap = if (preferences!!.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)) {
+            currentBitmap
+        } else {
+            (wallPreview!!.drawable as BitmapDrawable).bitmap
+        }
         Toast.makeText(this, "Downloading...", Toast.LENGTH_SHORT).show()
         val root = Environment.getExternalStorageDirectory().toString()
         val myDir = File("$root/RedditWalls")
@@ -291,7 +307,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             file.delete()
         try {
             val out = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
             out.flush()
             out.close()
             MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
@@ -331,15 +347,10 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         notifyManager!!.notify(NOTIFICATION_ID, notifyBuilder.build())
     }
 
-    /*public void cancelNotification() {
-        notifyManager.cancel(NOTIFICATION_ID);
-    }*/
-
     //creating a channel and putting it in the manager
     private fun createNotificationChannel() {
         notifyManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        //checking to see if the build version is greater than that of oreo to implement notification channels
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Create a NotificationChannel
             val notificationChannel = NotificationChannel(PRIMARY_CHANNEL_ID,
@@ -360,9 +371,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         super.onStop()
         if (task != null)
             task!!.cancel(true)
-
-        if (startUp != null)
-            startUp!!.cancel(true)
     }
 
     public override fun onDestroy() {
@@ -370,8 +378,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         if (task != null)
             task!!.cancel(true)
 
-        if (startUp != null)
-            startUp!!.cancel(true)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -386,21 +392,9 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             val curr = imageList[index]
             imgUrl = curr.url
             isGif = curr.hasGif()
-
-            when {
-                startUp == null -> {
-                    startUp = StartUp(this, width, height, isGif, fromFav, wallPreview,
-                            starred, load, filledStar, openStar, favViewModel!!.favList)
-                    startUp?.execute(imgUrl)
-                }
-                startUp!!.status == AsyncTask.Status.RUNNING ->
-                    Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
-                else -> {
-                    startUp?.cancel(true)
-                    startUp = StartUp(this, width, height, isGif, fromFav, wallPreview,
-                            starred, load, filledStar, openStar, favViewModel!!.favList)
-                    startUp?.execute(imgUrl)
-                }
+            val con = this
+            uiScope.launch {
+                startUp(con)
             }
         } else {
             Toast.makeText(this, "Reached the end", Toast.LENGTH_SHORT).show()
@@ -415,23 +409,10 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             val curr = imageList[index]
             imgUrl = curr.url
             isGif = curr.hasGif()
-
-            when {
-                startUp == null -> {
-                    startUp = StartUp(this, width, height, isGif, fromFav, wallPreview,
-                            starred, load, filledStar, openStar, favViewModel!!.favList)
-                    startUp?.execute(imgUrl)
-                }
-                startUp!!.status == AsyncTask.Status.RUNNING ->
-                    Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
-                else -> {
-                    startUp?.cancel(true)
-                    startUp = StartUp(this, width, height, isGif, fromFav, wallPreview,
-                            starred, load, filledStar, openStar, favViewModel!!.favList)
-                    startUp?.execute(imgUrl)
-                }
+            val con = this
+            uiScope.launch {
+                startUp(con)
             }
-
         } else if (task == null && fromFav) {
             Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
             task = LoadImages(this, load, imageList)
@@ -485,32 +466,14 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     override fun onLongPress(motionEvent: MotionEvent) {}
 
-    //TODO: replace with coroutines and parse json on separate thread as well
-    private class StartUp internal constructor(con: Context, val w: Int, val h: Int, val g: Boolean,
-                                               val fm: Boolean, image: ImageView?, menu: Menu?, load: ProgressBar?,
-                                               filled: Drawable?, open: Drawable?,
-                                               f: List<FavImage?>?) : AsyncTask<String, Void, Boolean>() {
-        var imgView: WeakReference<ImageView?> = WeakReference(image)
-        var starMenu: WeakReference<Menu?> = WeakReference(menu)
-        var loading: WeakReference<ProgressBar?> = WeakReference(load)
-        var fillStar: WeakReference<Drawable?> = WeakReference(filled)
-        var openStar: WeakReference<Drawable?> = WeakReference(open)
-        var context: WeakReference<Context> = WeakReference(con)
-        var favs: WeakReference<List<FavImage?>?> = WeakReference(f)
-        lateinit var iurl: String
-
-        override fun onPreExecute() {
-            super.onPreExecute()
-            loading.get()?.visibility = View.VISIBLE
-            imgView.get()?.visibility = View.GONE
-        }
-
-        override fun doInBackground(vararg string: String): Boolean {
-            iurl = string[0]
-            var saved = false
-            if (!fm) {
-                for (fav in favs.get()!!) {
-                    if (fav?.favUrl == string[0]) {
+    private suspend fun startUp(con: Context) {
+        load?.visibility = View.VISIBLE
+        wallPreview?.visibility = View.GONE
+        var saved = false
+        withContext(Dispatchers.Default) {
+            if (!fromFav) {
+                for (fav in favViewModel?.favList!!) {
+                    if (fav?.favUrl == imgUrl) {
                         saved = true
                         break
                     }
@@ -518,25 +481,26 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             } else {
                 saved = true
             }
-
-            return saved
         }
 
-        override fun onPostExecute(result: Boolean) {
-            super.onPostExecute(result)
-            starMenu.get()?.getItem(0)?.icon = if (result) {
-                fillStar.get()
-            } else {
-                openStar.get()
+        if (downloadOriginal) {
+            withContext(Dispatchers.IO) {
+                currentBitmap = with(con).asBitmap().load(imgUrl).submit().get()
             }
-            loading.get()?.visibility = View.GONE
-            imgView.get()?.visibility = View.VISIBLE
+        }
 
-            if (g) {
-                with(context.get()!!).asGif().load(iurl).override(w, h).centerCrop().into(imgView.get()!!)
-            } else {
-                with(context.get()!!).load(iurl).override(w, h).centerCrop().into(imgView.get()!!)
-            }
+        starred!!.getItem(0)?.icon = if (saved) {
+            filledStar
+        } else {
+            openStar
+        }
+        load?.visibility = View.GONE
+        wallPreview?.visibility = View.VISIBLE
+
+        if (isGif) {
+            with(con).asGif().load(imgUrl).override(width, height).centerCrop().into(wallPreview!!)
+        } else {
+            with(con).load(imgUrl).override(width, height).centerCrop().into(wallPreview!!)
         }
     }
 

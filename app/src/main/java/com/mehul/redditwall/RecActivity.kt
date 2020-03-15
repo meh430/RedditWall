@@ -29,6 +29,7 @@ class RecActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rec)
+        supportActionBar?.elevation = 0F
         loading = findViewById(R.id.rec_loading)
         recycler = findViewById(R.id.rec_scroll)
         error = findViewById(R.id.rec_empty)

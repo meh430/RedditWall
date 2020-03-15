@@ -39,15 +39,15 @@ internal class RestQuery(private val QUERY: String, private val context: Context
             when (sort) {
                 MainActivity.HOT -> {
                     MODIFIER = "/hot"
-                    AFTER = MainActivity.AFTER_HOT
+                    AFTER = MainActivity.AFTER_HOT ?: ""
                 }
                 MainActivity.NEW -> {
                     MODIFIER = "/new"
-                    AFTER = MainActivity.AFTER_NEW
+                    AFTER = MainActivity.AFTER_NEW ?: ""
                 }
                 MainActivity.TOP -> {
                     MODIFIER = "/top"
-                    AFTER = MainActivity.AFTER_TOP
+                    AFTER = MainActivity.AFTER_TOP ?: ""
                 }
                 else -> {
                     AFTER = ""

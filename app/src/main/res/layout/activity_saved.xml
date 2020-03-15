@@ -44,7 +44,7 @@
                 android:layout_margin="16dp"
                 android:gravity="center"
                 android:text="You do not have any saved subs, enter a sub you like in the field below to save it"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/textColor"
                 android:textSize="22sp"
                 android:visibility="gone" />
 

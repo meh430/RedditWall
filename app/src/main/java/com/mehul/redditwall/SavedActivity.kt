@@ -1,6 +1,7 @@
 package com.mehul.redditwall
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
@@ -38,6 +39,13 @@ class SavedActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         val sortIcon: Drawable = ContextCompat.getDrawable(applicationContext, R.drawable.ic_sort)!!
+        val dark = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+                .getBoolean(SettingsActivity.DARK, false)
+        if (dark) {
+            sortIcon.setTint(Color.WHITE)
+        } else {
+            sortIcon.setTint(Color.BLACK)
+        }
         toolbar.overflowIcon = sortIcon
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
@@ -148,6 +156,8 @@ class SavedActivity : AppCompatActivity() {
             saveText!!.setText("")
             saveVal.toLowerCase(Locale.ROOT)
         }
+
+        saveVal = saveVal.replace(" ", "")
         val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputManager.hideSoftInputFromWindow(view.windowToken,
                 InputMethodManager.HIDE_NOT_ALWAYS)

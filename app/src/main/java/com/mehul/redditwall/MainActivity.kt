@@ -22,6 +22,7 @@ import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -104,8 +105,18 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         newImages = ArrayList()
         topImages = ArrayList()
         preferences = getSharedPreferences(SharedPrefFile, Context.MODE_PRIVATE)
+        val dark = preferences!!.getBoolean(SettingsActivity.DARK, false)
+        if (dark) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            delegate.applyDayNight()
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            delegate.applyDayNight()
+        }
         defaultLoad = preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper").toString()
-
+        newChip!!.setChipBackgroundColorResource(R.color.white)
+        topChip!!.setChipBackgroundColorResource(R.color.white)
+        hotChip!!.setChipBackgroundColorResource(R.color.white)
         when (preferences!!.getInt(SettingsActivity.SORT_METHOD, HOT)) {
             HOT -> {
                 adapter = ImageAdapter(this, hotImages)
@@ -161,6 +172,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         imageScroll.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
@@ -192,7 +204,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 if (!recyclerView.canScrollVertically(1) && isRunning) {
                     bottomLoading?.visibility = View.VISIBLE
                 } else {
-                    bottomLoading?.visibility = View.INVISIBLE
+                    bottomLoading?.visibility = View.VISIBLE
+                    cancelThreads()
+
+                    scrollJob = uiScope.launch {
+                        loadImages(getCon(), if (queryString.isEmpty()) defaultLoad else queryString, false, getList())
+                    }
                 }
             }
         })
@@ -243,6 +260,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         topImages.clear()
         adapter!!.notifyDataSetChanged()
         queryString = search!!.text.toString()
+        queryString = queryString.replace(" ", "")
         val inputManager: InputMethodManager? = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
         inputManager?.hideSoftInputFromWindow(view.windowToken,
@@ -443,8 +461,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         const val NEW = 0
         const val HOT = 1
         const val TOP = 2
-        var AFTER_NEW = ""
-        var AFTER_HOT = ""
-        var AFTER_TOP = ""
+        var AFTER_NEW: String? = null
+        var AFTER_HOT: String? = null
+        var AFTER_TOP: String? = null
     }
 }

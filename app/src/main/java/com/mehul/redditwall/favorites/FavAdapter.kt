@@ -71,6 +71,10 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
         return favs[position]
     }
 
+    fun getFavs(): ArrayList<BitURL> {
+        return favs
+    }
+
     inner class FavViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val img: ImageView = itemView.findViewById(R.id.image_holder)
 
