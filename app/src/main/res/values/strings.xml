@@ -5,4 +5,10 @@
         <item>Lock Screen</item>
         <item>Both</item>
     </string-array>
+
+    <item name="fab_delete" type="id" />
+    <item name="fab_download" type="id" />
+    <item name="fab_random" type="id" />
 </resources>
+
+

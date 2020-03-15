@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -15,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
+import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.history.HistAdapter
 import com.mehul.redditwall.history.HistViewModel
 import com.mehul.redditwall.history.HistoryItem
@@ -25,8 +28,8 @@ import kotlin.collections.ArrayList
 
 class HistoryActivity : AppCompatActivity() {
     private var uiScope = CoroutineScope(Dispatchers.Main)
+    private var json = ""
     private var histJob: Job? = null
-    private var jsonJob: Job? = null
     private var adapter: HistAdapter? = null
     private var histViewModel: HistViewModel? = null
     private var images: ArrayList<Bitmap?> = ArrayList()
@@ -73,28 +76,13 @@ class HistoryActivity : AppCompatActivity() {
             histJob = uiScope.launch {
                 loadImages(hists, con)
             }
-            findViewById<View>(R.id.hist_empty).visibility = if (adapter!!.itemCount == 0) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
         })
-
-        findViewById<View>(R.id.hist_empty).visibility = if (adapter!!.itemCount == 0) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
         val currCon = this
         recycler.addOnItemTouchListener(RecyclerListener(this, recycler, object : RecyclerListener.OnItemClickListener {
             override fun onLongItemClick(view: View?, position: Int) {}
 
             override fun onItemClick(view: View, position: Int) {
                 cancelThreads()
-                var json = ""
-                jsonJob = uiScope.launch {
-                    json = convertToJSON(histories)
-                }
                 val current = histories[position]
                 val wallIntent = Intent(currCon, WallActivity::class.java)
                 wallIntent.apply {
@@ -109,11 +97,54 @@ class HistoryActivity : AppCompatActivity() {
                 currCon.startActivity(wallIntent)
             }
         }))
+
+        val speedView = findViewById<SpeedDialView>(R.id.speedDial)
+        speedView.inflate(R.menu.fab_menu)
+        speedView.setOnActionSelectedListener(SpeedDialView.OnActionSelectedListener { actionItem ->
+            when (actionItem.id) {
+                R.id.delete_all -> {
+                    val confirmDelete = AlertDialog.Builder(this)
+                    confirmDelete.setTitle("Are you sure?")
+                    confirmDelete.setMessage("Do you want to clear your favorites?")
+                    confirmDelete.setPositiveButton("Yes") { _, _ ->
+                        histViewModel!!.deleteAll()
+                        Toast.makeText(this@HistoryActivity, "Deleted favorite images", Toast.LENGTH_SHORT).show()
+                    }
+                    confirmDelete.setNegativeButton("No") { _, _ ->
+                        Toast.makeText(this@HistoryActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                    }
+                    confirmDelete.show()
+                    return@OnActionSelectedListener false // false will close it without animation
+                }
+                R.id.down_all -> {
+                    Toast.makeText(con, "TODO", Toast.LENGTH_SHORT).show()
+                    return@OnActionSelectedListener false // false will close it without animation
+                }
+                R.id.random -> {
+                    val randomNum = (0..histories.size).random()
+                    cancelThreads()
+                    val current = histories[randomNum]
+                    val wallIntent = Intent(currCon, WallActivity::class.java)
+                    wallIntent.apply {
+                        putExtra(WallActivity.WALL_URL, current?.url)
+                        putExtra(WallActivity.GIF, false)
+                        putExtra(WallActivity.FROM_FAV, false)
+                    }
+
+                    wallIntent.putExtra(WallActivity.INDEX, randomNum)
+                    wallIntent.putExtra(WallActivity.LIST, json)
+
+                    currCon.startActivity(wallIntent)
+                    return@OnActionSelectedListener false
+                }
+            }
+
+            false
+        })
     }
 
     private fun cancelThreads() {
         histJob?.cancel()
-        jsonJob?.cancel()
     }
 
     override fun onStop() {
@@ -164,6 +195,10 @@ class HistoryActivity : AppCompatActivity() {
                     images.add(bitmap)
                 }
             }
+
+            withContext(Dispatchers.Default) {
+                json = convertToJSON(hists)
+            }
         }
         adapter!!.setHistories(hists)
         adapter!!.setImages(images)
@@ -172,7 +207,6 @@ class HistoryActivity : AppCompatActivity() {
     }
 
     private suspend fun convertToJSON(hists: List<HistoryItem?>): String {
-        loading?.visibility = View.VISIBLE
         var json = ""
         withContext(Dispatchers.Default) {
             val bits = ArrayList<BitURL>()
@@ -181,8 +215,6 @@ class HistoryActivity : AppCompatActivity() {
             }
             json = Gson().toJson(bits)
         }
-
-        loading?.visibility = View.GONE
         return json
     }
 }

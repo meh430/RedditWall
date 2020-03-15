@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.favorites.FavAdapter
 import com.mehul.redditwall.favorites.FavImage
 import com.mehul.redditwall.favorites.FavViewModel
@@ -67,24 +68,43 @@ class FavImageActivity : AppCompatActivity() {
                 loadFavBits(favs, con)
             }
         })
+
+        val speedView = findViewById<SpeedDialView>(R.id.speedDial)
+        speedView.inflate(R.menu.fab_menu)
+        speedView.setOnActionSelectedListener(SpeedDialView.OnActionSelectedListener { actionItem ->
+            when (actionItem.id) {
+                R.id.delete_all -> {
+                    val confirmDelete = AlertDialog.Builder(this)
+                    confirmDelete.setTitle("Are you sure?")
+                    confirmDelete.setMessage("Do you want to clear your favorites?")
+                    confirmDelete.setPositiveButton("Yes") { _, _ ->
+                        favViewModel!!.deleteAll()
+                        Toast.makeText(this@FavImageActivity, "Deleted favorite images", Toast.LENGTH_SHORT).show()
+                    }
+                    confirmDelete.setNegativeButton("No") { _, _ ->
+                        Toast.makeText(this@FavImageActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                    }
+                    confirmDelete.show()
+                    return@OnActionSelectedListener false // false will close it without animation
+                }
+                R.id.down_all -> {
+                    Toast.makeText(con, "TODO", Toast.LENGTH_SHORT).show()
+                    return@OnActionSelectedListener false // false will close it without animation
+                }
+                R.id.random -> {
+                    val randomNum = (0..favImages!!.size).random()
+                    recycler.findViewHolderForAdapterPosition(randomNum)?.itemView?.performClick()
+                    return@OnActionSelectedListener false
+                }
+            }
+
+            false
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             super.onBackPressed()
-            return true
-        } else if (item.itemId == R.id.clear_list) {
-            val confirmSubs = AlertDialog.Builder(this)
-            confirmSubs.setTitle("Are you sure?")
-            confirmSubs.setMessage("Do you want to clear your favorites?")
-            confirmSubs.setPositiveButton("Yes") { _, _ ->
-                favViewModel!!.deleteAll()
-                Toast.makeText(this@FavImageActivity, "Deleted favorite images", Toast.LENGTH_SHORT).show()
-            }
-            confirmSubs.setNegativeButton("No") { _, _ ->
-                Toast.makeText(this@FavImageActivity, "Cancelled", Toast.LENGTH_SHORT).show()
-            }
-            confirmSubs.show()
             return true
         }
         return super.onOptionsItemSelected(item)
