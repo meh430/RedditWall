@@ -100,8 +100,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         histViewModel = ViewModelProvider(this).get(HistViewModel::class.java)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-        query = preferences!!.getString(MainActivity.QUERY,
-                preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper"))
     }
 
 
@@ -186,7 +184,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             }
             item.icon = filledStar
             Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
-            favViewModel?.insert(FavImage((Math.random() * 10000).toInt() + 1, imgUrl!!, isGif, imageList[index].postLink))
+            favViewModel?.insert(FavImage((Math.random() * 10000).toInt() + 1, imgUrl!!,
+                    isGif, imageList[index].postLink, query!!))
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -239,6 +238,13 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         windowManager.defaultDisplay.getMetrics(disp)
         width = preferences!!.getInt(SettingsActivity.IMG_WIDTH, disp.widthPixels)
         height = preferences!!.getInt(SettingsActivity.IMG_HEIGHT, disp.heightPixels)
+        query = if (fromFav) {
+            incoming.getStringExtra(FAV_LIST)
+        } else {
+            preferences!!.getString(MainActivity.QUERY,
+                    preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper"))
+        }
+
         filledStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_black)
         openStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_open)
         starred = menu
@@ -572,6 +578,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         const val LIST = "LIST"
         const val INDEX = "INDEX"
         const val FROM_FAV = "FAV_IMAGES"
+        const val FAV_LIST = "FAV_LIST"
 
         fun listToJson(imgs: ArrayList<BitURL>?): String {
             return Gson().toJson(imgs)

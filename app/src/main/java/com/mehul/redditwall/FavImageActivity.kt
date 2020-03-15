@@ -144,7 +144,7 @@ class FavImageActivity : AppCompatActivity() {
                 temp.setGif(fav.isGif)
                 withContext(Dispatchers.Main) {
                     bits.add(temp)
-                    adapter!!.setFavs(bits)
+                    adapter!!.setFavs(bits, favs)
                     loading?.visibility = View.GONE
                 }
             }
@@ -152,7 +152,7 @@ class FavImageActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 loading?.visibility = View.GONE
                 Log.e("BITS", bits.toString())
-                adapter!!.setFavs(bits)
+                adapter!!.setFavs(bits, favs)
                 findViewById<View>(R.id.fav_empty).visibility = if (adapter!!.itemCount == 0) View.VISIBLE else View.GONE
             }
         }

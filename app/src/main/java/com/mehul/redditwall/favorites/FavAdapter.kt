@@ -10,12 +10,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-
 import com.bumptech.glide.Glide
 import com.mehul.redditwall.*
 
 class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerView.Adapter<FavAdapter.FavViewHolder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(con)
+    private var favList: List<FavImage?> = ArrayList()
     private var favs = lis
     private val width: Int
     private val height: Int
@@ -51,13 +51,15 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
                 putExtra(WallActivity.INDEX, position)
                 putExtra(WallActivity.FROM_FAV, true)
                 putExtra(WallActivity.LIST, WallActivity.listToJson(favs))
+                putExtra(WallActivity.FAV_LIST, favList[position]?.favName)
             }
             con.startActivity(wallIntent)
         }
     }
 
-    fun setFavs(favs: ArrayList<BitURL>) {
+    fun setFavs(favs: ArrayList<BitURL>, favLists: List<FavImage?>) {
         this.favs = favs
+        this.favList = favLists
         notifyDataSetChanged()
     }
 
