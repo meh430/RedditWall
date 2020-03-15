@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
@@ -160,11 +159,6 @@ class FavImageActivity : AppCompatActivity() {
 
     private fun getCon(): Context {
         return this
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.clear_menu, menu)
-        return true
     }
 
     override fun onResume() {

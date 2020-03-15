@@ -1,6 +1,7 @@
 package com.mehul.redditwall
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -10,6 +11,8 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -20,15 +23,24 @@ import com.mehul.redditwall.savedsub.SubSaved
 import com.mehul.redditwall.savedsub.SubViewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class SavedActivity : AppCompatActivity() {
+    private var currSort = R.id.recent
     private var adapter: SubAdapter? = null
     private var saveText: EditText? = null
+    private var subs: List<SubSaved?>? = ArrayList()
     private var subViewModel: SubViewModel? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_saved)
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        val sortIcon: Drawable = ContextCompat.getDrawable(applicationContext, R.drawable.ic_sort)!!
+        toolbar.overflowIcon = sortIcon
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
         subViewModel = ViewModelProvider(this@SavedActivity).get(SubViewModel(application)::class.java)
         val recycler = findViewById<RecyclerView>(R.id.saveScroll)
         saveText = findViewById(R.id.search)
@@ -55,9 +67,21 @@ class SavedActivity : AppCompatActivity() {
         helper.attachToRecyclerView(recycler)
         subViewModel = ViewModelProvider(this).get(SubViewModel::class.java)
         subViewModel!!.allSubs!!.observe(this, Observer { subSaveds ->
-            val subs = subSaveds?.sortedWith(compareBy
-            { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+            subs = when (currSort) {
+                R.id.oldest -> {
+                    subSaveds?.sortedWith(compareBy
+                    { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+                }
+                R.id.alpha -> {
+                    subSaveds?.sortedWith(compareBy { it?.subName })
+                }
+                else -> {
+                    subSaveds?.sortedWith(compareBy
+                    { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })?.asReversed()
+                }
+            }
             adapter!!.setSubs(subs)
+
             findViewById<View>(R.id.sub_empty).visibility = if (adapter!!.itemCount == 0) {
                 View.VISIBLE
             } else {
@@ -73,26 +97,45 @@ class SavedActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            super.onBackPressed()
-            return true
-        } else if (item.itemId == R.id.clear_list) {
-            val confirmSubs = AlertDialog.Builder(this)
-            confirmSubs.setTitle("Are you sure?")
-            confirmSubs.setMessage("Do you want to clear your saved subreddits?")
-            confirmSubs.setPositiveButton("Yes") { _, _ ->
-                subViewModel!!.deleteAll()
-                Toast.makeText(this@SavedActivity, "Deleted saved subs", Toast.LENGTH_SHORT).show()
+        currSort = item.itemId
+        when (item.itemId) {
+            android.R.id.home -> {
+                super.onBackPressed()
+                return true
             }
-            confirmSubs.setNegativeButton("No") { _, _ -> Toast.makeText(this@SavedActivity, "Cancelled", Toast.LENGTH_SHORT).show() }
-            confirmSubs.show()
-            return true
+            56345564 -> {
+                val confirmSubs = AlertDialog.Builder(this)
+                confirmSubs.setTitle("Are you sure?")
+                confirmSubs.setMessage("Do you want to clear your saved subreddits?")
+                confirmSubs.setPositiveButton("Yes") { _, _ ->
+                    subViewModel!!.deleteAll()
+                    Toast.makeText(this@SavedActivity, "Deleted saved subs", Toast.LENGTH_SHORT).show()
+                }
+                confirmSubs.setNegativeButton("No") { _, _ -> Toast.makeText(this@SavedActivity, "Cancelled", Toast.LENGTH_SHORT).show() }
+                confirmSubs.show()
+                return true
+            }
+            R.id.recent -> {
+                subs = subs?.sortedWith(compareBy
+                { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })?.asReversed()
+                adapter!!.setSubs(subs)
+            }
+            R.id.alpha -> {
+                subs = subs?.sortedWith(compareBy { it?.subName })
+                adapter!!.setSubs(subs)
+            }
+            R.id.oldest -> {
+                subs = subs?.sortedWith(compareBy
+                { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+                adapter!!.setSubs(subs)
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.clear_menu, menu)
+        menu.add(Menu.NONE, 56345564, Menu.NONE, "Clear Saved")
         return true
     }
 

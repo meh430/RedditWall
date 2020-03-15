@@ -3,13 +3,17 @@ package com.mehul.redditwall
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -28,6 +32,7 @@ import kotlin.collections.ArrayList
 
 class HistoryActivity : AppCompatActivity() {
     private var uiScope = CoroutineScope(Dispatchers.Main)
+    private var currSort = R.id.recent
     private var json = ""
     private var histJob: Job? = null
     private var adapter: HistAdapter? = null
@@ -39,6 +44,12 @@ class HistoryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        val sortIcon: Drawable = ContextCompat.getDrawable(applicationContext, R.drawable.ic_sort)!!
+        toolbar.overflowIcon = sortIcon
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
         loading = findViewById(R.id.hist_loading)
         histViewModel = ViewModelProvider(this@HistoryActivity).get(HistViewModel(application)::class.java)
         val recycler = findViewById<RecyclerView>(R.id.hist_scroll)
@@ -68,8 +79,20 @@ class HistoryActivity : AppCompatActivity() {
         histViewModel!!.allHist!!.observe(this, Observer { histories ->
             this.histories = histories!!
 
-            val hists = histories.sortedWith(compareBy
-            { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
+            val hists = when (currSort) {
+                R.id.alpha -> {
+                    histories.sortedWith(compareBy { it?.subName }).asReversed()
+                }
+                R.id.oldest -> {
+                    histories.sortedWith(compareBy
+                    { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+
+                }
+                else -> {
+                    histories.sortedWith(compareBy
+                    { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
+                }
+            }
 
             loading?.visibility = View.VISIBLE
 
@@ -178,11 +201,34 @@ class HistoryActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            super.onBackPressed()
-            return true
+        currSort = item.itemId
+        when (item.itemId) {
+            android.R.id.home -> {
+                super.onBackPressed()
+                return true
+            }
+            R.id.alpha -> {
+                histories = histories.sortedWith(compareBy { it?.subName }).asReversed()
+                adapter?.setHistories(histories)
+            }
+            R.id.recent -> {
+                histories = histories.sortedWith(compareBy
+                { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
+                adapter?.setHistories(histories)
+
+            }
+            R.id.oldest -> {
+                histories = histories.sortedWith(compareBy
+                { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+                adapter?.setHistories(histories)
+            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.clear_menu, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 
     private suspend fun loadImages(hists: List<HistoryItem?>, con: Context) {
