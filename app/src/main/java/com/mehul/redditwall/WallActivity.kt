@@ -121,9 +121,9 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         val bitmap = (wallPreview?.drawable as BitmapDrawable).bitmap
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Set Where?")
-                .setItems(R.array.location_options) { _, index ->
+                .setItems(R.array.location_options) { _, i ->
                     temp.show()
-                    val wallLoc = if (index == 0) {
+                    val wallLoc = if (i == 0) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             WallpaperManager.FLAG_SYSTEM
                         } else {
@@ -137,9 +137,9 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                         }
                     }
 
-                    if (index == 0 || index == 1) {
+                    if (i == 0 || i == 1) {
                         try {
-                            var wallSource = 0
+                            val wallSource: Int
                             assert(wall != null)
                             if (wallLoc == 0) {
                                 wall?.setBitmap(bitmap)
@@ -248,8 +248,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         query = if (fromFav) {
             incoming.getStringExtra(FAV_LIST)
         } else {
-            preferences!!.getString(MainActivity.QUERY,
-                    preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper"))
+            incoming.getStringExtra(MainActivity.QUERY)
         }
 
         filledStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_black)

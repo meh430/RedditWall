@@ -119,6 +119,7 @@ class HistoryActivity : AppCompatActivity() {
                     putExtra(WallActivity.WALL_URL, current?.url)
                     putExtra(WallActivity.GIF, false)
                     putExtra(WallActivity.FROM_FAV, false)
+                    putExtra(MainActivity.QUERY, current?.subName)
                 }
 
                 wallIntent.putExtra(WallActivity.INDEX, position)
@@ -166,6 +167,7 @@ class HistoryActivity : AppCompatActivity() {
                         putExtra(WallActivity.WALL_URL, current?.url)
                         putExtra(WallActivity.GIF, false)
                         putExtra(WallActivity.FROM_FAV, false)
+                        putExtra(MainActivity.QUERY, current?.subName)
                     }
                     wallIntent.putExtra(WallActivity.INDEX, randomNum)
                     wallIntent.putExtra(WallActivity.LIST, json)

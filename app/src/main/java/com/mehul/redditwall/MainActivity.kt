@@ -88,6 +88,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     putExtra(WallActivity.WALL_URL, current.getUrl())
                     putExtra(WallActivity.GIF, current.hasGif())
                     putExtra(WallActivity.FROM_FAV, false)
+                    putExtra(QUERY, queryString)
                 }
                 val prevs = ArrayList<BitURL>()
                 for (i in (if (p >= 10) p - 10 else 0) until currList.size) {
@@ -154,6 +155,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")
         }).toString()
 
+        queryString = defaultLoad
+
         search!!.hint = defaultLoad
 
         val connMgr: ConnectivityManager? = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -161,7 +164,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         if (connMgr != null) {
             networkInfo = connMgr.activeNetworkInfo
         }
-        preferences!!.edit().putString(QUERY, defaultLoad).apply()
+
         if (networkInfo != null && networkInfo.isConnected) {
             imageJob = uiScope.launch {
                 loadImages(getCon(), defaultLoad, true, getList())
@@ -275,13 +278,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         if (networkInfo != null && networkInfo.isConnected && queryString.isNotEmpty()) {
-            preferences!!.edit().putString(QUERY, queryString).apply()
             imageJob = uiScope.launch {
                 loadImages(getCon(), queryString, true, getList())
             }
 
         } else {
             if (queryString.isEmpty()) {
+                queryString = defaultLoad
                 imageJob = uiScope.launch {
                     loadImages(getCon(), defaultLoad, true, getList())
                 }
