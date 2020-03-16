@@ -203,13 +203,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
                 if (!recyclerView.canScrollVertically(1) && isRunning) {
                     bottomLoading?.visibility = View.VISIBLE
-                } else {
+                } else if (!recyclerView.canScrollVertically(1) && !isRunning) {
                     bottomLoading?.visibility = View.VISIBLE
                     cancelThreads()
 
                     scrollJob = uiScope.launch {
                         loadImages(getCon(), if (queryString.isEmpty()) defaultLoad else queryString, false, getList())
                     }
+                } else {
+                    bottomLoading?.visibility = View.INVISIBLE
                 }
             }
         })

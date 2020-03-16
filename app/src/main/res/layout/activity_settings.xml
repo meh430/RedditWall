@@ -170,16 +170,6 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="8dp"
         android:orientation="vertical">
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/rounded_button"
-            android:foreground="@drawable/ripple"
-            android:text="Clear Image History"
-            android:textColor="@android:color/white" />
-
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -187,7 +177,7 @@
             android:background="@drawable/rounded_button"
             android:foreground="@drawable/ripple"
             android:onClick="clearCache"
-            android:text="Clear Image Cahce"
+            android:text="Clear Image Cache"
             android:textColor="@android:color/white" />
     </LinearLayout>
 </RelativeLayout>
