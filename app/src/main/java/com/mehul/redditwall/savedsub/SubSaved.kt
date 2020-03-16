@@ -24,7 +24,14 @@ class SubSaved(@field:PrimaryKey(autoGenerate = true) var id: Int,
         val date = tempDate[0].trim().split("-")
         val time = tempDate[1].trim().split(":")
         val month = months[Integer.parseInt(date[0])]
-        subDate = "$month ${getOrdinal(Integer.parseInt(date[1]))}, ${date[2]} | ${Integer.parseInt(time[0])}:${time[1]}"
+        var hours = Integer.parseInt(time[0])
+        val pmam = if (hours > 12) {
+            hours -= 12
+            "p.m"
+        } else {
+            "a.m"
+        }
+        subDate = "$month ${getOrdinal(Integer.parseInt(date[1]))}, ${date[2]} | ${hours}:${time[1]} $pmam"
 
     }
 

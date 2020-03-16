@@ -92,12 +92,12 @@ class HistoryActivity : AppCompatActivity() {
                 }
                 R.id.oldest -> {
                     hists!!.sortedWith(compareBy
-                    { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+                    { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
 
                 }
                 else -> {
                     hists!!.sortedWith(compareBy
-                    { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
+                    { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
                 }
             }
             adapter!!.setHistories(histories)
@@ -208,12 +208,12 @@ class HistoryActivity : AppCompatActivity() {
             }
             R.id.recent -> {
                 histories = histories.sortedWith(compareBy
-                { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
+                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
 
             }
             R.id.oldest -> {
                 histories = histories.sortedWith(compareBy
-                { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
             }
         }
 

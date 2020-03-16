@@ -1,5 +1,6 @@
 package com.mehul.redditwall.history
 
+import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -15,6 +16,7 @@ class HistoryItem(@field:PrimaryKey(autoGenerate = true) var id: Int,
     var internalDate: String = setDate
 
     init {
+        Log.e("INTERNAL", internalDate)
         convertDate()
     }
 
@@ -27,8 +29,15 @@ class HistoryItem(@field:PrimaryKey(autoGenerate = true) var id: Int,
         val date = tempDate[0].trim().split("-")
         val time = tempDate[1].trim().split(":")
         val month = months[Integer.parseInt(date[0])]
-        setDate = "$month ${getOrdinal(Integer.parseInt(date[1]))}, ${date[2]} | ${Integer.parseInt(time[0])}:${time[1]}"
-
+        var hours = Integer.parseInt(time[0])
+        val pmam = if (hours > 12) {
+            hours -= 12
+            "p.m"
+        } else {
+            "a.m"
+        }
+        setDate = "$month ${getOrdinal(Integer.parseInt(date[1]))}, ${date[2]} | ${hours}:${time[1]} $pmam"
+        Log.e("DATE", setDate)
     }
 
     private fun getOrdinal(n: Int): String {

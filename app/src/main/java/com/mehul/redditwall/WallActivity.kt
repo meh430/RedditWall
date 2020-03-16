@@ -150,7 +150,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                             }
                             Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
                             val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query!!,
-                                    SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).format(Date()),
+                                    SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                                     wallSource, imgUrl!!, imageList[index].postLink)
                             histViewModel?.insert(histItem)
                         } catch (e: Exception) {
@@ -163,7 +163,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                             wall?.setBitmap(bitmap)
                             Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
                             val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query!!,
-                                    SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).format(Date()),
+                                    SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                                     HistoryItem.BOTH, imgUrl!!, imageList[index].postLink)
                             histViewModel?.insert(histItem)
                         } catch (e: Exception) {
@@ -312,7 +312,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
             sendNotification()
             val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query!!,
-                    SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).format(Date()),
+                    SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                     HistoryItem.DOWNLOADED, imgUrl!!, imageList[index].postLink)
             histViewModel?.insert(histItem)
         } catch (e: Exception) {

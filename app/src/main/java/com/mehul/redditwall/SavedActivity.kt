@@ -78,14 +78,14 @@ class SavedActivity : AppCompatActivity() {
             subs = when (currSort) {
                 R.id.oldest -> {
                     subSaveds?.sortedWith(compareBy
-                    { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+                    { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
                 }
                 R.id.alpha -> {
                     subSaveds?.sortedWith(compareBy { it?.subName })
                 }
                 else -> {
                     subSaveds?.sortedWith(compareBy
-                    { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })?.asReversed()
+                    { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })?.asReversed()
                 }
             }
             adapter!!.setSubs(subs)
@@ -125,7 +125,7 @@ class SavedActivity : AppCompatActivity() {
             }
             R.id.recent -> {
                 subs = subs?.sortedWith(compareBy
-                { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })?.asReversed()
+                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })?.asReversed()
                 adapter!!.setSubs(subs)
             }
             R.id.alpha -> {
@@ -134,7 +134,7 @@ class SavedActivity : AppCompatActivity() {
             }
             R.id.oldest -> {
                 subs = subs?.sortedWith(compareBy
-                { SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
                 adapter!!.setSubs(subs)
             }
         }
@@ -167,7 +167,7 @@ class SavedActivity : AppCompatActivity() {
                 return
             }
         }
-        subViewModel!!.insert(SubSaved((Math.random() * 10000).toInt() + 1, saveVal, SimpleDateFormat("MM-dd-yyyy 'at' hh:mm:ss", Locale.CANADA).format(Date())))
+        subViewModel!!.insert(SubSaved((Math.random() * 10000).toInt() + 1, saveVal, SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date())))
         Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
     }
 }
