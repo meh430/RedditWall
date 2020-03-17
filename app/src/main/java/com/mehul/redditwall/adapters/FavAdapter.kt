@@ -1,4 +1,4 @@
-package com.mehul.redditwall.favorites
+package com.mehul.redditwall.adapters
 
 
 import android.app.Activity
@@ -11,7 +11,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.mehul.redditwall.*
+import com.mehul.redditwall.R
+import com.mehul.redditwall.activities.MainActivity
+import com.mehul.redditwall.activities.SettingsActivity
+import com.mehul.redditwall.activities.WallActivity
+import com.mehul.redditwall.favorites.FavImage
+import com.mehul.redditwall.objects.BitURL
 
 class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerView.Adapter<FavAdapter.FavViewHolder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(con)

@@ -1,4 +1,4 @@
-package com.mehul.redditwall
+package com.mehul.redditwall.adapters
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -15,6 +15,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.mehul.redditwall.R
+import com.mehul.redditwall.activities.MainActivity
+import com.mehul.redditwall.activities.SettingsActivity
+import com.mehul.redditwall.objects.Recommendation
 import java.util.*
 
 class RecAdapter internal constructor(

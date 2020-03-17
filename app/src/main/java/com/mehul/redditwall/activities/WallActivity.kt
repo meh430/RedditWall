@@ -1,4 +1,4 @@
-package com.mehul.redditwall
+package com.mehul.redditwall.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -34,10 +34,13 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide.with
 import com.google.gson.Gson
+import com.mehul.redditwall.R
 import com.mehul.redditwall.favorites.FavImage
 import com.mehul.redditwall.favorites.FavViewModel
 import com.mehul.redditwall.history.HistViewModel
 import com.mehul.redditwall.history.HistoryItem
+import com.mehul.redditwall.objects.BitURL
+import com.mehul.redditwall.rest.RestQuery
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

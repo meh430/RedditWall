@@ -1,4 +1,4 @@
-package com.mehul.redditwall.savedsub
+package com.mehul.redditwall.adapters
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -12,10 +12,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-
-import com.mehul.redditwall.MainActivity
 import com.mehul.redditwall.R
-import com.mehul.redditwall.SettingsActivity
+import com.mehul.redditwall.activities.MainActivity
+import com.mehul.redditwall.activities.SettingsActivity
+import com.mehul.redditwall.savedsub.SubSaved
 
 class SubAdapter(private val con: Context) : RecyclerView.Adapter<SubAdapter.SubViewHolder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(con)

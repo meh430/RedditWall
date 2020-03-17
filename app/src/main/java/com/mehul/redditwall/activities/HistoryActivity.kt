@@ -1,4 +1,4 @@
-package com.mehul.redditwall
+package com.mehul.redditwall.activities
 
 import android.Manifest
 import android.content.Context
@@ -29,9 +29,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.leinardi.android.speeddial.SpeedDialView
-import com.mehul.redditwall.history.HistAdapter
+import com.mehul.redditwall.R
+import com.mehul.redditwall.adapters.HistAdapter
 import com.mehul.redditwall.history.HistViewModel
 import com.mehul.redditwall.history.HistoryItem
+import com.mehul.redditwall.objects.BitURL
+import com.mehul.redditwall.objects.ProgressNotify
+import com.mehul.redditwall.objects.RecyclerListener
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream

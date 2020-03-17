@@ -1,4 +1,4 @@
-package com.mehul.redditwall
+package com.mehul.redditwall.activities
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import com.mehul.redditwall.R
 
 
 class PostActivity : AppCompatActivity() {

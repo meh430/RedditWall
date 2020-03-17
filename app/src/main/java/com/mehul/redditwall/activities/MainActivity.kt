@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package com.mehul.redditwall
+package com.mehul.redditwall.activities
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -28,6 +28,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.gson.Gson
+import com.mehul.redditwall.R
+import com.mehul.redditwall.adapters.ImageAdapter
+import com.mehul.redditwall.objects.BitURL
+import com.mehul.redditwall.objects.RecyclerListener
+import com.mehul.redditwall.rest.QueryRequest
 import kotlinx.coroutines.*
 
 @SuppressLint("SetTextI18n")

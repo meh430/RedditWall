@@ -18,38 +18,38 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".HistoryActivity"
+            android:name=".activities.HistoryActivity"
             android:label="History"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".PostActivity"
+            android:name=".activities.PostActivity"
             android:label="Post Comments"
-            android:parentActivityName=".WallActivity" />
+            android:parentActivityName=".activities.WallActivity" />
         <activity
-            android:name=".RecActivity"
+            android:name=".activities.RecActivity"
             android:label="Recommendations"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.MainActivity" />
         <activity
-            android:name=".FavImageActivity"
+            android:name=".activities.FavImageActivity"
             android:label="Favorite Images"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.MainActivity" />
         <activity
-            android:name=".SavedActivity"
+            android:name=".activities.SavedActivity"
             android:label="Saved Reddits"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:label="Settings"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.MainActivity" />
         <activity
-            android:name=".WallActivity"
+            android:name=".activities.WallActivity"
             android:label="Image Preview"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.ActionBar" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:label="Reddit Walls"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

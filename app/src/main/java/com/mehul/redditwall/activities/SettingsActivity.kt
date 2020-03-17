@@ -1,4 +1,4 @@
-package com.mehul.redditwall
+package com.mehul.redditwall.activities
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import com.mehul.redditwall.R
 
 class SettingsActivity : AppCompatActivity() {
     private var widthEdit: EditText? = null

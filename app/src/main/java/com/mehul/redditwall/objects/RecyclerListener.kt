@@ -1,4 +1,4 @@
-package com.mehul.redditwall
+package com.mehul.redditwall.objects
 
 import android.content.Context
 import android.view.GestureDetector

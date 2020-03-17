@@ -1,4 +1,4 @@
-package com.mehul.redditwall
+package com.mehul.redditwall.activities
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -8,6 +8,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.mehul.redditwall.R
+import com.mehul.redditwall.adapters.RecAdapter
+import com.mehul.redditwall.objects.Recommendation
+import com.mehul.redditwall.rest.RestRecs
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList

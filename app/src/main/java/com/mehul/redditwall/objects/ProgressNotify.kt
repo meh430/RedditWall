@@ -1,4 +1,4 @@
-package com.mehul.redditwall
+package com.mehul.redditwall.objects
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import androidx.core.app.NotificationCompat
+import com.mehul.redditwall.R
 
 class ProgressNotify(val context: Context, val size: Int) {
     private var notifyManager: NotificationManager? = null

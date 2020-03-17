@@ -1,4 +1,4 @@
-package com.mehul.redditwall
+package com.mehul.redditwall.adapters
 
 import android.app.Activity
 import android.content.Context
@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.mehul.redditwall.R
+import com.mehul.redditwall.objects.BitURL
 
 class ImageAdapter internal constructor(private val context: Context,
                                         private var images: ArrayList<BitURL>?) :

@@ -1,4 +1,4 @@
-package com.mehul.redditwall.history
+package com.mehul.redditwall.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.mehul.redditwall.R
+import com.mehul.redditwall.history.HistoryItem
 
 class HistAdapter(private val con: Context) : RecyclerView.Adapter<HistAdapter.HistViewHolder>() {
     private val inflater = LayoutInflater.from(con)

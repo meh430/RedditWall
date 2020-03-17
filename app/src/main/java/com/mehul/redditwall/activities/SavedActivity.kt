@@ -1,4 +1,4 @@
-package com.mehul.redditwall
+package com.mehul.redditwall.activities
 
 import android.content.Context
 import android.graphics.Color
@@ -19,7 +19,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.mehul.redditwall.savedsub.SubAdapter
+import com.mehul.redditwall.R
+import com.mehul.redditwall.adapters.SubAdapter
 import com.mehul.redditwall.savedsub.SubSaved
 import com.mehul.redditwall.savedsub.SubViewModel
 import java.text.SimpleDateFormat

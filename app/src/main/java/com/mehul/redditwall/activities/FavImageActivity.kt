@@ -1,4 +1,4 @@
-package com.mehul.redditwall
+package com.mehul.redditwall.activities
 
 import android.Manifest
 import android.app.Activity
@@ -26,9 +26,12 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.leinardi.android.speeddial.SpeedDialView
-import com.mehul.redditwall.favorites.FavAdapter
+import com.mehul.redditwall.R
+import com.mehul.redditwall.adapters.FavAdapter
 import com.mehul.redditwall.favorites.FavImage
 import com.mehul.redditwall.favorites.FavViewModel
+import com.mehul.redditwall.objects.BitURL
+import com.mehul.redditwall.objects.ProgressNotify
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream

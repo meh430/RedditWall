@@ -1,4 +1,4 @@
-package com.mehul.redditwall
+package com.mehul.redditwall.rest
 
 import android.app.Activity
 import android.content.Context
@@ -8,6 +8,10 @@ import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import com.bumptech.glide.Glide
+import com.mehul.redditwall.activities.MainActivity
+import com.mehul.redditwall.activities.SettingsActivity
+import com.mehul.redditwall.adapters.ImageAdapter
+import com.mehul.redditwall.objects.BitURL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.NonCancellable.isActive
