@@ -60,7 +60,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var isGif: Boolean = false
     private var downloadOriginal = false
     private var fromFav: Boolean = false
-    private val WRITE = 1231
     private var index: Int = 0
     private var width: Int = 0
     private var height: Int = 0
@@ -299,8 +298,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         val root = Environment.getExternalStorageDirectory().toString()
         val myDir = File("$root/RedditWalls")
         myDir.mkdirs()
-        fname = SimpleDateFormat("MM-dd-yyyy 'at' hh-mm-ss", Locale.CANADA).format(Date())
-                .replace(" ", "") + ".jpg"
+        fname = (0..999999999).random().toString().replace(" ", "") + ".jpg"
+
         val file = File(myDir, fname!!)
         if (file.exists())
             file.delete()
@@ -536,6 +535,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     companion object {
         private const val PRIMARY_CHANNEL_ID = "primary_notification_channel"
         private const val NOTIFICATION_ID = 0
+        const val WRITE = 1231
         const val WALL_URL = "WALLURL"
         const val GIF = "GIF"
         const val LIST = "LIST"

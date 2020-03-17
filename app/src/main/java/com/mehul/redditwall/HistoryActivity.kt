@@ -1,10 +1,15 @@
 package com.mehul.redditwall
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -14,18 +19,22 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.history.HistAdapter
 import com.mehul.redditwall.history.HistViewModel
 import com.mehul.redditwall.history.HistoryItem
 import kotlinx.coroutines.*
+import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -39,6 +48,8 @@ class HistoryActivity : AppCompatActivity() {
     private var histViewModel: HistViewModel? = null
     private var histories: List<HistoryItem?> = ArrayList()
     private var loading: ProgressBar? = null
+    private var width = 1080
+    private var height = 1920
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +59,14 @@ class HistoryActivity : AppCompatActivity() {
         val sortIcon: Drawable = ContextCompat.getDrawable(applicationContext, R.drawable.ic_sort)!!
         val dark = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
                 .getBoolean(SettingsActivity.DARK, false)
+
+        width = getCon()
+                .getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+                .getInt(SettingsActivity.IMG_WIDTH, width)
+        height = getCon()
+                .getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+                .getInt(SettingsActivity.IMG_HEIGHT, height)
+
         if (dark) {
             sortIcon.setTint(Color.WHITE)
         } else {
@@ -149,7 +168,15 @@ class HistoryActivity : AppCompatActivity() {
                     return@OnActionSelectedListener false
                 }
                 R.id.down_all -> {
-                    Toast.makeText(con, "TODO", Toast.LENGTH_SHORT).show()
+                    if (ContextCompat.checkSelfPermission(getCon(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this,
+                                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), WallActivity.WRITE)
+                    } else {
+                        uiScope.launch {
+                            downloadAllImages()
+                        }
+                    }
                     return@OnActionSelectedListener false
                 }
                 R.id.random -> {
@@ -232,6 +259,65 @@ class HistoryActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        if (requestCode == WallActivity.WRITE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                uiScope.launch {
+                    downloadAllImages()
+                }
+            } else {
+                Toast.makeText(this, "Cannot download, please grant permissions", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private suspend fun downloadAllImages() {
+        val downloadOriginal = getCon()
+                .getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+                .getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
+        val notify = ProgressNotify(getCon(), histories.size)
+        notify.sendNotification()
+        var finalName = ""
+
+        withContext(Dispatchers.IO) {
+            val done = ArrayList<String?>()
+            for (i in histories.indices) {
+                if (done.contains(histories[i]?.url)) {
+                    continue
+                }
+                val bitmap = if (downloadOriginal) {
+                    Glide.with(getCon()).asBitmap().load(histories[i]?.url).submit().get()
+                } else {
+                    Glide.with(getCon()).asBitmap().load(histories[i]?.url).override(width, height).submit().get()
+                }
+
+                val root = Environment.getExternalStorageDirectory().toString()
+                val myDir = File("$root/RedditWalls")
+                myDir.mkdirs()
+                val fname = (0..999999999).random().toString().replace(" ", "") + ".jpg"
+                finalName = fname
+                val file = File(myDir, fname)
+                if (file.exists())
+                    file.delete()
+                try {
+                    val out = FileOutputStream(file)
+                    bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                    out.flush()
+                    out.close()
+                    MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
+                    done.add(histories[i]?.url)
+                    withContext(Dispatchers.Main) {
+                        Log.e("PROGRESS", "$i / ${histories.size}")
+                        notify.updateProgress(i)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        notify.finish(finalName)
+    }
+
     private suspend fun convertToJSON(hists: List<HistoryItem?>): String {
         var json = ""
         withContext(Dispatchers.Default) {
@@ -244,5 +330,9 @@ class HistoryActivity : AppCompatActivity() {
             json = Gson().toJson(bits)
         }
         return json
+    }
+
+    private fun getCon(): Context {
+        return this
     }
 }

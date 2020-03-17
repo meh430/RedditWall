@@ -186,7 +186,8 @@ internal class QueryRequest {
                             if (isImage) {
                                 var bitmap: Bitmap? = null
                                 withContext(Dispatchers.IO) {
-                                    bitmap = Glide.with(context).asBitmap().load(url).override(width / scale, height / 4).centerCrop().submit().get()
+                                    bitmap = Glide.with(context).asBitmap()
+                                            .load(url).override(width / scale, height / 4).centerCrop().submit().get()
                                 }
 
                                 withContext(Dispatchers.Main) {

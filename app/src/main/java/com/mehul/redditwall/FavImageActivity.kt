@@ -1,10 +1,14 @@
 package com.mehul.redditwall
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.MenuItem
@@ -13,6 +17,8 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -24,6 +30,8 @@ import com.mehul.redditwall.favorites.FavAdapter
 import com.mehul.redditwall.favorites.FavImage
 import com.mehul.redditwall.favorites.FavViewModel
 import kotlinx.coroutines.*
+import java.io.File
+import java.io.FileOutputStream
 import java.util.concurrent.ExecutionException
 
 class FavImageActivity : AppCompatActivity() {
@@ -33,6 +41,8 @@ class FavImageActivity : AppCompatActivity() {
     private var favImages: List<FavImage?>? = ArrayList()
     private var uiScope = CoroutineScope(Dispatchers.Main)
     private var favJob: Job? = null
+    private var width = 1080
+    private var height = 1920
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fav_image)
@@ -89,7 +99,17 @@ class FavImageActivity : AppCompatActivity() {
                     return@OnActionSelectedListener false // false will close it without animation
                 }
                 R.id.down_all -> {
-                    Toast.makeText(con, "TODO", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(con, "TODO", Toast.LENGTH_SHORT).show()
+                    if (ContextCompat.checkSelfPermission(getCon(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this,
+                                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), WallActivity.WRITE)
+                    } else {
+                        uiScope.launch {
+                            downloadAllImages()
+                        }
+                    }
+
                     return@OnActionSelectedListener false // false will close it without animation
                 }
                 R.id.random -> {
@@ -134,8 +154,8 @@ class FavImageActivity : AppCompatActivity() {
         withContext(Dispatchers.Default) {
             val displayMetrics = DisplayMetrics()
             (con as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
-            val width = displayMetrics.widthPixels
-            val height = displayMetrics.heightPixels
+            width = displayMetrics.widthPixels
+            height = displayMetrics.heightPixels
             val scale = (con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
                     .getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
 
@@ -174,6 +194,66 @@ class FavImageActivity : AppCompatActivity() {
                 findViewById<View>(R.id.fav_empty).visibility = if (adapter!!.itemCount == 0) View.VISIBLE else View.GONE
             }
         }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        if (requestCode == WallActivity.WRITE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                uiScope.launch {
+                    downloadAllImages()
+                }
+            } else {
+                Toast.makeText(this, "Cannot download, please grant permissions", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private suspend fun downloadAllImages() {
+        val downloadOriginal = getCon()
+                .getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+                .getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
+        val notify = ProgressNotify(getCon(), favImages!!.size)
+        var finalName = ""
+        notify.sendNotification()
+        width = getCon()
+                .getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+                .getInt(SettingsActivity.IMG_WIDTH, width)
+        height = getCon()
+                .getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+                .getInt(SettingsActivity.IMG_HEIGHT, height)
+
+        withContext(Dispatchers.IO) {
+            for (i in favImages!!.indices) {
+                val bitmap = if (downloadOriginal) {
+                    Glide.with(getCon()).asBitmap().load(favImages!![i]?.favUrl).submit().get()
+                } else {
+                    Glide.with(getCon()).asBitmap().load(favImages!![i]?.favUrl).override(width, height).submit().get()
+                }
+
+                val root = Environment.getExternalStorageDirectory().toString()
+                val myDir = File("$root/RedditWalls")
+                myDir.mkdirs()
+                val fname = (0..999999999).random().toString().replace(" ", "") + ".jpg"
+                finalName = fname
+                val file = File(myDir, fname)
+                if (file.exists())
+                    file.delete()
+                try {
+                    val out = FileOutputStream(file)
+                    bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                    out.flush()
+                    out.close()
+                    MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
+                    withContext(Dispatchers.Main) {
+                        Log.e("PROGRESS", "$i / ${favImages!!.size}")
+                        notify.updateProgress(i)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        notify.finish(finalName)
     }
 
     private fun getCon(): Context {
