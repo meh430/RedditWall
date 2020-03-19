@@ -17,6 +17,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <receiver android:name=".NextWallpaper">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/next_wallpaper_info" />
+        </receiver>
+        <receiver
+            android:name=".ChangeWallpaper"
+            android:enabled="true"
+            android:exported="true" />
+
         <activity
             android:name=".activities.HistoryActivity"
             android:label="History"

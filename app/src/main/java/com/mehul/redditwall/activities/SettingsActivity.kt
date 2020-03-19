@@ -1,16 +1,20 @@
 package com.mehul.redditwall.activities
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.DisplayMetrics
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import com.mehul.redditwall.ChangeWallpaper
 import com.mehul.redditwall.R
 
 class SettingsActivity : AppCompatActivity() {
@@ -18,10 +22,16 @@ class SettingsActivity : AppCompatActivity() {
     private var heightEdit: EditText? = null
     private var defaultEdit: EditText? = null
     private var scaleSeek: SeekBar? = null
+    private var intervalSeek: SeekBar? = null
+    private var intervalCount: TextView? = null
     private var seekCount: TextView? = null
     private var preferences: SharedPreferences? = null
     private var dark = false
+    private var alarmChanged = false
     private var stateChanged = false
+    private var wallAlarm: AlarmManager? = null
+    private var wallChangeIntent: Intent? = null
+    private var pending: PendingIntent? = null
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,11 +39,17 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
         supportActionBar?.elevation = 0F
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+        wallAlarm = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        wallChangeIntent = Intent(this, ChangeWallpaper::class.java)
+        pending = PendingIntent.getBroadcast(this, 2, wallChangeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        intervalSeek = findViewById(R.id.interval_seek)
+        intervalCount = findViewById(R.id.interval_count)
         seekCount = findViewById(R.id.scale_count)
         scaleSeek = findViewById(R.id.scale_seek)
         widthEdit = findViewById(R.id.width_edit)
         heightEdit = findViewById(R.id.height_edit)
         defaultEdit = findViewById(R.id.default_edit)
+        val randomSwitch = findViewById<Switch>(R.id.random_changer)
         val gifSwitch = findViewById<Switch>(R.id.gif_switch)
         val darkSwitch = findViewById<Switch>(R.id.dark_switch)
         val downloadOrigin = findViewById<Switch>(R.id.download_origin)
@@ -41,11 +57,16 @@ class SettingsActivity : AppCompatActivity() {
         darkSwitch.isChecked = dark
         gifSwitch.isChecked = preferences!!.getBoolean(LOAD_GIF, true)
         downloadOrigin.isChecked = preferences!!.getBoolean(DOWNLOAD_ORIGIN, false)
+        randomSwitch.isChecked = preferences!!.getBoolean(RANDOM_ENABLED, false)
+        intervalSeek!!.progress = preferences!!.getInt(RANDOM_INTERVAL, 0)
+        intervalCount!!.text = (intervalSeek!!.progress + 1).toString() + " hrs"
         scaleSeek!!.progress = preferences!!.getInt(LOAD_SCALE, 0)
         seekCount!!.text = ((scaleSeek!!.progress + 1) * 2).toString() + "X"
+        randomSwitch.setOnCheckedChangeListener { _, b ->
+            preferences!!.edit().putBoolean(RANDOM_ENABLED, b).apply()
+        }
         gifSwitch.setOnCheckedChangeListener { _, b ->
             preferences!!.edit().putBoolean(LOAD_GIF, b).apply()
-
         }
         darkSwitch.setOnCheckedChangeListener { _, b ->
             dark = b
@@ -61,7 +82,6 @@ class SettingsActivity : AppCompatActivity() {
         downloadOrigin.setOnCheckedChangeListener { _, b ->
             preferences!!.edit().putBoolean(DOWNLOAD_ORIGIN, b).apply()
         }
-        scaleSeek = findViewById(R.id.scale_seek)
         scaleSeek!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
                 if (i > 0) {
@@ -76,6 +96,22 @@ class SettingsActivity : AppCompatActivity() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
+
+        intervalSeek!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
+                alarmChanged = true
+                if (i > 0) {
+                    intervalCount!!.text = (i + 1).toString() + " hrs"
+                } else {
+                    intervalCount!!.text = "1 hrs"
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        })
+
         val disp = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(disp)
         val width = preferences!!.getInt(IMG_WIDTH, disp.widthPixels)
@@ -93,6 +129,19 @@ class SettingsActivity : AppCompatActivity() {
         val preferenceEditor = preferences!!.edit()
         preferenceEditor.putInt(LOAD_SCALE, scaleSeek!!.progress)
         preferenceEditor.putBoolean(DARK, dark)
+        preferenceEditor.putInt(RANDOM_INTERVAL, intervalSeek!!.progress)
+        if (preferences!!.getBoolean(RANDOM_ENABLED, false) && alarmChanged) {
+            val interval = (intervalSeek!!.progress + 1) * 60 * 60 * 1000
+            val triggerTime = SystemClock.elapsedRealtime() + interval
+            if (wallAlarm != null) {
+                Toast.makeText(this, "Fired Alarm", Toast.LENGTH_SHORT).show()
+                wallAlarm!!.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, interval.toLong(), pending)
+            }
+        } else {
+            if (wallAlarm != null) {
+                wallAlarm!!.cancel(pending!!)
+            }
+        }
         val disp = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(disp)
         var width = disp.widthPixels
@@ -108,7 +157,6 @@ class SettingsActivity : AppCompatActivity() {
         if (valid) {
             preferenceEditor.putInt(IMG_WIDTH, width)
             preferenceEditor.putInt(IMG_HEIGHT, height)
-            Toast.makeText(this, "Saved Settings", Toast.LENGTH_SHORT).show()
         }
 
         val defaultSub = defaultEdit!!.text.toString()
@@ -148,6 +196,8 @@ class SettingsActivity : AppCompatActivity() {
         const val LOAD_GIF = "LOADGIF"
         const val DARK = "DARK"
         const val DOWNLOAD_ORIGIN = "DOWNLOAD_ORIGINAL"
+        const val RANDOM_ENABLED = "SWITCHING_ENABLED"
+        const val RANDOM_INTERVAL = "INTERVAL"
     }
 
     fun clearCache(view: View) {

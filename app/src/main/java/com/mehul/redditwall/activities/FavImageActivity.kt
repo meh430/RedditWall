@@ -122,6 +122,9 @@ class FavImageActivity : AppCompatActivity() {
                     }
 
                     var randomNum = (0..favImages!!.size).random()
+                    while (randomNum >= favImages!!.size || randomNum < 0) {
+                        randomNum = (0..favImages!!.size).random()
+                    }
                     if (randomNum == favImages!!.size) randomNum = favImages!!.size - 1
                     val current = adapter!!.getFavAtPosition(randomNum)
 

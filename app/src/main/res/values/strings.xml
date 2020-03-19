@@ -9,6 +9,8 @@
     <item name="fab_delete" type="id" />
     <item name="fab_download" type="id" />
     <item name="fab_random" type="id" />
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>
 
 

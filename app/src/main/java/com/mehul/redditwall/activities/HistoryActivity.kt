@@ -190,7 +190,10 @@ class HistoryActivity : AppCompatActivity() {
                     }
 
 
-                    val randomNum = (0..histories.size).random()
+                    var randomNum = (0..histories.size).random()
+                    while (randomNum >= histories.size || randomNum < 0) {
+                        randomNum = (0..histories.size).random()
+                    }
                     cancelThreads()
                     val current = histories[randomNum]
                     val wallIntent = Intent(currCon, WallActivity::class.java)

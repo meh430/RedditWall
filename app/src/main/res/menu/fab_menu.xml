@@ -18,5 +18,5 @@
         android:id="@+id/random"
         android:icon="@drawable/ic_shuffle"
         android:orderInCategory="70"
-        android:title="RANDOM" />
+        android:title="CHOOSE RANDOM" />
 </menu>

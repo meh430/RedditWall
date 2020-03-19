@@ -5,7 +5,7 @@ import android.os.AsyncTask
 import androidx.lifecycle.LiveData
 import java.util.concurrent.ExecutionException
 
-class FavRepository internal constructor(application: Context) {
+class FavRepository constructor(application: Context) {
     private val favDAO: FavDAO?
     val allFav: LiveData<List<FavImage?>?>?
 
