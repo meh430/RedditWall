@@ -434,40 +434,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        val dark = preferences!!.getBoolean(SettingsActivity.DARK, false)
-        val currMode = if (dark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-        if (currMode == AppCompatDelegate.getDefaultNightMode()) {
-            return
-        }
-
-        if (dark) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            delegate.applyDayNight()
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            delegate.applyDayNight()
-        }
-    }
-
-    override fun onRestart() {
-        super.onRestart()
-        val dark = preferences!!.getBoolean(SettingsActivity.DARK, false)
-        val currMode = if (dark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-        if (currMode == AppCompatDelegate.getDefaultNightMode()) {
-            return
-        }
-
-        if (dark) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            delegate.applyDayNight()
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            delegate.applyDayNight()
-        }
-    }
-
     @InternalCoroutinesApi
     private suspend fun loadImages(con: Context, query: String, first: Boolean, images: ArrayList<BitURL>) {
         if (first) {
