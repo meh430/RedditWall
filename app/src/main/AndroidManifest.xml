@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:largeHeap="true"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
@@ -49,11 +50,13 @@
             android:label="Favorite Images"
             android:parentActivityName=".activities.MainActivity" />
         <activity
+            android:windowSoftInputMode="stateHidden"
             android:name=".activities.SavedActivity"
             android:label="Saved Reddits"
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:windowSoftInputMode="stateHidden"
             android:name=".activities.SettingsActivity"
             android:label="Settings"
             android:parentActivityName=".activities.MainActivity" />
@@ -63,6 +66,7 @@
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.ActionBar" />
         <activity
+            android:windowSoftInputMode="stateHidden"
             android:name=".activities.MainActivity"
             android:label="Reddit Walls"
             android:theme="@style/AppTheme.NoActionBar">

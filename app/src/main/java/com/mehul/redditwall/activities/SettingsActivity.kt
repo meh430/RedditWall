@@ -9,13 +9,14 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.DisplayMetrics
-import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.NavUtils
 import com.mehul.redditwall.ChangeWallpaper
 import com.mehul.redditwall.R
+
 
 class SettingsActivity : AppCompatActivity() {
     private var widthEdit: EditText? = null
@@ -164,27 +165,10 @@ class SettingsActivity : AppCompatActivity() {
         preferenceEditor.apply()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            //if dark
-            if (stateChanged) {
-                val main = Intent(this, MainActivity::class.java)
-                startActivity(main)
-            }
-            super.onBackPressed()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     override fun onBackPressed() {
+        NavUtils.navigateUpFromSameTask(this)
         super.onBackPressed()
-        if (stateChanged) {
-            val main = Intent(this, MainActivity::class.java)
-            startActivity(main)
-        }
     }
-
 
     companion object {
         //pref keys

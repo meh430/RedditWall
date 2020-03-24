@@ -31,6 +31,14 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="open">
+        <item name="android:icon">@drawable/ic_open_dark</item>
+    </style>
+
+    <style name="filled">
+        <item name="android:icon">@drawable/ic_filled_dark</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />

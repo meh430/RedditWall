@@ -1,14 +1,14 @@
 package com.mehul.redditwall.objects
 
 import android.graphics.Bitmap
+import com.google.gson.annotations.Expose
 
 import com.google.gson.annotations.SerializedName
 
-class BitURL(@field:SerializedName("img")
-             internal val img: Bitmap?, @field:SerializedName("url")
-             internal val url: String,
-             @field:SerializedName("post")
+class BitURL(internal val img: Bitmap?, @Expose @field:SerializedName("url")
+internal val url: String, @Expose @field:SerializedName("post")
              internal val postLink: String) {
+    @Expose
     @SerializedName("gif")
     private var containsGif = false
 

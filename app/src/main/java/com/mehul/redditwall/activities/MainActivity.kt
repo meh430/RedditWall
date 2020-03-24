@@ -27,7 +27,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
-import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.ImageAdapter
 import com.mehul.redditwall.objects.BitURL
@@ -99,11 +99,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 for (i in (if (p >= 10) p - 10 else 0) until currList.size) {
                     prevs.add(currList[i])
                 }
-
+                val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
                 val index = if (p >= 10) 10 else p
+                val jsonList = gson.toJson(prevs)
                 wallIntent.putExtra(WallActivity.INDEX, index)
-                wallIntent.putExtra(WallActivity.LIST, Gson().toJson(prevs))
 
+                wallIntent.putExtra(WallActivity.LIST, jsonList)
                 currCon!!.startActivity(wallIntent)
             }
         }))
@@ -430,6 +431,40 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 adapter!!.setList(topImages)
                 runQuery()
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val dark = preferences!!.getBoolean(SettingsActivity.DARK, false)
+        val currMode = if (dark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        if (currMode == AppCompatDelegate.getDefaultNightMode()) {
+            return
+        }
+
+        if (dark) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            delegate.applyDayNight()
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            delegate.applyDayNight()
+        }
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        val dark = preferences!!.getBoolean(SettingsActivity.DARK, false)
+        val currMode = if (dark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        if (currMode == AppCompatDelegate.getDefaultNightMode()) {
+            return
+        }
+
+        if (dark) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            delegate.applyDayNight()
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            delegate.applyDayNight()
         }
     }
 

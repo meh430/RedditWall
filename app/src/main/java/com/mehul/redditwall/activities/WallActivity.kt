@@ -28,12 +28,13 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide.with
-import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.mehul.redditwall.R
 import com.mehul.redditwall.favorites.FavImage
 import com.mehul.redditwall.favorites.FavViewModel
@@ -233,7 +234,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         fromFav = incoming.getBooleanExtra(FROM_FAV, true)
         jsonList = incoming.getStringExtra(LIST)
         uiScope.launch {
-            if (jsonList != null) {
+            if (jsonList != null && jsonList!!.isNotEmpty()) {
                 imageList = jsonToList(jsonList!!)
             }
         }
@@ -252,9 +253,18 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         } else {
             incoming.getStringExtra(MainActivity.QUERY)
         }
-
-        filledStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_black)
-        openStar = ContextCompat.getDrawable(applicationContext, R.drawable.ic_star_open)
+        val open = if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            R.drawable.ic_open_dark
+        } else {
+            R.drawable.ic_open_light
+        }
+        val filled = if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            R.drawable.ic_filled_dark
+        } else {
+            R.drawable.ic_filled_light
+        }
+        filledStar = ContextCompat.getDrawable(applicationContext, filled)
+        openStar = ContextCompat.getDrawable(applicationContext, open)
         starred = menu
         val con = this
         //TODO: Replace this monstrosity with coroutines
@@ -387,6 +397,9 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     private fun swipedRight() {
+        if (jsonList!!.isEmpty()) {
+            return
+        }
         Log.e("R", "Right")
         if ((index - 1) >= 0) {
             index--
@@ -403,6 +416,9 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     private fun swipedLeft() {
+        if (jsonList!!.isEmpty()) {
+            return
+        }
         Log.e("L", "LEFT")
         val inBound = index + 1 < imageList.size
         if (inBound) {
@@ -547,7 +563,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         const val FAV_LIST = "FAV_LIST"
 
         fun listToJson(imgs: ArrayList<BitURL>?): String {
-            return Gson().toJson(imgs)
+            val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
+            return gson.toJson(imgs)
         }
     }
 }
