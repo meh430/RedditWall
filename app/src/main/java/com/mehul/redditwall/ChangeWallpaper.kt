@@ -12,6 +12,10 @@ import com.bumptech.glide.request.transition.Transition
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.favorites.FavRepository
+import com.mehul.redditwall.history.HistoryItem
+import com.mehul.redditwall.history.HistoryRepository
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ChangeWallpaper : BroadcastReceiver() {
 
@@ -47,6 +51,10 @@ class ChangeWallpaper : BroadcastReceiver() {
                     .into(object : CustomTarget<Bitmap>() {
                         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                             wall?.setBitmap(resource)
+                            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, current!!.favName,
+                                    SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
+                                    HistoryItem.REFRESH, current.favUrl, current.postLink)
+                            HistoryRepository(con).insert(histItem)
                         }
 
                         override fun onLoadCleared(placeholder: Drawable?) {}

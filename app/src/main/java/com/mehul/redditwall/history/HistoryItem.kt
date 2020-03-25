@@ -57,10 +57,11 @@ class HistoryItem(@field:PrimaryKey(autoGenerate = true) var id: Int,
     companion object {
         private val months = arrayOf("INIT", "Jan", "Feb", "March", "April", "May", "June", "July", "Oct", "Nov", "Dec")
         private val ordinals = arrayOf("th", "st", "nd", "rd")
-        public val sources = arrayOf("Downloaded", "Set on home screen", "Set on lock screen", "Set on both")
-        public const val DOWNLOADED = 0
-        public const val HOME_SCREEN = 1
-        public const val LOCK_SCREEN = 2
-        public const val BOTH = 3
+        val sources = arrayOf("Downloaded", "Set on home screen", "Set on lock screen", "Set on both", "Set through refresh")
+        const val DOWNLOADED = 0
+        const val HOME_SCREEN = 1
+        const val LOCK_SCREEN = 2
+        const val BOTH = 3
+        const val REFRESH = 4
     }
 }
