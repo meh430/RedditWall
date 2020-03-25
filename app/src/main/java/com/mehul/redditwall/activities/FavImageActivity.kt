@@ -1,7 +1,6 @@
 package com.mehul.redditwall.activities
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,7 +8,6 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -152,17 +150,17 @@ class FavImageActivity : AppCompatActivity() {
     }
 
     private suspend fun loadFavBits(favs: List<FavImage?>?, con: Context) {
-        val bits = ArrayList<BitURL>()
-
+        loading?.visibility = View.VISIBLE
         withContext(Dispatchers.Default) {
-            val displayMetrics = DisplayMetrics()
-            (con as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
-            width = displayMetrics.widthPixels
-            height = displayMetrics.heightPixels
+            val bits = ArrayList<BitURL>()
+            val dims = MainActivity.getDimensions(con)
+            width = dims[0]
+            height = dims[1]
             val scale = (con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
                     .getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
 
-            for (fav in favs!!) {
+            for (i in favs!!.indices) {
+                val fav = favs[i]
                 if (!isActive) {
                     break
                 }
@@ -176,19 +174,23 @@ class FavImageActivity : AppCompatActivity() {
                 }
                 val temp = BitURL(bitmap, fav!!.favUrl, fav.postLink)
                 temp.setGif(fav.isGif)
-                withContext(Dispatchers.Main) {
-                    bits.add(temp)
-                    adapt!!.setFavs(bits, favs)
-                    loading?.visibility = View.GONE
+                bits.add(temp)
+
+                if (i >= favs.size / 2) {
+                    withContext(Dispatchers.Main) {
+                        adapt!!.setFavs(bits, favs)
+                        loading?.visibility = View.GONE
+                    }
                 }
             }
 
             withContext(Dispatchers.Main) {
-                loading?.visibility = View.GONE
                 adapt!!.setFavs(bits, favs)
-                findViewById<View>(R.id.fav_empty).visibility = if (adapt!!.itemCount == 0) View.VISIBLE else View.GONE
             }
         }
+
+        loading?.visibility = View.GONE
+        findViewById<View>(R.id.fav_empty).visibility = if (adapt!!.itemCount == 0) View.VISIBLE else View.GONE
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
