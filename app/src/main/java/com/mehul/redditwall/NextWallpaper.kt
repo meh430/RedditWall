@@ -6,16 +6,14 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
-import android.widget.Toast
 
 /**
  * Implementation of App Widget functionality.
  */
 class NextWallpaper : AppWidgetProvider() {
-    override fun onReceive(context: Context?, intent: Intent?) {
+    override fun onReceive(context: Context, intent: Intent?) {
         super.onReceive(context, intent)
         if (intent?.action == "CHANGE_TIME") {
-            Toast.makeText(context!!, "Changing wallpaper...", Toast.LENGTH_SHORT).show()
             ChangeWallpaper.changeWall(context)
         }
     }

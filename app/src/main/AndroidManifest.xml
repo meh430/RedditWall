@@ -7,17 +7,28 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
-        android:largeHeap="true"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <receiver android:name=".NextWallpaper">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -27,10 +38,11 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/next_wallpaper_info" />
         </receiver>
+
         <receiver
             android:name=".ChangeWallpaper"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="false" />
 
         <activity
             android:name=".activities.HistoryActivity"
@@ -50,26 +62,26 @@
             android:label="Favorite Images"
             android:parentActivityName=".activities.MainActivity" />
         <activity
-            android:windowSoftInputMode="stateHidden"
             android:name=".activities.SavedActivity"
             android:label="Saved Reddits"
             android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
         <activity
-            android:windowSoftInputMode="stateHidden"
             android:name=".activities.SettingsActivity"
             android:label="Settings"
-            android:parentActivityName=".activities.MainActivity" />
+            android:parentActivityName=".activities.MainActivity"
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activities.WallActivity"
             android:label="Image Preview"
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.ActionBar" />
         <activity
-            android:windowSoftInputMode="stateHidden"
             android:name=".activities.MainActivity"
             android:label="Reddit Walls"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

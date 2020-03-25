@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -42,6 +43,7 @@ class ChangeWallpaper : BroadcastReceiver() {
             }
             if (randomNum == favs.size) randomNum = favs.size - 1
             val current = favs[randomNum]
+            Toast.makeText(con, "Changing Wallpaper...", Toast.LENGTH_SHORT).show()
 
             val wall: WallpaperManager? = con.applicationContext.getSystemService(Context.WALLPAPER_SERVICE) as WallpaperManager
             Glide.with(con)
