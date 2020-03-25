@@ -20,6 +20,7 @@ An app that pulls images from a specified subreddit to set as device wallpaper
 - Set scale down for images being loaded in gridview to minimize bandwidth consumption
 - View a list of curated subreddit recommendations stored in a remote database to get wallpapers from
 - View history of downloaded or set wallpapers
+- Place a widget on the homescreen that allows you to quickly switch to another random wallpaper from you favorites list
 ### Dark Mode Screenshots
 <img src="screens/dark_home.png" height="331" width="223"><img src="screens/preview.png" height="331" width="223"><img src="screens/dark_rec.png" height="331" width="223"><img src="screens/dark_fav.png" height="331" width="223"><img src="screens/fav_fab.png" height="331" width="223"><img src="screens/dark_saved.png" height="331" width="223"><img src="screens/dark_hist.png" height="331" width="223">
 ### Light Mode Screenshots
