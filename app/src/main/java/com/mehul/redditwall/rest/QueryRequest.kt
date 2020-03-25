@@ -1,9 +1,7 @@
 package com.mehul.redditwall.rest
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
@@ -141,10 +139,9 @@ internal class QueryRequest {
             withContext(Dispatchers.Default) {
                 val scale = (context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
                 !!.getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
-                val displayMetrics = DisplayMetrics()
-                (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
-                val width = displayMetrics.widthPixels
-                val height = displayMetrics.heightPixels
+                val dims = MainActivity.getDimensions(context)
+                val width = dims[0]
+                val height = dims[1]
                 try {
                     var json = JSONObject(jsonResult)
                     json = json.getJSONObject("data")

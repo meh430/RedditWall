@@ -1,11 +1,7 @@
 package com.mehul.redditwall.rest
 
-import android.app.Activity
 import android.content.Context
-import android.graphics.Bitmap
-import android.util.DisplayMetrics
 import android.util.Log
-import com.bumptech.glide.Glide
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.activities.WallActivity
@@ -20,7 +16,6 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.concurrent.ExecutionException
 
 //opens up https connection to get json data and return as a string
 @Suppress("LocalVariableName")
@@ -114,12 +109,6 @@ internal class RestQuery(private val QUERY: String, private val context: Context
     suspend fun getImages(jsonResult: String): ArrayList<BitURL> {
         val ret = ArrayList<BitURL>()
         withContext(Dispatchers.Default) {
-            val scale = (context?.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-            !!.getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
-            val displayMetrics = DisplayMetrics()
-            (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
-            val width = displayMetrics.widthPixels
-            val height = displayMetrics.heightPixels
             try {
                 var json = JSONObject(jsonResult)
                 json = json.getJSONObject("data")
@@ -144,9 +133,9 @@ internal class RestQuery(private val QUERY: String, private val context: Context
                     val image = preview.getJSONArray("images").getJSONObject(0)
                     var gif: JSONObject? = null
                     var isImage = true
-                    val canLoadGif = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-                            .getBoolean(SettingsActivity.LOAD_GIF, true)
-                    if (canLoadGif) {
+                    val canLoadGif = context?.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+                            ?.getBoolean(SettingsActivity.LOAD_GIF, true)
+                    if (canLoadGif!!) {
                         if (image.has("variants") && image.getJSONObject("variants").has("gif")) {
                             isImage = false
                             gif = image.getJSONObject("variants").getJSONObject("gif")
@@ -159,25 +148,10 @@ internal class RestQuery(private val QUERY: String, private val context: Context
                     } else {
                         gif!!.getJSONObject("source")
                     }
-
-                    try {
-                        val url = source.getString("url").replace("amp;".toRegex(), "")
-                        if (isImage) {
-                            var bitmap: Bitmap? = null
-                            withContext(Dispatchers.IO) {
-                                bitmap = Glide.with(context).asBitmap().load(url)
-                                        .override(width / scale, height / 4).centerCrop().submit().get()
-                            }
-                            ret.add(BitURL(bitmap, url, "https://www.reddit.com$postLink"))
-                        } else {
-                            ret.add(BitURL(null, url, "https://www.reddit.com$postLink"))
-                        }
-                    } catch (e: InterruptedException) {
-                        e.printStackTrace()
-                    } catch (e: ExecutionException) {
-                        e.printStackTrace()
-                    }
-
+                    val url = source.getString("url").replace("amp;".toRegex(), "")
+                    val temp = BitURL(null, url, "https://www.reddit.com$postLink")
+                    temp.setGif(!isImage)
+                    ret.add(temp)
                 }
             } catch (e: JSONException) {
                 e.printStackTrace()
