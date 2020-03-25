@@ -1,10 +1,8 @@
 package com.mehul.redditwall.adapters
 
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,10 +25,9 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
     private val scale: Int
 
     init {
-        val displayMetrics = DisplayMetrics()
-        (con as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
-        width = displayMetrics.widthPixels
-        height = displayMetrics.heightPixels
+        val dims = MainActivity.getDimensions(con)
+        width = dims[0]
+        height = dims[1]
         scale = (con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
                 .getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
     }
@@ -48,7 +45,6 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
             isClickable = true
         }
         holder.itemView.setOnClickListener {
-            //launch wall activity
             val wallIntent = Intent(con, WallActivity::class.java)
             wallIntent.apply {
                 putExtra(WallActivity.WALL_URL, current.url)

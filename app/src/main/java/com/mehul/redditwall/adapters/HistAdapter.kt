@@ -14,6 +14,7 @@ import com.mehul.redditwall.history.HistoryItem
 class HistAdapter(private val con: Context) : RecyclerView.Adapter<HistAdapter.HistViewHolder>() {
     private val inflater = LayoutInflater.from(con)
     private var histories: List<HistoryItem?>? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistViewHolder {
         val itemView = inflater.inflate(R.layout.history_item, parent, false)
         return HistViewHolder(itemView)

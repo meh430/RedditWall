@@ -3,13 +3,14 @@
 package com.mehul.redditwall.activities
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -55,10 +56,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var topChip: Chip? = null
     private var currentSort: Int = 0
     private var preferences: SharedPreferences? = null
-    private var currCon: Context? = null
 
     @InternalCoroutinesApi
-    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -74,7 +73,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         search = findViewById(R.id.search)
         val imageScroll = findViewById<RecyclerView>(R.id.imageScroll)
         imageScroll.layoutManager = GridLayoutManager(this, 2)
-        currCon = this
         imageScroll.addOnItemTouchListener(RecyclerListener(this, imageScroll, object : RecyclerListener.OnItemClickListener {
             override fun onLongItemClick(view: View?, position: Int) {}
 
@@ -88,7 +86,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 cancelThreads()
                 p = if (p <= 0) 0 else p
                 val current = currList!![p]
-                val wallIntent = Intent(currCon, WallActivity::class.java)
+                val wallIntent = Intent(getCon(), WallActivity::class.java)
                 wallIntent.apply {
                     putExtra(WallActivity.WALL_URL, current.getUrl())
                     putExtra(WallActivity.GIF, current.hasGif())
@@ -103,14 +101,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 val index = if (p >= 10) 10 else p
                 val jsonList = gson.toJson(prevs)
                 wallIntent.putExtra(WallActivity.INDEX, index)
-
                 wallIntent.putExtra(WallActivity.LIST, jsonList)
-                currCon!!.startActivity(wallIntent)
+                getCon().startActivity(wallIntent)
             }
         }))
-        hotImages = ArrayList()
-        newImages = ArrayList()
-        topImages = ArrayList()
         preferences = getSharedPreferences(SharedPrefFile, Context.MODE_PRIVATE)
         val dark = preferences!!.getBoolean(SettingsActivity.DARK, false)
         if (dark) {
@@ -121,57 +115,37 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             delegate.applyDayNight()
         }
         defaultLoad = preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper").toString()
-        newChip!!.setChipBackgroundColorResource(R.color.white)
-        topChip!!.setChipBackgroundColorResource(R.color.white)
-        hotChip!!.setChipBackgroundColorResource(R.color.white)
+        changeChipColor(-1)
         when (preferences!!.getInt(SettingsActivity.SORT_METHOD, HOT)) {
             HOT -> {
                 adapter = ImageAdapter(this, hotImages)
                 currentSort = HOT
-                hotChip!!.setChipBackgroundColorResource(R.color.chip)
-                hotChip!!.setTextColor(Color.WHITE)
+                changeChipColor(1)
             }
             NEW -> {
                 adapter = ImageAdapter(this, newImages)
                 currentSort = NEW
-                newChip!!.setChipBackgroundColorResource(R.color.chip)
-                newChip!!.setTextColor(Color.WHITE)
+                changeChipColor(0)
             }
             else -> {
-                topImages = ArrayList()
-                currentSort = TOP
                 adapter = ImageAdapter(this, topImages)
-                topChip!!.setChipBackgroundColorResource(R.color.chip)
-                topChip!!.setTextColor(Color.WHITE)
+                currentSort = TOP
+                changeChipColor(2)
             }
         }
-
         imageScroll.adapter = adapter
-
-
         hotChip!!.setOnClickListener(this)
         newChip!!.setOnClickListener(this)
         topChip!!.setOnClickListener(this)
-
         val savedIntent = intent
-
         defaultLoad = (if (savedIntent.getBooleanExtra(OVERRIDE, false)) {
             savedIntent.getStringExtra(SAVED)
         } else {
             preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")
         }).toString()
-
         queryString = defaultLoad
-
         search!!.hint = defaultLoad
-
-        val connMgr: ConnectivityManager? = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        var networkInfo: NetworkInfo? = null
-        if (connMgr != null) {
-            networkInfo = connMgr.activeNetworkInfo
-        }
-
-        if (networkInfo != null && networkInfo.isConnected) {
+        if (networkAvailable()) {
             imageJob = uiScope.launch {
                 loadImages(getCon(), defaultLoad, true, getList())
             }
@@ -179,9 +153,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             info!!.visibility = View.VISIBLE
             info!!.text = "No Network"
         }
-
         imageScroll.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
@@ -234,6 +206,30 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         })
     }
 
+    private fun changeChipColor(highlight: Int) {
+        newChip!!.setChipBackgroundColorResource(R.color.white)
+        hotChip!!.setChipBackgroundColorResource(R.color.white)
+        topChip!!.setChipBackgroundColorResource(R.color.white)
+        newChip!!.setTextColor(Color.BLACK)
+        hotChip!!.setTextColor(Color.BLACK)
+        topChip!!.setTextColor(Color.BLACK)
+        when (highlight) {
+            0 -> {
+                newChip!!.setChipBackgroundColorResource(R.color.chip)
+                newChip!!.setTextColor(Color.WHITE)
+            }
+            1 -> {
+                hotChip!!.setChipBackgroundColorResource(R.color.chip)
+                hotChip!!.setTextColor(Color.WHITE)
+            }
+            2 -> {
+                topChip!!.setChipBackgroundColorResource(R.color.chip)
+                topChip!!.setTextColor(Color.WHITE)
+            }
+            else -> return
+        }
+    }
+
     private fun getList(): ArrayList<BitURL> = when (currentSort) {
         NEW -> newImages
         HOT -> hotImages
@@ -244,25 +240,24 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         return this
     }
 
-    public override fun onStop() {
-        super.onStop()
-        Log.e("STOP", "STOP")
-    }
-
     public override fun onDestroy() {
         super.onDestroy()
         Log.e("DESTROY", "DESTROY")
         cancelThreads()
     }
 
+    private fun networkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
+
     @InternalCoroutinesApi
     fun startSearch(view: View) {
+        AFTER_HOT = ""
+        AFTER_NEW = ""
+        AFTER_TOP = ""
         cancelThreads()
-
-        if (imageJob != null && imageJob!!.isActive) {
-            Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
-            return
-        }
         queryString = ""
         loading!!.visibility = View.VISIBLE
         info!!.visibility = View.INVISIBLE
@@ -270,31 +265,20 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         hotImages.clear()
         topImages.clear()
         adapter!!.notifyDataSetChanged()
-        queryString = search!!.text.toString()
-        queryString = queryString.replace(" ", "")
+        queryString = search!!.text.toString().replace(" ", "")
         val inputManager: InputMethodManager? = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputManager?.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
 
-        inputManager?.hideSoftInputFromWindow(view.windowToken,
-                InputMethodManager.HIDE_NOT_ALWAYS)
-
-        val connMgr: ConnectivityManager? = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        var networkInfo: NetworkInfo? = null
-        if (connMgr != null) {
-            networkInfo = connMgr.activeNetworkInfo
-        }
-
-        if (networkInfo != null && networkInfo.isConnected && queryString.isNotEmpty()) {
+        if (networkAvailable() && queryString.isNotEmpty()) {
             imageJob = uiScope.launch {
                 loadImages(getCon(), queryString, true, getList())
             }
-
         } else {
             if (queryString.isEmpty()) {
                 queryString = defaultLoad
                 imageJob = uiScope.launch {
                     loadImages(getCon(), defaultLoad, true, getList())
                 }
-
             } else {
                 info!!.visibility = View.VISIBLE
                 info!!.text = "No Network"
@@ -307,7 +291,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         return true
     }
 
-    //Launch activities from menu here
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.saved_subs -> {
@@ -360,8 +343,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             else
                 queryString, true, getList())
         }
-
-        Log.e("BRUH", "$queryString, $defaultLoad")
     }
 
     @InternalCoroutinesApi
@@ -383,19 +364,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         adapter!!.notifyDataSetChanged()
         val prefEdit = preferences!!.edit()
-        hotChip!!.setTextColor(Color.BLACK)
-        newChip!!.setTextColor(Color.BLACK)
-        topChip!!.setTextColor(Color.BLACK)
         if (view == hotChip) {
             currentSort = HOT
             Log.e("CLICk", "CLICKED HOT")
             prefEdit.putInt(SettingsActivity.SORT_METHOD, HOT)
-            hotChip!!.setChipBackgroundColorResource(R.color.chip)
-            hotChip!!.setTextColor(Color.WHITE)
-            newChip!!.setChipBackgroundColorResource(R.color.white)
-            topChip!!.setChipBackgroundColorResource(R.color.white)
             prefEdit.apply()
-            if (hotImages.size > 0) {
+            changeChipColor(1)
+            if (hotImages.isNotEmpty()) {
                 adapter!!.setList(hotImages)
             } else {
                 adapter!!.setList(hotImages)
@@ -405,12 +380,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             currentSort = NEW
             Log.e("CLICk", "CLICKED NEW")
             prefEdit.putInt(SettingsActivity.SORT_METHOD, NEW)
-            hotChip!!.setChipBackgroundColorResource(R.color.white)
-            newChip!!.setChipBackgroundColorResource(R.color.chip)
-            newChip!!.setTextColor(Color.WHITE)
-            topChip!!.setChipBackgroundColorResource(R.color.white)
             prefEdit.apply()
-            if (newImages.size > 0) {
+            changeChipColor(0)
+            if (newImages.isNotEmpty()) {
                 adapter!!.setList(newImages)
             } else {
                 adapter!!.setList(newImages)
@@ -420,12 +392,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             currentSort = TOP
             Log.e("CLICk", "CLICKED TOP")
             prefEdit.putInt(SettingsActivity.SORT_METHOD, TOP)
-            hotChip!!.setChipBackgroundColorResource(R.color.white)
-            newChip!!.setChipBackgroundColorResource(R.color.white)
-            topChip!!.setChipBackgroundColorResource(R.color.chip)
-            topChip!!.setTextColor(Color.WHITE)
             prefEdit.apply()
-            if (topImages.size > 0) {
+            changeChipColor(2)
+            if (topImages.isNotEmpty()) {
                 adapter!!.setList(topImages)
             } else {
                 adapter!!.setList(topImages)
@@ -439,17 +408,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         if (first) {
             loading?.visibility = View.VISIBLE
         }
-
         info?.visibility = View.GONE
-
-
         withContext(Dispatchers.IO) {
             val json = QueryRequest.getQueryJson(query, first, con)
             withContext(Dispatchers.Default) {
                 QueryRequest.loadImgsFromJSON(json, adapter, con, images, if (first) loading else bottomLoading, first)
             }
         }
-
         adapter?.notifyDataSetChanged()
         if (first) {
             loading?.visibility = View.GONE
@@ -475,5 +440,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         var AFTER_NEW: String? = null
         var AFTER_HOT: String? = null
         var AFTER_TOP: String? = null
+
+        public fun getDimensions(con: Context): IntArray {
+            val disp = DisplayMetrics()
+            (con as Activity).windowManager.defaultDisplay.getMetrics(disp)
+            return intArrayOf(disp.widthPixels, disp.heightPixels)
+        }
     }
 }

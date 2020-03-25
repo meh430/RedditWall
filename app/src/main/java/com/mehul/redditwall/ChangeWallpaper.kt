@@ -20,16 +20,13 @@ class ChangeWallpaper : BroadcastReceiver() {
             //change wallpaper
             changeWall(context)
         }
-
-        // This method is called when the BroadcastReceiver is receiving an Intent broadcast.
-        TODO("ChangeWallpaper.onReceive() is not implemented")
     }
 
     companion object {
         fun changeWall(con: Context) {
             val pref = con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-            val width = pref!!.getInt(SettingsActivity.IMG_WIDTH, 1080)
-            val height = pref.getInt(SettingsActivity.IMG_HEIGHT, 1920)
+            val width = pref!!.getInt(SettingsActivity.IMG_WIDTH, 1920)
+            val height = pref.getInt(SettingsActivity.IMG_HEIGHT, 1080)
             val favs = FavRepository(con).favAsList
             if (favs!!.isEmpty()) {
                 return

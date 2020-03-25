@@ -1,12 +1,10 @@
 package com.mehul.redditwall.adapters
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,18 +19,16 @@ import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.objects.Recommendation
 import java.util.*
 
-class RecAdapter internal constructor(
-        private val context: Context,
-        private val recs: ArrayList<Recommendation>?) : RecyclerView.Adapter<RecAdapter.ReccViewHolder>() {
+class RecAdapter internal constructor(private val context: Context,
+                                      private val recs: ArrayList<Recommendation>?) : RecyclerView.Adapter<RecAdapter.ReccViewHolder>() {
     private val inflater: LayoutInflater
     private val width: Int
     private val height: Int
 
     init {
-        val displayMetrics = DisplayMetrics()
-        (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
-        width = displayMetrics.widthPixels
-        height = displayMetrics.heightPixels
+        val dims = MainActivity.getDimensions(context)
+        width = dims[0]
+        height = dims[1]
         inflater = LayoutInflater.from(context)
     }
 

@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.HistAdapter
@@ -43,17 +43,35 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
+@Suppress("DEPRECATION")
 class HistoryActivity : AppCompatActivity() {
     private var uiScope = CoroutineScope(Dispatchers.Main)
     private var currSort = R.id.recent
     private var json = ""
     private var histJob: Job? = null
-    private var adapter: HistAdapter? = null
+    private var adapt: HistAdapter? = null
     private var histViewModel: HistViewModel? = null
     private var histories: List<HistoryItem?> = ArrayList()
     private var loading: ProgressBar? = null
     private var width = 1080
     private var height = 1920
+
+    private fun sortList(sort: Int, list: List<HistoryItem?>): List<HistoryItem?> {
+        return when (sort) {
+            R.id.alpha -> {
+                list.sortedWith(compareBy { it?.subName }).asReversed()
+            }
+            R.id.oldest -> {
+                list.sortedWith(compareBy
+                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+
+            }
+            else -> {
+                list.sortedWith(compareBy
+                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,32 +79,24 @@ class HistoryActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         val sortIcon: Drawable = ContextCompat.getDrawable(applicationContext, R.drawable.ic_sort)!!
-        val dark = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-                .getBoolean(SettingsActivity.DARK, false)
-
-        width = getCon()
-                .getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-                .getInt(SettingsActivity.IMG_WIDTH, width)
-        height = getCon()
-                .getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-                .getInt(SettingsActivity.IMG_HEIGHT, height)
-
-        if (dark) {
-            sortIcon.setTint(Color.WHITE)
-        } else {
-            sortIcon.setTint(Color.BLACK)
-        }
-
+        val prefs = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+        val dark = prefs.getBoolean(SettingsActivity.DARK, false)
+        sortIcon.setTint(if (dark) Color.WHITE else Color.BLACK)
+        width = prefs.getInt(SettingsActivity.IMG_WIDTH, width)
+        height = prefs.getInt(SettingsActivity.IMG_HEIGHT, height)
         toolbar.overflowIcon = sortIcon
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
+        }
         loading = findViewById(R.id.hist_loading)
         histViewModel = ViewModelProvider(this@HistoryActivity).get(HistViewModel(application)::class.java)
-        val recycler = findViewById<RecyclerView>(R.id.hist_scroll)
-        adapter = HistAdapter(this)
-        recycler.adapter = adapter
-        recycler.layoutManager = LinearLayoutManager(this)
-        adapter!!.setHistories(histories)
+        adapt = HistAdapter(this)
+        val recycler = findViewById<RecyclerView>(R.id.hist_scroll).apply {
+            adapter = adapt
+            layoutManager = LinearLayoutManager(getCon())
+        }
+        adapt!!.setHistories(histories)
         val helper = ItemTouchHelper(
                 object : ItemTouchHelper.SimpleCallback(0,
                         ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -98,46 +108,27 @@ class HistoryActivity : AppCompatActivity() {
 
                     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                         val position = viewHolder.adapterPosition
-                        val saved = adapter!!.getHistory(position)
+                        val saved = adapt!!.getHistory(position)
                         histViewModel!!.deleteHist(saved)
-                        histories = histViewModel!!.allHist!!.value!!
+                        adapt!!.notifyDataSetChanged()
                     }
                 })
-
         helper.attachToRecyclerView(recycler)
-        histViewModel = ViewModelProvider(this).get(HistViewModel::class.java)
-        val con = this
         histViewModel!!.allHist!!.observe(this, Observer { hists ->
-
-            this.histories = when (currSort) {
-                R.id.alpha -> {
-                    hists!!.sortedWith(compareBy { it?.subName }).asReversed()
-                }
-                R.id.oldest -> {
-                    hists!!.sortedWith(compareBy
-                    { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
-
-                }
-                else -> {
-                    hists!!.sortedWith(compareBy
-                    { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
-                }
-            }
-            adapter!!.setHistories(histories)
-
+            this.histories = sortList(currSort, hists!!)
+            adapt!!.setHistories(histories)
             uiScope.launch {
                 json = convertToJSON(histories)
             }
-            findViewById<View>(R.id.hist_empty).visibility = if (adapter!!.itemCount == 0) View.VISIBLE else View.GONE
+            findViewById<View>(R.id.hist_empty).visibility = if (adapt!!.itemCount == 0) View.VISIBLE else View.GONE
         })
-        val currCon = this
         recycler.addOnItemTouchListener(RecyclerListener(this, recycler, object : RecyclerListener.OnItemClickListener {
             override fun onLongItemClick(view: View?, position: Int) {}
 
             override fun onItemClick(view: View, position: Int) {
                 cancelThreads()
                 val current = histories[position]
-                val wallIntent = Intent(currCon, WallActivity::class.java)
+                val wallIntent = Intent(getCon(), WallActivity::class.java)
                 wallIntent.apply {
                     putExtra(WallActivity.WALL_URL, current?.url)
                     putExtra(WallActivity.GIF, false)
@@ -149,7 +140,7 @@ class HistoryActivity : AppCompatActivity() {
                 wallIntent.putExtra(WallActivity.LIST, json)
                 Log.e("JSON", json)
 
-                currCon.startActivity(wallIntent)
+                getCon().startActivity(wallIntent)
             }
         }))
 
@@ -158,15 +149,16 @@ class HistoryActivity : AppCompatActivity() {
         speedView.setOnActionSelectedListener(SpeedDialView.OnActionSelectedListener { actionItem ->
             when (actionItem.id) {
                 R.id.delete_all -> {
-                    val confirmDelete = AlertDialog.Builder(this)
-                    confirmDelete.setTitle("Are you sure?")
-                    confirmDelete.setMessage("Do you want to clear history?")
-                    confirmDelete.setPositiveButton("Yes") { _, _ ->
-                        histViewModel!!.deleteAll()
-                        Toast.makeText(this@HistoryActivity, "Cleared history", Toast.LENGTH_SHORT).show()
-                    }
-                    confirmDelete.setNegativeButton("No") { _, _ ->
-                        Toast.makeText(this@HistoryActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                    val confirmDelete = AlertDialog.Builder(this).apply {
+                        title = "Are you sure?"
+                        setMessage("Do you want to clear history?")
+                        setPositiveButton("Yes") { _, _ ->
+                            histViewModel!!.deleteAll()
+                            Toast.makeText(this@HistoryActivity, "Cleared history", Toast.LENGTH_SHORT).show()
+                        }
+                        setNegativeButton("No") { _, _ ->
+                            Toast.makeText(this@HistoryActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                        }
                     }
                     confirmDelete.show()
                     return@OnActionSelectedListener false
@@ -185,7 +177,7 @@ class HistoryActivity : AppCompatActivity() {
                 }
                 R.id.random -> {
                     if (histories.isEmpty()) {
-                        Toast.makeText(con, "No items", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
                         return@OnActionSelectedListener false
                     }
 
@@ -196,7 +188,7 @@ class HistoryActivity : AppCompatActivity() {
                     }
                     cancelThreads()
                     val current = histories[randomNum]
-                    val wallIntent = Intent(currCon, WallActivity::class.java)
+                    val wallIntent = Intent(getCon(), WallActivity::class.java)
                     wallIntent.apply {
                         putExtra(WallActivity.WALL_URL, current?.url)
                         putExtra(WallActivity.GIF, false)
@@ -207,7 +199,7 @@ class HistoryActivity : AppCompatActivity() {
                     wallIntent.putExtra(WallActivity.LIST, json)
                     Log.e("JSON", json)
 
-                    currCon.startActivity(wallIntent)
+                    getCon().startActivity(wallIntent)
                     return@OnActionSelectedListener false
                 }
             }
@@ -237,22 +229,14 @@ class HistoryActivity : AppCompatActivity() {
                 super.onBackPressed()
                 return true
             }
-            R.id.alpha -> {
-                histories = histories.sortedWith(compareBy { it?.subName })
-            }
-            R.id.recent -> {
-                histories = histories.sortedWith(compareBy
-                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
 
-            }
-            R.id.oldest -> {
-                histories = histories.sortedWith(compareBy
-                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+            else -> {
+                histories = sortList(currSort, histories)
             }
         }
 
         if (item.itemId != android.R.id.home) {
-            adapter?.setHistories(histories)
+            adapt?.setHistories(histories)
             uiScope.launch {
                 json = convertToJSON(histories)
             }
@@ -334,7 +318,7 @@ class HistoryActivity : AppCompatActivity() {
                 temp.setGif(false)
                 bits.add(temp)
             }
-            json = Gson().toJson(bits)
+            json = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(bits)
         }
         return json
     }

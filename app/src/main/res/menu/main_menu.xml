@@ -12,9 +12,9 @@
 
     <item
         style="@style/filled"
-        android:id="@+id/saved_subs"
+        android:id="@+id/fav_pics"
         android:orderInCategory="50"
-        android:title="SAVED"
+        android:title="FAVORITES"
         app:showAsAction="always" />
 
     <item
@@ -30,8 +30,8 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/fav_pics"
+        android:id="@+id/saved_subs"
         android:orderInCategory="10"
-        android:title="Favorite Pictures"
+        android:title="Saved Subs"
         app:showAsAction="never" />
 </menu>

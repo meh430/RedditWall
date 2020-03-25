@@ -42,11 +42,7 @@ class SavedActivity : AppCompatActivity() {
         val sortIcon: Drawable = ContextCompat.getDrawable(applicationContext, R.drawable.ic_sort)!!
         val dark = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
                 .getBoolean(SettingsActivity.DARK, false)
-        if (dark) {
-            sortIcon.setTint(Color.WHITE)
-        } else {
-            sortIcon.setTint(Color.BLACK)
-        }
+        sortIcon.setTint(if (dark) Color.WHITE else Color.BLACK)
         toolbar.overflowIcon = sortIcon
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
@@ -74,34 +70,30 @@ class SavedActivity : AppCompatActivity() {
                 })
 
         helper.attachToRecyclerView(recycler)
-        subViewModel = ViewModelProvider(this).get(SubViewModel::class.java)
         subViewModel!!.allSubs!!.observe(this, Observer { subSaveds ->
-            subs = when (currSort) {
-                R.id.oldest -> {
-                    subSaveds?.sortedWith(compareBy
-                    { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
-                }
-                R.id.alpha -> {
-                    subSaveds?.sortedWith(compareBy { it?.subName })
-                }
-                else -> {
-                    subSaveds?.sortedWith(compareBy
-                    { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })?.asReversed()
-                }
-            }
+            subs = sortList(currSort, subSaveds!!)
             adapter!!.setSubs(subs)
-
             findViewById<View>(R.id.sub_empty).visibility = if (adapter!!.itemCount == 0) {
                 View.VISIBLE
             } else {
                 View.GONE
             }
         })
+    }
 
-        findViewById<View>(R.id.sub_empty).visibility = if (adapter!!.itemCount == 0) {
-            View.VISIBLE
-        } else {
-            View.GONE
+    private fun sortList(sort: Int, list: List<SubSaved?>): List<SubSaved?> {
+        return when (sort) {
+            R.id.recent -> {
+                list.sortedWith(compareBy
+                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
+            }
+            R.id.alpha -> {
+                list.sortedWith(compareBy { it!!.subName })
+            }
+            else -> {
+                list.sortedWith(compareBy
+                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+            }
         }
     }
 
@@ -124,19 +116,9 @@ class SavedActivity : AppCompatActivity() {
                 confirmSubs.show()
                 return true
             }
-            R.id.recent -> {
-                subs = subs?.sortedWith(compareBy
-                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })?.asReversed()
-                adapter!!.setSubs(subs)
-            }
-            R.id.alpha -> {
-                subs = subs?.sortedWith(compareBy { it?.subName })
-                adapter!!.setSubs(subs)
-            }
-            R.id.oldest -> {
-                subs = subs?.sortedWith(compareBy
-                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
-                adapter!!.setSubs(subs)
+            else -> {
+                subs = sortList(currSort, subs!!)
+                adapter?.setSubs(subs)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -149,7 +131,7 @@ class SavedActivity : AppCompatActivity() {
     }
 
     fun saveSub(view: View) {
-        var saveVal = saveText!!.text.toString()
+        var saveVal = saveText!!.text.toString().replace(" ", "")
         saveVal = if (saveVal.length == 1) {
             Toast.makeText(this, "Please enter something to save", Toast.LENGTH_SHORT).show()
             return
@@ -157,8 +139,6 @@ class SavedActivity : AppCompatActivity() {
             saveText!!.setText("")
             saveVal.toLowerCase(Locale.ROOT)
         }
-
-        saveVal = saveVal.replace(" ", "")
         val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputManager.hideSoftInputFromWindow(view.windowToken,
                 InputMethodManager.HIDE_NOT_ALWAYS)
@@ -168,7 +148,8 @@ class SavedActivity : AppCompatActivity() {
                 return
             }
         }
-        subViewModel!!.insert(SubSaved((Math.random() * 10000).toInt() + 1, saveVal, SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date())))
+        subViewModel!!.insert(SubSaved((Math.random() * 10000).toInt() + 1,
+                saveVal, SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date())))
         Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
     }
 }

@@ -1,8 +1,6 @@
 package com.mehul.redditwall.adapters
 
-import android.app.Activity
 import android.content.Context
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +8,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.mehul.redditwall.R
+import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.objects.BitURL
 
 class ImageAdapter internal constructor(private val context: Context,
@@ -20,10 +19,9 @@ class ImageAdapter internal constructor(private val context: Context,
     private val height: Int
 
     init {
-        val displayMetrics = DisplayMetrics()
-        (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
-        width = displayMetrics.widthPixels
-        height = displayMetrics.heightPixels
+        val dims = MainActivity.getDimensions(context)
+        width = dims[0]
+        height = dims[1]
         inflater = LayoutInflater.from(context)
     }
 
@@ -51,7 +49,6 @@ class ImageAdapter internal constructor(private val context: Context,
         images = list
         notifyDataSetChanged()
     }
-
 
     inner class ImageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val image: ImageView = view.findViewById(R.id.image_holder)

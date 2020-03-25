@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.SystemClock
-import android.util.DisplayMetrics
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -42,6 +41,7 @@ class SettingsActivity : AppCompatActivity() {
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
         wallAlarm = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         wallChangeIntent = Intent(this, ChangeWallpaper::class.java)
+        wallChangeIntent?.action = "CHANGE_WALL"
         pending = PendingIntent.getBroadcast(this, 2, wallChangeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         intervalSeek = findViewById(R.id.interval_seek)
         intervalCount = findViewById(R.id.interval_count)
@@ -56,7 +56,7 @@ class SettingsActivity : AppCompatActivity() {
         val downloadOrigin = findViewById<Switch>(R.id.download_origin)
         dark = preferences!!.getBoolean(DARK, false)
         darkSwitch.isChecked = dark
-        gifSwitch.isChecked = preferences!!.getBoolean(LOAD_GIF, true)
+        gifSwitch.isChecked = preferences!!.getBoolean(LOAD_GIF, false)
         downloadOrigin.isChecked = preferences!!.getBoolean(DOWNLOAD_ORIGIN, false)
         randomSwitch.isChecked = preferences!!.getBoolean(RANDOM_ENABLED, false)
         intervalSeek!!.progress = preferences!!.getInt(RANDOM_INTERVAL, 0)
@@ -69,6 +69,9 @@ class SettingsActivity : AppCompatActivity() {
         gifSwitch.setOnCheckedChangeListener { _, b ->
             preferences!!.edit().putBoolean(LOAD_GIF, b).apply()
         }
+        downloadOrigin.setOnCheckedChangeListener { _, b ->
+            preferences!!.edit().putBoolean(DOWNLOAD_ORIGIN, b).apply()
+        }
         darkSwitch.setOnCheckedChangeListener { _, b ->
             dark = b
             stateChanged = true
@@ -80,9 +83,6 @@ class SettingsActivity : AppCompatActivity() {
                 delegate.applyDayNight()
             }
         }
-        downloadOrigin.setOnCheckedChangeListener { _, b ->
-            preferences!!.edit().putBoolean(DOWNLOAD_ORIGIN, b).apply()
-        }
         scaleSeek!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
                 if (i > 0) {
@@ -91,13 +91,9 @@ class SettingsActivity : AppCompatActivity() {
                     seekCount!!.text = "2X"
                 }
             }
-
-
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
-
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
-
         intervalSeek!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
                 alarmChanged = true
@@ -107,16 +103,12 @@ class SettingsActivity : AppCompatActivity() {
                     intervalCount!!.text = "1 hrs"
                 }
             }
-
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
-
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
-
-        val disp = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(disp)
-        val width = preferences!!.getInt(IMG_WIDTH, disp.widthPixels)
-        val height = preferences!!.getInt(IMG_HEIGHT, disp.heightPixels)
+        val dims = MainActivity.getDimensions(this)
+        val width = preferences!!.getInt(IMG_WIDTH, dims[0])
+        val height = preferences!!.getInt(IMG_HEIGHT, dims[1])
         widthEdit!!.setText(width.toString() + "")
         heightEdit!!.setText(height.toString() + "")
 
@@ -131,11 +123,12 @@ class SettingsActivity : AppCompatActivity() {
         preferenceEditor.putInt(LOAD_SCALE, scaleSeek!!.progress)
         preferenceEditor.putBoolean(DARK, dark)
         preferenceEditor.putInt(RANDOM_INTERVAL, intervalSeek!!.progress)
-        if (preferences!!.getBoolean(RANDOM_ENABLED, false) && alarmChanged) {
+
+        if (preferences!!.getBoolean(RANDOM_ENABLED, false)) {
             val interval = (intervalSeek!!.progress + 1) * 60 * 60 * 1000
             val triggerTime = SystemClock.elapsedRealtime() + interval
             if (wallAlarm != null) {
-                Toast.makeText(this, "Fired Alarm", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Random refresh enabled", Toast.LENGTH_SHORT).show()
                 wallAlarm!!.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, interval.toLong(), pending)
             }
         } else {
@@ -143,10 +136,9 @@ class SettingsActivity : AppCompatActivity() {
                 wallAlarm!!.cancel(pending!!)
             }
         }
-        val disp = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(disp)
-        var width = disp.widthPixels
-        var height = disp.heightPixels
+        val dims = MainActivity.getDimensions(this)
+        var width = dims[0]
+        var height = dims[1]
         try {
             width = Integer.parseInt(widthEdit!!.text.toString())
             height = Integer.parseInt(heightEdit!!.text.toString())
@@ -170,6 +162,11 @@ class SettingsActivity : AppCompatActivity() {
         super.onBackPressed()
     }
 
+    fun clearCache(view: View) {
+        this.cacheDir.deleteRecursively()
+        Toast.makeText(this, "Deleted Cache", Toast.LENGTH_SHORT).show()
+    }
+
     companion object {
         //pref keys
         const val SORT_METHOD = "SORTIMG"
@@ -182,10 +179,5 @@ class SettingsActivity : AppCompatActivity() {
         const val DOWNLOAD_ORIGIN = "DOWNLOAD_ORIGINAL"
         const val RANDOM_ENABLED = "SWITCHING_ENABLED"
         const val RANDOM_INTERVAL = "INTERVAL"
-    }
-
-    fun clearCache(view: View) {
-        this.cacheDir.deleteRecursively()
-        Toast.makeText(this, "Deleted Cache", Toast.LENGTH_SHORT).show()
     }
 }

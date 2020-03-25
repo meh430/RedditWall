@@ -15,12 +15,10 @@ import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
@@ -42,21 +40,17 @@ import com.mehul.redditwall.history.HistViewModel
 import com.mehul.redditwall.history.HistoryItem
 import com.mehul.redditwall.objects.BitURL
 import com.mehul.redditwall.rest.RestQuery
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONException
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
 
-@Suppress("PrivatePropertyName")
+@Suppress("PrivatePropertyName", "DEPRECATION", "RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var jsonList: String? = ""
     private var notifyManager: NotificationManager? = null
@@ -71,7 +65,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var imgUrl: String? = null
     private var imageList: ArrayList<BitURL> = ArrayList()
     private var detector: GestureDetector? = null
-    private var task: LoadImages? = null
+    private var imageJob: Job? = null
     private var preferences: SharedPreferences? = null
     private var filledStar: Drawable? = null
     private var openStar: Drawable? = null
@@ -80,7 +74,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var favViewModel: FavViewModel? = null
     private var histViewModel: HistViewModel? = null
     private val uiScope = CoroutineScope(Dispatchers.Main)
-    private var query: String? = null
+    private var query = ""
     private var currentBitmap: Bitmap? = null
     private val notificationBuilder: NotificationCompat.Builder
         get() {
@@ -105,6 +99,9 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         histViewModel = ViewModelProvider(this).get(HistViewModel::class.java)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+        AFTER_HOT_WALL = MainActivity.AFTER_HOT
+        AFTER_NEW_WALL = MainActivity.AFTER_NEW
+        AFTER_TOP_WALL = MainActivity.AFTER_TOP
     }
 
 
@@ -142,17 +139,16 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
                     if (i == 0 || i == 1) {
                         try {
-                            val wallSource: Int
                             assert(wall != null)
-                            if (wallLoc == 0) {
+                            val wallSource: Int = if (wallLoc == 0) {
                                 wall?.setBitmap(bitmap)
-                                wallSource = HistoryItem.BOTH
+                                HistoryItem.BOTH
                             } else {
                                 wall?.setBitmap(bitmap, null, true, wallLoc)
-                                wallSource = if (wallLoc == WallpaperManager.FLAG_LOCK) HistoryItem.LOCK_SCREEN else HistoryItem.HOME_SCREEN
+                                if (wallLoc == WallpaperManager.FLAG_LOCK) HistoryItem.LOCK_SCREEN else HistoryItem.HOME_SCREEN
                             }
                             Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
-                            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query!!,
+                            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query,
                                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                                     wallSource, imgUrl!!, imageList[index].postLink)
                             histViewModel?.insert(histItem)
@@ -165,7 +161,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                             assert(wall != null)
                             wall?.setBitmap(bitmap)
                             Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
-                            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query!!,
+                            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query,
                                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                                     HistoryItem.BOTH, imgUrl!!, imageList[index].postLink)
                             histViewModel?.insert(histItem)
@@ -194,7 +190,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             item.icon = filledStar
             Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
             favViewModel?.insert(FavImage((Math.random() * 10000).toInt() + 1, imgUrl!!,
-                    isGif, imageList[index].postLink, query!!))
+                    isGif, imageList[index].postLink, query))
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -244,15 +240,15 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
         downloadOriginal = preferences!!.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
         createNotificationChannel()
-        val disp = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(disp)
-        width = preferences!!.getInt(SettingsActivity.IMG_WIDTH, disp.widthPixels)
-        height = preferences!!.getInt(SettingsActivity.IMG_HEIGHT, disp.heightPixels)
+        val dims = MainActivity.getDimensions(this)
+        width = preferences!!.getInt(SettingsActivity.IMG_WIDTH, dims[0])
+        height = preferences!!.getInt(SettingsActivity.IMG_HEIGHT, dims[1])
         query = if (fromFav) {
             incoming.getStringExtra(FAV_LIST)
         } else {
             incoming.getStringExtra(MainActivity.QUERY)
-        }
+        }.toString()
+
         val open = if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
             R.drawable.ic_open_dark
         } else {
@@ -266,16 +262,13 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         filledStar = ContextCompat.getDrawable(applicationContext, filled)
         openStar = ContextCompat.getDrawable(applicationContext, open)
         starred = menu
-        val con = this
-        //TODO: Replace this monstrosity with coroutines
         uiScope.launch {
-            startUp(con)
+            startUp(getCon())
         }
         return true
     }
 
     fun launchPost(view: View) {
-        //from main, jsonList, currindex, imgUrl, isGif
         val currPost = imageList[index]
         val postIntent = Intent(this, PostActivity::class.java)
         postIntent.putExtra(PostActivity.POST_LINK, currPost.postLink)
@@ -323,7 +316,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             out.close()
             MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
             sendNotification()
-            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query!!,
+            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query,
                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                     HistoryItem.DOWNLOADED, imgUrl!!, imageList[index].postLink)
             histViewModel?.insert(histItem)
@@ -344,7 +337,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     private fun sendNotification() {
         val notifyBuilder = notificationBuilder
-        //send notification through the channel in the manager
         notifyManager!!.notify(NOTIFICATION_ID, notifyBuilder.build())
         updateNotification()
     }
@@ -358,16 +350,13 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         notifyManager!!.notify(NOTIFICATION_ID, notifyBuilder.build())
     }
 
-    //creating a channel and putting it in the manager
     private fun createNotificationChannel() {
         notifyManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Create a NotificationChannel
             val notificationChannel = NotificationChannel(PRIMARY_CHANNEL_ID,
                     "Download Notification", NotificationManager.IMPORTANCE_HIGH)
 
-            //configuring notification settings when sent
             notificationChannel.apply {
                 enableLights(true)
                 lightColor = Color.YELLOW
@@ -380,20 +369,23 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     public override fun onStop() {
         super.onStop()
-        if (task != null)
-            task!!.cancel(true)
+        if (imageJob != null)
+            imageJob!!.cancel()
     }
 
     public override fun onDestroy() {
         super.onDestroy()
-        if (task != null)
-            task!!.cancel(true)
-
+        if (imageJob != null)
+            imageJob!!.cancel()
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (detector != null) this.detector!!.onTouchEvent(event)
         return super.onTouchEvent(event)
+    }
+
+    private fun getCon(): Context {
+        return this
     }
 
     private fun swipedRight() {
@@ -430,17 +422,19 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             uiScope.launch {
                 startUp(con)
             }
-        } else if (task == null && fromFav) {
+        } else if (imageJob == null && !fromFav) {
             Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
-            task = LoadImages(this, load, imageList)
-            task!!.execute(query)
-        } else if (task != null && task?.status == AsyncTask.Status.RUNNING && fromFav) {
+            imageJob = uiScope.launch {
+                loadImages(getCon(), query)
+            }
+        } else if (imageJob != null && imageJob!!.isActive && !fromFav) {
             Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
-        } else if (task != null && task?.status != AsyncTask.Status.RUNNING && fromFav) {
+        } else if (imageJob != null && (!imageJob!!.isActive) && !fromFav) {
             Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
-            task?.cancel(true)
-            task = LoadImages(this, load, imageList)
-            task!!.execute(query)
+            imageJob?.cancel()
+            imageJob = uiScope.launch {
+                loadImages(getCon(), query)
+            }
         } else {
             Toast.makeText(this, "Reached the end", Toast.LENGTH_SHORT).show()
         }
@@ -521,34 +515,19 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
     }
 
-    private class LoadImages internal constructor(con: Context?, load: ProgressBar?, imgs: ArrayList<BitURL>?)
-        : AsyncTask<String, Void, Void?>() {
-        internal var context: WeakReference<Context?> = WeakReference(con)
-        internal var load: WeakReference<ProgressBar?> = WeakReference(load)
-        internal var imgs: WeakReference<ArrayList<BitURL>?> = WeakReference(imgs)
-
-        override fun onPreExecute() {
-            super.onPreExecute()
-            load.get()?.visibility = View.VISIBLE
-        }
-
-        override fun doInBackground(vararg strings: String): Void? {
-            if (isCancelled) {
-                return null
+    private suspend fun loadImages(con: Context?, queryString: String) {
+        load?.visibility = View.VISIBLE
+        withContext(Dispatchers.IO) {
+            val rq = RestQuery(queryString, con)
+            val jsonRes = rq.getQueryJson()
+            val retImages = rq.getImages(jsonRes)
+            withContext(Dispatchers.Main) {
+                imageList.addAll(retImages)
             }
-            val rq = RestQuery(strings[0], context.get(), imgs.get(), null, load.get(), this)
-            rq.getImages(rq.getQueryJson(false)!!)
-            return null
         }
 
-        override fun onPostExecute(result: Void?) {
-            super.onPostExecute(result)
-            if (isCancelled) {
-                return
-            }
-            load.get()?.visibility = View.GONE
-            Toast.makeText(context.get(), "Done Loading", Toast.LENGTH_SHORT).show()
-        }
+        load?.visibility = View.GONE
+        Toast.makeText(con, "Done Loading", Toast.LENGTH_SHORT).show()
     }
 
     companion object {
@@ -561,6 +540,9 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         const val INDEX = "INDEX"
         const val FROM_FAV = "FAV_IMAGES"
         const val FAV_LIST = "FAV_LIST"
+        var AFTER_NEW_WALL: String? = null
+        var AFTER_HOT_WALL: String? = null
+        var AFTER_TOP_WALL: String? = null
 
         fun listToJson(imgs: ArrayList<BitURL>?): String {
             val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()

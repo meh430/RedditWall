@@ -35,10 +35,10 @@ import com.mehul.redditwall.objects.ProgressNotify
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
-import java.util.concurrent.ExecutionException
 
+@Suppress("DEPRECATION")
 class FavImageActivity : AppCompatActivity() {
-    private var adapter: FavAdapter? = null
+    private var adapt: FavAdapter? = null
     private var favViewModel: FavViewModel? = null
     private var loading: ProgressBar? = null
     private var favImages: List<FavImage?>? = ArrayList()
@@ -52,10 +52,11 @@ class FavImageActivity : AppCompatActivity() {
         supportActionBar?.elevation = 0F
         loading = findViewById(R.id.fav_loading)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
-        val recycler = findViewById<RecyclerView>(R.id.fav_scroll)
-        adapter = FavAdapter(this, ArrayList())
-        recycler.adapter = adapter
-        recycler.layoutManager = GridLayoutManager(this, 2)
+        adapt = FavAdapter(this, ArrayList())
+        val recycler = findViewById<RecyclerView>(R.id.fav_scroll).apply {
+            adapter = adapt
+            layoutManager = GridLayoutManager(getCon(), 2)
+        }
         val helper = ItemTouchHelper(
                 object : ItemTouchHelper.SimpleCallback(0,
                         ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -69,17 +70,14 @@ class FavImageActivity : AppCompatActivity() {
                         val position = viewHolder.adapterPosition
                         val saved = favImages?.get(position)
                         favViewModel!!.deleteFavImage(saved)
-                        adapter!!.notifyDataSetChanged()
+                        adapt!!.notifyDataSetChanged()
                     }
                 })
         helper.attachToRecyclerView(recycler)
-        favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
-        val con = this
         favViewModel!!.allFav?.observe(this, Observer { favs ->
             favImages = favs
-            loading?.visibility = View.VISIBLE
             favJob = uiScope.launch {
-                loadFavBits(favs, con)
+                loadFavBits(favs, getCon())
             }
         })
 
@@ -88,21 +86,21 @@ class FavImageActivity : AppCompatActivity() {
         speedView.setOnActionSelectedListener(SpeedDialView.OnActionSelectedListener { actionItem ->
             when (actionItem.id) {
                 R.id.delete_all -> {
-                    val confirmDelete = AlertDialog.Builder(this)
-                    confirmDelete.setTitle("Are you sure?")
-                    confirmDelete.setMessage("Do you want to clear your favorites?")
-                    confirmDelete.setPositiveButton("Yes") { _, _ ->
-                        favViewModel!!.deleteAll()
-                        Toast.makeText(this@FavImageActivity, "Deleted favorite images", Toast.LENGTH_SHORT).show()
-                    }
-                    confirmDelete.setNegativeButton("No") { _, _ ->
-                        Toast.makeText(this@FavImageActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                    val confirmDelete = AlertDialog.Builder(getCon()).apply {
+                        title = "Are you sure?"
+                        setMessage("Do you want to clear your favorites?")
+                        setPositiveButton("Yes") { _, _ ->
+                            favViewModel!!.deleteAll()
+                            Toast.makeText(this@FavImageActivity, "Deleted favorite images", Toast.LENGTH_SHORT).show()
+                        }
+                        setNegativeButton("No") { _, _ ->
+                            Toast.makeText(this@FavImageActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                        }
                     }
                     confirmDelete.show()
                     return@OnActionSelectedListener false // false will close it without animation
                 }
                 R.id.down_all -> {
-                    //Toast.makeText(con, "TODO", Toast.LENGTH_SHORT).show()
                     if (ContextCompat.checkSelfPermission(getCon(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                             != PackageManager.PERMISSION_GRANTED) {
                         ActivityCompat.requestPermissions(this,
@@ -117,7 +115,7 @@ class FavImageActivity : AppCompatActivity() {
                 }
                 R.id.random -> {
                     if (favImages!!.isEmpty()) {
-                        Toast.makeText(con, "No items", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
                         return@OnActionSelectedListener false
                     }
 
@@ -126,18 +124,17 @@ class FavImageActivity : AppCompatActivity() {
                         randomNum = (0..favImages!!.size).random()
                     }
                     if (randomNum == favImages!!.size) randomNum = favImages!!.size - 1
-                    val current = adapter!!.getFavAtPosition(randomNum)
-
-                    val wallIntent = Intent(con, WallActivity::class.java)
+                    val current = adapt!!.getFavAtPosition(randomNum)
+                    val wallIntent = Intent(getCon(), WallActivity::class.java)
                     wallIntent.apply {
                         putExtra(WallActivity.WALL_URL, current.url)
                         putExtra(WallActivity.GIF, current.hasGif())
                         putExtra(WallActivity.INDEX, randomNum)
                         putExtra(WallActivity.FROM_FAV, true)
-                        putExtra(WallActivity.LIST, WallActivity.listToJson(adapter!!.getFavs()))
+                        putExtra(WallActivity.LIST, WallActivity.listToJson(adapt!!.getFavs()))
                         putExtra(WallActivity.FAV_LIST, favImages!![randomNum]?.favName)
                     }
-                    con.startActivity(wallIntent)
+                    getCon().startActivity(wallIntent)
                     return@OnActionSelectedListener false
                 }
             }
@@ -173,31 +170,23 @@ class FavImageActivity : AppCompatActivity() {
                 var bitmap: Bitmap? = null
                 withContext(Dispatchers.IO) {
                     if (!fav!!.isGif) {
-                        try {
-                            bitmap = Glide.with(con).asBitmap().load(fav.favUrl)
-                                    .override(width / scale, height / 4).centerCrop().submit().get()
-                        } catch (e: InterruptedException) {
-                            e.printStackTrace()
-                        } catch (e: ExecutionException) {
-                            e.printStackTrace()
-                        }
+                        bitmap = Glide.with(con).asBitmap().load(fav.favUrl)
+                                .override(width / scale, height / 4).centerCrop().submit().get()
                     }
                 }
                 val temp = BitURL(bitmap, fav!!.favUrl, fav.postLink)
-                Log.e("BITMAP", bitmap.toString())
                 temp.setGif(fav.isGif)
                 withContext(Dispatchers.Main) {
                     bits.add(temp)
-                    adapter!!.setFavs(bits, favs)
+                    adapt!!.setFavs(bits, favs)
                     loading?.visibility = View.GONE
                 }
             }
 
             withContext(Dispatchers.Main) {
                 loading?.visibility = View.GONE
-                Log.e("BITS", bits.toString())
-                adapter!!.setFavs(bits, favs)
-                findViewById<View>(R.id.fav_empty).visibility = if (adapter!!.itemCount == 0) View.VISIBLE else View.GONE
+                adapt!!.setFavs(bits, favs)
+                findViewById<View>(R.id.fav_empty).visibility = if (adapt!!.itemCount == 0) View.VISIBLE else View.GONE
             }
         }
     }
@@ -215,18 +204,16 @@ class FavImageActivity : AppCompatActivity() {
     }
 
     private suspend fun downloadAllImages() {
-        val downloadOriginal = getCon()
+        val prefs = getCon()
                 .getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-                .getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
+
+        val downloadOriginal = prefs.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
         val notify = ProgressNotify(getCon(), favImages!!.size)
         var finalName = ""
         notify.sendNotification()
-        width = getCon()
-                .getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-                .getInt(SettingsActivity.IMG_WIDTH, width)
-        height = getCon()
-                .getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-                .getInt(SettingsActivity.IMG_HEIGHT, height)
+        val dims = MainActivity.getDimensions(getCon())
+        width = prefs.getInt(SettingsActivity.IMG_WIDTH, dims[0])
+        height = prefs.getInt(SettingsActivity.IMG_HEIGHT, dims[1])
 
         withContext(Dispatchers.IO) {
             for (i in favImages!!.indices) {
@@ -268,7 +255,7 @@ class FavImageActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (adapter?.itemCount != favImages?.size) {
+        if (adapt?.itemCount != favImages?.size) {
             favJob = uiScope.launch {
                 loadFavBits(favImages, getCon())
             }

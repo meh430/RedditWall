@@ -35,10 +35,10 @@ class RecActivity : AppCompatActivity() {
         setContentView(R.layout.activity_rec)
         supportActionBar?.elevation = 0F
         loading = findViewById(R.id.rec_loading)
+        adapter = RecAdapter(this, recs)
         recycler = findViewById(R.id.rec_scroll)
         error = findViewById(R.id.rec_empty)
         error?.visibility = View.INVISIBLE
-        adapter = RecAdapter(this, recs)
         recycler?.adapter = adapter
         recycler?.layoutManager = LinearLayoutManager(this)
         recJob = uiScope.launch {
