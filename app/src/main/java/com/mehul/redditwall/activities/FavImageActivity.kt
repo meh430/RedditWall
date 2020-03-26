@@ -119,16 +119,16 @@ class FavImageActivity : AppCompatActivity() {
                     return@OnActionSelectedListener false // false will close it without animation
                 }
                 R.id.random -> {
-                    if (favImages!!.isEmpty()) {
+                    if (adapt!!.itemCount == 0) {
                         Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
                         return@OnActionSelectedListener false
                     }
 
-                    var randomNum = (0..favImages!!.size).random()
-                    while (randomNum >= favImages!!.size || randomNum < 0) {
-                        randomNum = (0..favImages!!.size).random()
+                    var randomNum = (0..adapt!!.itemCount).random()
+                    while (randomNum >= adapt!!.itemCount || randomNum < 0) {
+                        randomNum = (0..adapt!!.itemCount).random()
                     }
-                    if (randomNum == favImages!!.size) randomNum = favImages!!.size - 1
+                    if (randomNum == adapt!!.itemCount) randomNum = adapt!!.itemCount - 1
                     val current = adapt!!.getFavAtPosition(randomNum)
                     val wallIntent = Intent(getCon(), WallActivity::class.java)
                     wallIntent.apply {
