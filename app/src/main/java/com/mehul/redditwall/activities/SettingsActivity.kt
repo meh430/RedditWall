@@ -39,12 +39,16 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
         supportActionBar?.elevation = 0F
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-        wallAlarm = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         wallChangeIntent = Intent(this, ChangeWallpaper::class.java)
+        wallAlarm = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         wallChangeIntent?.action = "CHANGE_WALL"
         pending = PendingIntent.getBroadcast(this, 2, wallChangeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val refreshTitle = findViewById<TextView>(R.id.change_interval)
+        refreshTitle.visibility = View.GONE
         intervalSeek = findViewById(R.id.interval_seek)
+        intervalSeek!!.visibility = View.GONE
         intervalCount = findViewById(R.id.interval_count)
+        intervalCount!!.visibility = View.GONE
         seekCount = findViewById(R.id.scale_count)
         scaleSeek = findViewById(R.id.scale_seek)
         widthEdit = findViewById(R.id.width_edit)
@@ -59,12 +63,26 @@ class SettingsActivity : AppCompatActivity() {
         gifSwitch.isChecked = preferences!!.getBoolean(LOAD_GIF, false)
         downloadOrigin.isChecked = preferences!!.getBoolean(DOWNLOAD_ORIGIN, false)
         randomSwitch.isChecked = preferences!!.getBoolean(RANDOM_ENABLED, false)
+        if (randomSwitch.isChecked) {
+            refreshTitle.visibility = View.VISIBLE
+            intervalCount!!.visibility = View.VISIBLE
+            intervalSeek!!.visibility = View.VISIBLE
+        }
         intervalSeek!!.progress = preferences!!.getInt(RANDOM_INTERVAL, 0)
         intervalCount!!.text = (intervalSeek!!.progress + 1).toString() + " hrs"
         scaleSeek!!.progress = preferences!!.getInt(LOAD_SCALE, 0)
         seekCount!!.text = ((scaleSeek!!.progress + 1) * 2).toString() + "X"
         randomSwitch.setOnCheckedChangeListener { _, b ->
             preferences!!.edit().putBoolean(RANDOM_ENABLED, b).apply()
+            if (b) {
+                intervalSeek!!.visibility = View.VISIBLE
+                intervalCount!!.visibility = View.VISIBLE
+                refreshTitle.visibility = View.VISIBLE
+            } else {
+                refreshTitle.visibility = View.GONE
+                intervalSeek!!.visibility = View.GONE
+                intervalCount!!.visibility = View.GONE
+            }
         }
         gifSwitch.setOnCheckedChangeListener { _, b ->
             preferences!!.edit().putBoolean(LOAD_GIF, b).apply()
@@ -91,6 +109,7 @@ class SettingsActivity : AppCompatActivity() {
                     seekCount!!.text = "2X"
                 }
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
@@ -103,6 +122,7 @@ class SettingsActivity : AppCompatActivity() {
                     intervalCount!!.text = "1 hrs"
                 }
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
@@ -123,8 +143,9 @@ class SettingsActivity : AppCompatActivity() {
         preferenceEditor.putInt(LOAD_SCALE, scaleSeek!!.progress)
         preferenceEditor.putBoolean(DARK, dark)
         preferenceEditor.putInt(RANDOM_INTERVAL, intervalSeek!!.progress)
+        val setRefresh = preferences!!.getBoolean(RANDOM_ENABLED, false) && alarmChanged
 
-        if (preferences!!.getBoolean(RANDOM_ENABLED, false)) {
+        if (setRefresh) {
             val interval = (intervalSeek!!.progress + 1) * 60 * 60 * 1000
             val triggerTime = SystemClock.elapsedRealtime() + interval
             if (wallAlarm != null) {
@@ -152,7 +173,7 @@ class SettingsActivity : AppCompatActivity() {
             preferenceEditor.putInt(IMG_HEIGHT, height)
         }
 
-        val defaultSub = defaultEdit!!.text.toString()
+        val defaultSub = defaultEdit!!.text.toString().replace(" ", "")
         preferenceEditor.putString(DEFAULT, defaultSub)
         preferenceEditor.apply()
     }

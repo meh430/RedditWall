@@ -16,7 +16,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -27,6 +26,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.GsonBuilder
 import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.R
@@ -132,12 +132,11 @@ class HistoryActivity : AppCompatActivity() {
                 wallIntent.apply {
                     putExtra(WallActivity.WALL_URL, current?.url)
                     putExtra(WallActivity.GIF, false)
-                    putExtra(WallActivity.FROM_FAV, false)
-                    putExtra(MainActivity.QUERY, current?.subName)
+                    putExtra(WallActivity.FROM_FAV, true)
+                    putExtra(WallActivity.FAV_LIST, current?.subName)
+                    putExtra(WallActivity.INDEX, position)
+                    putExtra(WallActivity.LIST, json)
                 }
-
-                wallIntent.putExtra(WallActivity.INDEX, position)
-                wallIntent.putExtra(WallActivity.LIST, json)
                 Log.e("JSON", json)
 
                 getCon().startActivity(wallIntent)
@@ -149,17 +148,18 @@ class HistoryActivity : AppCompatActivity() {
         speedView.setOnActionSelectedListener(SpeedDialView.OnActionSelectedListener { actionItem ->
             when (actionItem.id) {
                 R.id.delete_all -> {
-                    val confirmDelete = AlertDialog.Builder(this).apply {
-                        title = "Are you sure?"
-                        setMessage("Do you want to clear history?")
-                        setPositiveButton("Yes") { _, _ ->
-                            histViewModel!!.deleteAll()
-                            Toast.makeText(this@HistoryActivity, "Cleared history", Toast.LENGTH_SHORT).show()
-                        }
-                        setNegativeButton("No") { _, _ ->
-                            Toast.makeText(this@HistoryActivity, "Cancelled", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                    val confirmDelete =
+                            MaterialAlertDialogBuilder(getCon(), R.style.MyThemeOverlayAlertDialog).apply {
+                                setTitle("Are You Sure?")
+                                setMessage("Do you want to clear history?")
+                                setPositiveButton("Yes") { _, _ ->
+                                    histViewModel!!.deleteAll()
+                                    Toast.makeText(this@HistoryActivity, "Cleared history", Toast.LENGTH_SHORT).show()
+                                }
+                                setNegativeButton("No") { _, _ ->
+                                    Toast.makeText(this@HistoryActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                                }
+                            }
                     confirmDelete.show()
                     return@OnActionSelectedListener false
                 }
@@ -169,6 +169,10 @@ class HistoryActivity : AppCompatActivity() {
                         ActivityCompat.requestPermissions(this,
                                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), WallActivity.WRITE)
                     } else {
+                        if (histories.isEmpty()) {
+                            Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
+                            return@OnActionSelectedListener false
+                        }
                         uiScope.launch {
                             downloadAllImages()
                         }

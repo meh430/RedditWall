@@ -24,7 +24,6 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
@@ -32,6 +31,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide.with
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.GsonBuilder
 import com.mehul.redditwall.R
 import com.mehul.redditwall.favorites.FavImage
@@ -119,7 +119,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             return
         }
         val bitmap = (wallPreview?.drawable as BitmapDrawable).bitmap
-        val builder = AlertDialog.Builder(this)
+        val builder = MaterialAlertDialogBuilder(this, R.style.MyThemeOverlayAlertDialog)
         builder.setTitle("Set Where?")
                 .setItems(R.array.location_options) { _, i ->
                     temp.show()
@@ -171,7 +171,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                         }
                     }
                 }
-        builder.create().show()//date, source, url, post
+        builder.create().show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

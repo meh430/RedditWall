@@ -13,7 +13,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -23,6 +22,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.FavAdapter
@@ -84,17 +84,19 @@ class FavImageActivity : AppCompatActivity() {
         speedView.setOnActionSelectedListener(SpeedDialView.OnActionSelectedListener { actionItem ->
             when (actionItem.id) {
                 R.id.delete_all -> {
-                    val confirmDelete = AlertDialog.Builder(getCon()).apply {
-                        title = "Are you sure?"
-                        setMessage("Do you want to clear your favorites?")
-                        setPositiveButton("Yes") { _, _ ->
-                            favViewModel!!.deleteAll()
-                            Toast.makeText(this@FavImageActivity, "Deleted favorite images", Toast.LENGTH_SHORT).show()
-                        }
-                        setNegativeButton("No") { _, _ ->
-                            Toast.makeText(this@FavImageActivity, "Cancelled", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                    val confirmDelete =
+                            MaterialAlertDialogBuilder(getCon(), R.style.MyThemeOverlayAlertDialog).apply {
+                                setTitle("Are You Sure?")
+                                setMessage("Do you want to clear your favorites?")
+
+                                setPositiveButton("Yes") { _, _ ->
+                                    favViewModel!!.deleteAll()
+                                    Toast.makeText(this@FavImageActivity, "Deleted favorite images", Toast.LENGTH_SHORT).show()
+                                }
+                                setNegativeButton("No") { _, _ ->
+                                    Toast.makeText(this@FavImageActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                                }
+                            }
                     confirmDelete.show()
                     return@OnActionSelectedListener false // false will close it without animation
                 }
@@ -104,6 +106,11 @@ class FavImageActivity : AppCompatActivity() {
                         ActivityCompat.requestPermissions(this,
                                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), WallActivity.WRITE)
                     } else {
+                        if (favImages!!.isEmpty()) {
+                            Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
+                            return@OnActionSelectedListener false
+                        }
+
                         uiScope.launch {
                             downloadAllImages()
                         }

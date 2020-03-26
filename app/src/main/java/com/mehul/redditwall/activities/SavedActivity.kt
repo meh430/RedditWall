@@ -10,7 +10,6 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -19,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.SubAdapter
 import com.mehul.redditwall.savedsub.SubSaved
@@ -105,14 +105,15 @@ class SavedActivity : AppCompatActivity() {
                 return true
             }
             56345564 -> {
-                val confirmSubs = AlertDialog.Builder(this)
-                confirmSubs.setTitle("Are you sure?")
-                confirmSubs.setMessage("Do you want to clear your saved subreddits?")
-                confirmSubs.setPositiveButton("Yes") { _, _ ->
-                    subViewModel!!.deleteAll()
-                    Toast.makeText(this@SavedActivity, "Deleted saved subs", Toast.LENGTH_SHORT).show()
+                val confirmSubs = MaterialAlertDialogBuilder(this, R.style.MyThemeOverlayAlertDialog).apply {
+                    setTitle("Are You Sure?")
+                    setMessage("Do you want to clear your saved subreddits?")
+                    setPositiveButton("Yes") { _, _ ->
+                        subViewModel!!.deleteAll()
+                        Toast.makeText(this@SavedActivity, "Deleted saved subs", Toast.LENGTH_SHORT).show()
+                    }
+                    setNegativeButton("No") { _, _ -> Toast.makeText(this@SavedActivity, "Cancelled", Toast.LENGTH_SHORT).show() }
                 }
-                confirmSubs.setNegativeButton("No") { _, _ -> Toast.makeText(this@SavedActivity, "Cancelled", Toast.LENGTH_SHORT).show() }
                 confirmSubs.show()
                 return true
             }

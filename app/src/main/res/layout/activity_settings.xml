@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     tools:context=".activities.SettingsActivity"
     tools:ignore="HardcodedText">
 
@@ -107,6 +109,7 @@
                 android:orientation="horizontal">
 
                 <SeekBar
+                    android:theme="@style/ThemeOverlay.AppCompat.DayNight"
                     android:id="@+id/scale_seek"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -122,6 +125,52 @@
                     android:layout_weight="0.5"
                     android:gravity="center"
                     android:text="2x"
+                    android:textColor="@color/textColor"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <Switch
+                android:id="@+id/random_changer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:switchPadding="10dp"
+                android:text="Enable random favorite wallpapers"
+                android:textColor="@color/textColor"
+                android:textSize="16sp"
+                android:theme="@style/ThemeOverlay.AppCompat.DayNight" />
+
+            <TextView
+                android:id="@+id/change_interval"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:text="Set random switch interval (hours): "
+                android:textColor="@color/textColor"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <SeekBar
+                    android:id="@+id/interval_seek"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="12dp"
+                    android:layout_weight="2"
+                    android:max="23"
+                    android:theme="@style/ThemeOverlay.AppCompat.DayNight" />
+
+                <TextView
+                    android:id="@+id/interval_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
+                    android:text="1 hr"
                     android:textColor="@color/textColor"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -159,52 +208,6 @@
                 android:textColor="@color/textColor"
                 android:textSize="16sp"
                 android:theme="@style/ThemeOverlay.AppCompat.DayNight" />
-
-
-            <Switch
-                android:id="@+id/random_changer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                android:switchPadding="10dp"
-                android:text="Enable random favorite wallpapers"
-                android:textColor="@color/textColor"
-                android:textSize="16sp"
-                android:theme="@style/ThemeOverlay.AppCompat.DayNight" />
-
-            <TextView
-                android:id="@+id/change_interval"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                android:text="Set random switch interval (hours): "
-                android:textColor="@color/textColor"
-                android:textSize="16sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <SeekBar
-                    android:id="@+id/interval_seek"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="12dp"
-                    android:layout_weight="2"
-                    android:max="167" />
-
-                <TextView
-                    android:id="@+id/interval_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.5"
-                    android:gravity="center"
-                    android:text="1 hr"
-                    android:textColor="@color/textColor"
-                    android:textSize="16sp" />
-            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
@@ -216,6 +219,7 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="8dp"
         android:orientation="vertical">
+
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
