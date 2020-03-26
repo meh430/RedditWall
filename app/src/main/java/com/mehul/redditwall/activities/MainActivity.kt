@@ -269,20 +269,20 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         val inputManager: InputMethodManager? = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputManager?.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
 
-        if (networkAvailable() && queryString.isNotEmpty()) {
-            imageJob = uiScope.launch {
-                loadImages(getCon(), queryString, true, getList())
-            }
-        } else {
-            if (queryString.isEmpty()) {
+        if (networkAvailable()) {
+            if (queryString.isNotEmpty()) {
+                imageJob = uiScope.launch {
+                    loadImages(getCon(), queryString, true, getList())
+                }
+            } else {
                 queryString = defaultLoad
                 imageJob = uiScope.launch {
                     loadImages(getCon(), defaultLoad, true, getList())
                 }
-            } else {
-                info!!.visibility = View.VISIBLE
-                info!!.text = "No Network"
             }
+        } else {
+            info!!.visibility = View.VISIBLE
+            info!!.text = "No Network"
         }
     }
 
@@ -338,10 +338,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     @InternalCoroutinesApi
     private fun runQuery() {
         imageJob = uiScope.launch {
-            loadImages(getCon(), if (queryString.isEmpty())
-                defaultLoad
-            else
-                queryString, true, getList())
+            loadImages(getCon(), if (queryString.isEmpty()) defaultLoad else queryString, true, getList())
         }
     }
 

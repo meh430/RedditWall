@@ -74,6 +74,7 @@ class SettingsActivity : AppCompatActivity() {
         seekCount!!.text = ((scaleSeek!!.progress + 1) * 2).toString() + "X"
         randomSwitch.setOnCheckedChangeListener { _, b ->
             preferences!!.edit().putBoolean(RANDOM_ENABLED, b).apply()
+            alarmChanged = b
             if (b) {
                 intervalSeek!!.visibility = View.VISIBLE
                 intervalCount!!.visibility = View.VISIBLE
@@ -153,7 +154,8 @@ class SettingsActivity : AppCompatActivity() {
                 wallAlarm!!.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, interval.toLong(), pending)
             }
         } else {
-            if (wallAlarm != null) {
+            if (wallAlarm != null && !preferences!!.getBoolean(RANDOM_ENABLED, false)) {
+                Toast.makeText(this, "Random refresh disabled", Toast.LENGTH_SHORT).show()
                 wallAlarm!!.cancel(pending!!)
             }
         }

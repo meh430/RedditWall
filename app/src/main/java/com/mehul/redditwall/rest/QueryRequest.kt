@@ -21,7 +21,6 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.concurrent.ExecutionException
 
 //TODO: get post link to view thread in app
 @Suppress("LocalVariableName", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
@@ -182,47 +181,41 @@ internal class QueryRequest {
                             gif!!.getJSONObject("source")
                         }
 
-                        try {
-                            val url = source.getString("url").replace("amp;".toRegex(), "")
-                            if (isImage) {
-                                var bitmap: Bitmap? = null
-                                withContext(Dispatchers.IO) {
-                                    bitmap = Glide.with(context).asBitmap()
-                                            .load(url).override(width / scale, height / 4).centerCrop().submit().get()
+                        val url = source.getString("url").replace("amp;".toRegex(), "")
+                        if (isImage) {
+                            var bitmap: Bitmap? = null
+                            withContext(Dispatchers.IO) {
+                                bitmap = Glide.with(context).asBitmap()
+                                        .load(url).override(width / scale, height / 4).centerCrop().submit().get()
+                            }
+
+                            withContext(Dispatchers.Main) {
+                                images.add(BitURL(bitmap, url, "https://www.reddit.com$postLink"))
+                                if (first && i % 4 == 0 && i != 0) {
+                                    load?.visibility = View.GONE
+                                } else if (!first && i % 4 == 0 && i != 0) {
+                                    load?.visibility = View.INVISIBLE
                                 }
 
-                                withContext(Dispatchers.Main) {
-                                    images.add(BitURL(bitmap, url, "https://www.reddit.com$postLink"))
-                                    if (first && i % 4 == 0 && i != 0) {
-                                        load?.visibility = View.GONE
-                                    } else if (!first && i % 4 == 0 && i != 0) {
-                                        load?.visibility = View.INVISIBLE
-                                    }
-
-                                    if (i % 4 == 0 && i != 0) {
-                                        adapter?.notifyDataSetChanged()
-                                    }
+                                if (i % 4 == 0 && i != 0) {
+                                    adapter?.notifyDataSetChanged()
                                 }
-                            } else {
-                                withContext(Dispatchers.Main) {
-                                    images.add(BitURL(null, url, "https://www.reddit.com$postLink"))
-                                    if (first && i % 4 == 0 && i != 0) {
-                                        load?.visibility = View.GONE
-                                    } else if (!first && i % 4 == 0 && i != 0) {
-                                        load?.visibility = View.INVISIBLE
-                                    }
+                                Log.e("ADDING", "$i")
+                            }
+                        } else {
+                            withContext(Dispatchers.Main) {
+                                images.add(BitURL(null, url, "https://www.reddit.com$postLink"))
+                                if (first && i % 4 == 0 && i != 0) {
+                                    load?.visibility = View.GONE
+                                } else if (!first && i % 4 == 0 && i != 0) {
+                                    load?.visibility = View.INVISIBLE
+                                }
 
-                                    if (i % 4 == 0 && i != 0) {
-                                        adapter?.notifyDataSetChanged()
-                                    }
+                                if (i % 4 == 0 && i != 0) {
+                                    adapter?.notifyDataSetChanged()
                                 }
                             }
-                        } catch (e: InterruptedException) {
-                            e.printStackTrace()
-                        } catch (e: ExecutionException) {
-                            e.printStackTrace()
                         }
-
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
