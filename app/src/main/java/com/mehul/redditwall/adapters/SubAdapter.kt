@@ -1,7 +1,6 @@
 package com.mehul.redditwall.adapters
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -12,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mehul.redditwall.R
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SettingsActivity
@@ -35,17 +35,18 @@ class SubAdapter(private val con: Context) : RecyclerView.Adapter<SubAdapter.Sub
             }
             holder.bindTo(current)
             holder.itemView.setOnLongClickListener {
-                val defaultConfirm = AlertDialog.Builder(con)
-                defaultConfirm.setTitle("Set as default?")
-                defaultConfirm.setMessage("Are you sure you want " + current?.subName + " to be your default subreddit?")
-                defaultConfirm.setPositiveButton("Yes") { _, _ ->
-                    val preferences = con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-                    val prefEdit = preferences.edit()
-                    prefEdit.putString(SettingsActivity.DEFAULT, current?.subName)
-                    prefEdit.apply()
-                    Toast.makeText(con, "Set " + current?.subName + " as default", Toast.LENGTH_SHORT).show()
+                val defaultConfirm = MaterialAlertDialogBuilder(con, R.style.MyThemeOverlayAlertDialog).apply {
+                    setTitle("Set as default?")
+                    setMessage("Are you sure you want " + current?.subName + " to be your default subreddit?")
+                    setPositiveButton("Yes") { _, _ ->
+                        val preferences = con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+                        val prefEdit = preferences.edit()
+                        prefEdit.putString(SettingsActivity.DEFAULT, current?.subName)
+                        prefEdit.apply()
+                        Toast.makeText(con, "Set " + current?.subName + " as default", Toast.LENGTH_SHORT).show()
+                    }
+                    setNegativeButton("No") { _, _ -> Toast.makeText(con, "Cancelled", Toast.LENGTH_SHORT).show() }
                 }
-                defaultConfirm.setNegativeButton("No") { _, _ -> Toast.makeText(con, "Cancelled", Toast.LENGTH_SHORT).show() }
                 defaultConfirm.show()
                 true
             }
