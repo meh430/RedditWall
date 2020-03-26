@@ -519,10 +519,10 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         load?.visibility = View.VISIBLE
         withContext(Dispatchers.IO) {
             val rq = RestQuery(queryString, con)
-            val jsonRes = rq.getQueryJson()
-            val retImages = rq.getImages(jsonRes)
+            val jsonRes = async { rq.getQueryJson() }
+            val retImages = async { rq.getImages(jsonRes.await()) }
             withContext(Dispatchers.Main) {
-                imageList.addAll(retImages)
+                imageList.addAll(retImages.await())
             }
         }
 
