@@ -28,6 +28,5 @@ An app that pulls images from a specified subreddit to set as device wallpaper
 
 ## Features in Progress/Planned Features
 - Ability to specify a download path in settings
-- Randomly chosen wallpaper from list of favorites that refreshes at a specified interval
 - Setting for only allowing downloads when connected to wifi
 - GIF support. Be able to set GIFs as wallpaper
