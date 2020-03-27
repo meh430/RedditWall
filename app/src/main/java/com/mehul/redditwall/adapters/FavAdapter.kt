@@ -3,6 +3,7 @@ package com.mehul.redditwall.adapters
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
@@ -89,7 +90,21 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
             if (saved.hasGif()) {
                 Glide.with(con).asGif().load(url).override(width / scale, height / 4).into(img)
             } else {
-                if (saved.img == null) {
+                try {
+                    if (saved.img == null || (saved.img != null && (saved.img as Bitmap).isRecycled)) {
+                        Glide.with(con).load(url).placeholder(ColorDrawable(Color.GRAY))
+                                .override(width / scale, height / 4).diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .centerCrop().into(img)
+                        if (img.drawable != null && img.drawable !is ColorDrawable) {
+                            Log.e("SAVED", "saved image $p")
+                            favs[p].img = (img.drawable as BitmapDrawable).bitmap
+                        }
+                    } else {
+                        img.setImageBitmap(saved.img)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Log.e("FAIL", "Recycler error")
                     Glide.with(con).load(url).placeholder(ColorDrawable(Color.GRAY))
                             .override(width / scale, height / 4).diskCacheStrategy(DiskCacheStrategy.ALL)
                             .centerCrop().into(img)
@@ -97,8 +112,6 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
                         Log.e("SAVED", "saved image $p")
                         favs[p].img = (img.drawable as BitmapDrawable).bitmap
                     }
-                } else {
-                    img.setImageBitmap(saved.img)
                 }
             }
             /*if (saved.hasGif()) {

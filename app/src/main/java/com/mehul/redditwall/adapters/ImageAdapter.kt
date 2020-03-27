@@ -1,6 +1,7 @@
 package com.mehul.redditwall.adapters
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
@@ -44,7 +45,21 @@ class ImageAdapter internal constructor(private val context: Context,
             if (current.hasGif()) {
                 Glide.with(context).asGif().load(current.url).override(width / scale, height / 4).into(holder.image)
             } else {
-                if (current.img == null) {
+                try {
+                    if (current.img == null || (current.img != null && (current.img as Bitmap).isRecycled)) {
+                        Glide.with(context).load(current.url).placeholder(ColorDrawable(Color.GRAY))
+                                .override(width / scale, height / 4).diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .centerCrop().into(holder.image)
+                        if (holder.image.drawable != null && holder.image.drawable !is ColorDrawable) {
+                            Log.e("SAVED", "saved image $position")
+                            images!![position].img = (holder.image.drawable as BitmapDrawable).bitmap
+                        }
+                    } else {
+                        holder.image.setImageBitmap(current.img)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Log.e("FAIL", "Recycler error")
                     Glide.with(context).load(current.url).placeholder(ColorDrawable(Color.GRAY))
                             .override(width / scale, height / 4).diskCacheStrategy(DiskCacheStrategy.ALL)
                             .centerCrop().into(holder.image)
@@ -52,8 +67,6 @@ class ImageAdapter internal constructor(private val context: Context,
                         Log.e("SAVED", "saved image $position")
                         images!![position].img = (holder.image.drawable as BitmapDrawable).bitmap
                     }
-                } else {
-                    holder.image.setImageBitmap(current.img)
                 }
             }
         }

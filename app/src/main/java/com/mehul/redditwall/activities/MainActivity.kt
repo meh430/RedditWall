@@ -28,6 +28,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.GsonBuilder
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.ImageAdapter
@@ -340,6 +341,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         imageJob = uiScope.launch {
             loadImages(getCon(), if (queryString.isEmpty()) defaultLoad else queryString, true, getList())
         }
+    }
+
+    override fun onBackPressed() {
+        val confirmExit =
+                MaterialAlertDialogBuilder(getCon(), R.style.MyThemeOverlayAlertDialog).apply {
+                    setTitle("Exit App")
+                    setMessage("Do you want to exit the app?")
+
+                    setPositiveButton("Yes") { _, _ ->
+                        (getCon() as Activity).finishAffinity()
+                    }
+                    setNegativeButton("No") { _, _ ->
+                        Toast.makeText(this@MainActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        confirmExit.show()
     }
 
     @InternalCoroutinesApi
