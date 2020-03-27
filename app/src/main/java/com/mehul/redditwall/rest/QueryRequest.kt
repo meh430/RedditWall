@@ -2,6 +2,8 @@ package com.mehul.redditwall.rest
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
@@ -182,39 +184,34 @@ internal class QueryRequest {
                         }
 
                         val url = source.getString("url").replace("amp;".toRegex(), "")
-                        if (isImage) {
-                            var bitmap: Bitmap? = null
-                            withContext(Dispatchers.IO) {
-                                bitmap = Glide.with(context).asBitmap()
-                                        .load(url).override(width / scale, height / 4).centerCrop().submit().get()
+                        var bitmap: Bitmap? = null
+                        withContext(Dispatchers.IO) {
+                            try {
+                                if (isImage && i % 2 == 0) {
+                                    bitmap = Glide.with(context).asBitmap()
+                                            .load(url).error(ColorDrawable(Color.GRAY)).placeholder(ColorDrawable(Color.GRAY))
+                                            .override(width / scale, height / 4).centerCrop().submit().get()
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                bitmap = null
+                            }
+                        }
+
+                        withContext(Dispatchers.Main) {
+                            val temp = BitURL(bitmap, url, "https://www.reddit.com$postLink")
+                            temp.setGif(!isImage)
+                            images.add(temp)
+                            if (first && i % 2 == 0 && i != 0) {
+                                load?.visibility = View.GONE
+                            } else if (!first && i % 2 == 0 && i != 0) {
+                                load?.visibility = View.INVISIBLE
                             }
 
-                            withContext(Dispatchers.Main) {
-                                images.add(BitURL(bitmap, url, "https://www.reddit.com$postLink"))
-                                if (first && i % 4 == 0 && i != 0) {
-                                    load?.visibility = View.GONE
-                                } else if (!first && i % 4 == 0 && i != 0) {
-                                    load?.visibility = View.INVISIBLE
-                                }
-
-                                if (i % 4 == 0 && i != 0) {
-                                    adapter?.notifyDataSetChanged()
-                                }
-                                Log.e("ADDING", "$i")
+                            if (i % 2 == 0 && i != 0) {
+                                adapter?.notifyDataSetChanged()
                             }
-                        } else {
-                            withContext(Dispatchers.Main) {
-                                images.add(BitURL(null, url, "https://www.reddit.com$postLink"))
-                                if (first && i % 4 == 0 && i != 0) {
-                                    load?.visibility = View.GONE
-                                } else if (!first && i % 4 == 0 && i != 0) {
-                                    load?.visibility = View.INVISIBLE
-                                }
-
-                                if (i % 4 == 0 && i != 0) {
-                                    adapter?.notifyDataSetChanged()
-                                }
-                            }
+                            //Log.e("ADDING", "$i")
                         }
                     }
                 } catch (e: JSONException) {

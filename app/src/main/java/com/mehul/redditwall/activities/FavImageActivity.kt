@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -39,6 +41,7 @@ class FavImageActivity : AppCompatActivity() {
     private var adapt: FavAdapter? = null
     private var favViewModel: FavViewModel? = null
     private var loading: ProgressBar? = null
+    private var remaining: ProgressBar? = null
     private var favImages: List<FavImage?>? = ArrayList()
     private var uiScope = CoroutineScope(Dispatchers.Main)
     private var favJob: Job? = null
@@ -49,6 +52,7 @@ class FavImageActivity : AppCompatActivity() {
         setContentView(R.layout.activity_fav_image)
         supportActionBar?.elevation = 0F
         loading = findViewById(R.id.fav_loading)
+        remaining = findViewById(R.id.remaining)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
         adapt = FavAdapter(this, ArrayList())
         val recycler = findViewById<RecyclerView>(R.id.fav_scroll).apply {
@@ -174,25 +178,32 @@ class FavImageActivity : AppCompatActivity() {
 
                 var bitmap: Bitmap? = null
                 withContext(Dispatchers.IO) {
-                    if (!fav!!.isGif) {
-                        bitmap = Glide.with(con).asBitmap().load(fav.favUrl)
-                                .override(width / scale, height / 4).centerCrop().submit().get()
+                    try {
+                        if (!fav!!.isGif && i % 2 == 0) {
+                            bitmap = Glide.with(getCon()).asBitmap()
+                                    .load(fav.favUrl).error(ColorDrawable(Color.GRAY)).placeholder(ColorDrawable(Color.GRAY))
+                                    .override(width / scale, height / 4).centerCrop().submit().get()
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        bitmap = null
                     }
                 }
+
                 val temp = BitURL(bitmap, fav!!.favUrl, fav.postLink)
                 temp.setGif(fav.isGif)
                 bits.add(temp)
 
-                if (i >= favs.size / 2) {
-                    withContext(Dispatchers.Main) {
-                        adapt!!.setFavs(bits, favs)
-                        loading?.visibility = View.GONE
-                    }
+                withContext(Dispatchers.Main) {
+                    remaining?.visibility = View.VISIBLE
+                    adapt!!.setFavs(bits, favs)
+                    loading?.visibility = View.GONE
                 }
             }
 
             withContext(Dispatchers.Main) {
                 adapt!!.setFavs(bits, favs)
+                remaining?.visibility = View.GONE
             }
         }
 

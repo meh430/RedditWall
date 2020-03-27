@@ -6,8 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".activities.FavImageActivity">
 
+    <ProgressBar
+        android:id="@+id/remaining"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/fav_scroll"
+        android:layout_below="@id/remaining"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"

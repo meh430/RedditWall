@@ -1,14 +1,20 @@
 package com.mehul.redditwall.adapters
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.mehul.redditwall.R
 import com.mehul.redditwall.activities.MainActivity
+import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.objects.BitURL
 
 class ImageAdapter internal constructor(private val context: Context,
@@ -17,11 +23,13 @@ class ImageAdapter internal constructor(private val context: Context,
     private val inflater: LayoutInflater
     private val width: Int
     private val height: Int
+    private val scale: Int
 
     init {
         val dims = MainActivity.getDimensions(context)
         width = dims[0]
         height = dims[1]
+        scale = (context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)!!.getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
         inflater = LayoutInflater.from(context)
     }
 
@@ -33,10 +41,20 @@ class ImageAdapter internal constructor(private val context: Context,
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         if (images != null) {
             val current = images!![position]
-            if (current.img == null) {
-                Glide.with(context).asGif().load(current.url).override(width / 2, height / 4).into(holder.image)
+            if (current.hasGif()) {
+                Glide.with(context).asGif().load(current.url).override(width / scale, height / 4).into(holder.image)
             } else {
-                holder.image.setImageBitmap(current.img)
+                if (current.img == null) {
+                    Glide.with(context).load(current.url).placeholder(ColorDrawable(Color.GRAY))
+                            .override(width / scale, height / 4).diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .centerCrop().into(holder.image)
+                    if (holder.image.drawable != null && holder.image.drawable !is ColorDrawable) {
+                        Log.e("SAVED", "saved image $position")
+                        images!![position].img = (holder.image.drawable as BitmapDrawable).bitmap
+                    }
+                } else {
+                    holder.image.setImageBitmap(current.img)
+                }
             }
         }
     }

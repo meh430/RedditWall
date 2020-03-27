@@ -3,12 +3,17 @@ package com.mehul.redditwall.adapters
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.mehul.redditwall.R
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SettingsActivity
@@ -39,7 +44,7 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
 
     override fun onBindViewHolder(holder: FavViewHolder, position: Int) {
         val current = favs[position]
-        holder.bindTo(current)
+        holder.bindTo(current, position)
         holder.itemView.apply {
             isLongClickable = true
             isClickable = true
@@ -79,13 +84,28 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
     inner class FavViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val img: ImageView = itemView.findViewById(R.id.image_holder)
 
-        fun bindTo(saved: BitURL) {
+        fun bindTo(saved: BitURL, p: Int) {
             val url = saved.url
             if (saved.hasGif()) {
+                Glide.with(con).asGif().load(url).override(width / scale, height / 4).into(img)
+            } else {
+                if (saved.img == null) {
+                    Glide.with(con).load(url).placeholder(ColorDrawable(Color.GRAY))
+                            .override(width / scale, height / 4).diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .centerCrop().into(img)
+                    if (img.drawable != null && img.drawable !is ColorDrawable) {
+                        Log.e("SAVED", "saved image $p")
+                        favs[p].img = (img.drawable as BitmapDrawable).bitmap
+                    }
+                } else {
+                    img.setImageBitmap(saved.img)
+                }
+            }
+            /*if (saved.hasGif()) {
                 Glide.with(con).asGif().load(url).override(width / scale, height / 4).centerCrop().into(img)
             } else {
-                img.setImageBitmap(saved.getImg())
-            }
+                img.setImageBitmap(saved.img)
+            }*/
         }
     }
 }

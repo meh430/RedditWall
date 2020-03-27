@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose
 
 import com.google.gson.annotations.SerializedName
 
-class BitURL(internal val img: Bitmap?, @Expose @field:SerializedName("url")
+class BitURL(var img: Bitmap?, @Expose @field:SerializedName("url")
 internal val url: String, @Expose @field:SerializedName("post")
              internal val postLink: String) {
     @Expose
@@ -28,9 +28,5 @@ internal val url: String, @Expose @field:SerializedName("post")
 
     fun getUrl(): String {
         return url
-    }
-
-    fun getImg(): Bitmap? {
-        return img
     }
 }

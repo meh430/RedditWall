@@ -27,6 +27,7 @@ class BootReceiver : BroadcastReceiver() {
             val triggerTime = SystemClock.elapsedRealtime() + interval
             Toast.makeText(context, "Random refresh enabled", Toast.LENGTH_SHORT).show()
             wallAlarm.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, interval.toLong(), pending)
+            ChangeWallpaper.changeWall(context)
         }
     }
 }
