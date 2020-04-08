@@ -13,6 +13,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NavUtils
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mehul.redditwall.ChangeWallpaper
 import com.mehul.redditwall.R
 
@@ -127,6 +128,21 @@ class SettingsActivity : AppCompatActivity() {
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
+        val randButton = findViewById<Button>(R.id.random_location_button)
+        when (preferences!!.getInt(RANDOM_LOCATION, 2)) {
+            0 -> {
+                randButton.text = "HOME"
+            }
+
+            1 -> {
+                randButton.text = "LOCK"
+            }
+
+            2 -> {
+                randButton.text = "BOTH"
+            }
+        }
+
         val dims = MainActivity.getDimensions(this)
         val width = preferences!!.getInt(IMG_WIDTH, dims[0])
         val height = preferences!!.getInt(IMG_HEIGHT, dims[1])
@@ -202,5 +218,38 @@ class SettingsActivity : AppCompatActivity() {
         const val DOWNLOAD_ORIGIN = "DOWNLOAD_ORIGINAL"
         const val RANDOM_ENABLED = "SWITCHING_ENABLED"
         const val RANDOM_INTERVAL = "INTERVAL"
+        const val RANDOM_LOCATION = "RAND_LOCATION"
+        const val HOME = 0
+        const val LOCK = 1
+        const val BOTH = 2
+    }
+
+    fun setRandomLocation(view: View) {
+        val but = view as Button
+        val builder = MaterialAlertDialogBuilder(this, R.style.MyThemeOverlayAlertDialog)
+        builder.setTitle("Set Where?")
+                .setItems(R.array.location_options) { _, i ->
+                    when (i) {
+                        0 -> {
+                            but.text = "HOME"
+                            preferences?.edit()?.putInt(RANDOM_LOCATION, HOME)?.apply()
+                        }
+
+                        1 -> {
+                            but.text = "LOCK"
+                            preferences?.edit()?.putInt(RANDOM_LOCATION, LOCK)?.apply()
+                        }
+
+                        2 -> {
+                            but.text = "BOTH"
+                            preferences?.edit()?.putInt(RANDOM_LOCATION, BOTH)?.apply()
+                        }
+
+                        else -> {
+                            Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+        builder.create().show()
     }
 }

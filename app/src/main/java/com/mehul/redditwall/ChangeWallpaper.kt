@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
@@ -30,7 +31,8 @@ class ChangeWallpaper : BroadcastReceiver() {
     companion object {
         fun changeWall(con: Context) {
             val pref = con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-            val width = pref!!.getInt(SettingsActivity.IMG_WIDTH, 1920)
+            val location = pref!!.getInt(SettingsActivity.RANDOM_LOCATION, 2)
+            val width = pref.getInt(SettingsActivity.IMG_WIDTH, 1920)
             val height = pref.getInt(SettingsActivity.IMG_HEIGHT, 1080)
             val favs = FavRepository(con).favAsList
             if (favs!!.isEmpty()) {
@@ -52,7 +54,17 @@ class ChangeWallpaper : BroadcastReceiver() {
                     .override(width, height)
                     .into(object : CustomTarget<Bitmap>() {
                         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                            wall?.setBitmap(resource)
+
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || location == 2) {
+                                wall?.setBitmap(resource)
+                            } else {
+                                if (location == 0) {
+                                    wall?.setBitmap(resource, null, true, WallpaperManager.FLAG_SYSTEM)
+                                } else if (location == 1) {
+                                    wall?.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK)
+                                }
+                            }
+
                             val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, current!!.favName,
                                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                                     HistoryItem.REFRESH, current.favUrl, current.postLink)
