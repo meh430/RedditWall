@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Environment
 import android.os.SystemClock
 import android.view.View
 import android.widget.*
@@ -16,6 +17,7 @@ import androidx.core.app.NavUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mehul.redditwall.ChangeWallpaper
 import com.mehul.redditwall.R
+import java.io.File
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -251,5 +253,21 @@ class SettingsActivity : AppCompatActivity() {
                     }
                 }
         builder.create().show()
+    }
+
+    fun deleteDownloads(view: View) {
+        val root = Environment.getExternalStorageDirectory().toString()
+        val downloads = File("$root/RedditWalls")
+        if (downloads.exists()) {
+            val pics = downloads.list()
+            for (pic in pics) {
+                val curr = File(downloads.path, pic)
+                curr.delete()
+            }
+
+            downloads.delete()
+        }
+
+        Toast.makeText(this, "Deleted downloaded images", Toast.LENGTH_SHORT).show()
     }
 }

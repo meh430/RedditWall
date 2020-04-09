@@ -107,7 +107,7 @@ class SavedActivity : AppCompatActivity() {
             56345564 -> {
                 val confirmSubs = MaterialAlertDialogBuilder(this, R.style.MyThemeOverlayAlertDialog).apply {
                     setTitle("Are You Sure?")
-                    setMessage("Do you want to clear your saved subreddits?")
+                    setMessage("Do you want to clear ${subs?.size ?: 0} saved subreddits?")
                     setPositiveButton("Yes") { _, _ ->
                         subViewModel!!.deleteAll()
                         Toast.makeText(this@SavedActivity, "Deleted saved subs", Toast.LENGTH_SHORT).show()

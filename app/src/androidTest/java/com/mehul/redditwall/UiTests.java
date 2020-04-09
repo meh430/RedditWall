@@ -60,10 +60,10 @@ public class UiTests {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i <= 20; i++) {
+        for (int i = 0; i <= 90; i++) {
             onView(withId(R.id.fav_scroll)).perform(RecyclerViewActions.actionOnItemAtPosition(i, click()));
-            onView(withId(R.id.set_wall)).perform(click());
-            onView(withText("Both")).perform(click());
+            onView(withId(R.id.load_post)).perform(click());
+            onView(isRoot()).perform(pressBack());
             onView(isRoot()).perform(pressBack());
         }
     }

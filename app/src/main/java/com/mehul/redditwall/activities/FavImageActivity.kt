@@ -91,7 +91,7 @@ class FavImageActivity : AppCompatActivity() {
                     val confirmDelete =
                             MaterialAlertDialogBuilder(getCon(), R.style.MyThemeOverlayAlertDialog).apply {
                                 setTitle("Are You Sure?")
-                                setMessage("Do you want to clear your favorites?")
+                                setMessage("Do you want to clear ${favImages?.size ?: 0} favorite images?")
 
                                 setPositiveButton("Yes") { _, _ ->
                                     favViewModel!!.deleteAll()

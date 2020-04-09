@@ -58,6 +58,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var isGif: Boolean = false
     private var downloadOriginal = false
     private var fromFav: Boolean = false
+    private var fromHist: Boolean = false
+    private var noQuery: Boolean = false
     private var index: Int = 0
     private var width: Int = 0
     private var height: Int = 0
@@ -227,7 +229,9 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         wallPreview = findViewById(R.id.wall_holder)
         detector = GestureDetector(this, this)
         val incoming = intent
-        fromFav = incoming.getBooleanExtra(FROM_FAV, true)
+        fromFav = incoming.getBooleanExtra(FROM_FAV, false)
+        fromHist = incoming.getBooleanExtra(FROM_HIST, false)
+        noQuery = fromFav || fromHist
         jsonList = incoming.getStringExtra(LIST)
         uiScope.launch {
             if (jsonList != null && jsonList!!.isNotEmpty()) {
@@ -243,7 +247,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         val dims = MainActivity.getDimensions(this)
         width = preferences!!.getInt(SettingsActivity.IMG_WIDTH, dims[0])
         height = preferences!!.getInt(SettingsActivity.IMG_HEIGHT, dims[1])
-        query = if (fromFav) {
+        query = if (noQuery) {
             incoming.getStringExtra(FAV_LIST)
         } else {
             incoming.getStringExtra(MainActivity.QUERY)
@@ -422,14 +426,14 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             uiScope.launch {
                 startUp(con)
             }
-        } else if (imageJob == null && !fromFav) {
+        } else if (imageJob == null && !noQuery) {
             Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
             imageJob = uiScope.launch {
                 loadImages(getCon(), query)
             }
-        } else if (imageJob != null && imageJob!!.isActive && !fromFav) {
+        } else if (imageJob != null && imageJob!!.isActive && !noQuery) {
             Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
-        } else if (imageJob != null && (!imageJob!!.isActive) && !fromFav) {
+        } else if (imageJob != null && (!imageJob!!.isActive) && !noQuery) {
             Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show()
             imageJob?.cancel()
             imageJob = uiScope.launch {
@@ -539,6 +543,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         const val LIST = "LIST"
         const val INDEX = "INDEX"
         const val FROM_FAV = "FAV_IMAGES"
+        const val FROM_HIST = "HIST_IMAGES"
         const val FAV_LIST = "FAV_LIST"
         var AFTER_NEW_WALL: String? = null
         var AFTER_HOT_WALL: String? = null

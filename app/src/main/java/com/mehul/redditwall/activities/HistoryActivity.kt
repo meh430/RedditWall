@@ -1,6 +1,8 @@
 package com.mehul.redditwall.activities
 
 import android.Manifest
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -123,7 +125,20 @@ class HistoryActivity : AppCompatActivity() {
             findViewById<View>(R.id.hist_empty).visibility = if (adapt!!.itemCount == 0) View.VISIBLE else View.GONE
         })
         recycler.addOnItemTouchListener(RecyclerListener(this, recycler, object : RecyclerListener.OnItemClickListener {
-            override fun onLongItemClick(view: View?, position: Int) {}
+            override fun onLongItemClick(view: View?, position: Int) {
+                cancelThreads()
+                val launchMain = Intent(getCon(), MainActivity::class.java)
+                launchMain.apply {
+                    putExtra(MainActivity.SAVED, histories[position]?.subName)
+                    putExtra(MainActivity.OVERRIDE, true)
+                }
+                val clipboard: ClipboardManager? = getCon().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("Copied Text", histories[position]?.subName)
+                assert(clipboard != null)
+                clipboard?.setPrimaryClip(clip)
+                Toast.makeText(getCon(), "Saved to clipboard", Toast.LENGTH_SHORT).show()
+                getCon().startActivity(launchMain)
+            }
 
             override fun onItemClick(view: View, position: Int) {
                 cancelThreads()
@@ -132,7 +147,7 @@ class HistoryActivity : AppCompatActivity() {
                 wallIntent.apply {
                     putExtra(WallActivity.WALL_URL, current?.url)
                     putExtra(WallActivity.GIF, false)
-                    putExtra(WallActivity.FROM_FAV, true)
+                    putExtra(WallActivity.FROM_HIST, true)
                     putExtra(WallActivity.FAV_LIST, current?.subName)
                     putExtra(WallActivity.INDEX, position)
                     putExtra(WallActivity.LIST, json)
@@ -151,7 +166,7 @@ class HistoryActivity : AppCompatActivity() {
                     val confirmDelete =
                             MaterialAlertDialogBuilder(getCon(), R.style.MyThemeOverlayAlertDialog).apply {
                                 setTitle("Are You Sure?")
-                                setMessage("Do you want to clear history?")
+                                setMessage("Do you want to clear ${histories.size} history items?")
                                 setPositiveButton("Yes") { _, _ ->
                                     histViewModel!!.deleteAll()
                                     Toast.makeText(this@HistoryActivity, "Cleared history", Toast.LENGTH_SHORT).show()

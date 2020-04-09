@@ -52,6 +52,7 @@
             android:foreground="@drawable/ripple"
             android:background="@drawable/rounded_button_3"
             android:onClick="launchPost"
+            android:id="@+id/load_post"
             android:text="Visit Post"
             android:textColor="@android:color/white" />
     </LinearLayout>
