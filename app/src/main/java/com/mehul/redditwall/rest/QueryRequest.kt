@@ -1,9 +1,13 @@
 package com.mehul.redditwall.rest
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
+import com.bumptech.glide.Glide
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.adapters.ImageAdapter
@@ -180,12 +184,11 @@ internal class QueryRequest {
                         }
 
                         val url = source.getString("url").replace("amp;".toRegex(), "")
-                        /*var bitmap: Bitmap? = null
+                        var bitmap: Bitmap? = null
                         withContext(Dispatchers.IO) {
                             try {
-                                if (isImage && i % 2 == 0) {
+                                if (isImage && i % 3 == 0) {
                                     bitmap = Glide.with(context).asBitmap()
-                                            .load(url).error(ColorDrawable(Color.GRAY)).placeholder(ColorDrawable(Color.GRAY))
                                             .load(url).error(ColorDrawable(Color.GRAY)).placeholder(ColorDrawable(Color.GRAY))
                                             .override(width / scale, height / 4).centerCrop().submit().get()
                                 }
@@ -193,10 +196,10 @@ internal class QueryRequest {
                                 e.printStackTrace()
                                 bitmap = null
                             }
-                        }*/
+                        }
 
                         withContext(Dispatchers.Main) {
-                            val temp = BitURL(null, url, "https://www.reddit.com$postLink")
+                            val temp = BitURL(bitmap, url, "https://www.reddit.com$postLink")
                             temp.setGif(!isImage)
                             images.add(temp)
                             if (first && i % 2 == 0 && i != 0) {

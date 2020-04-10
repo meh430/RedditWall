@@ -11,6 +11,11 @@
     <item name="fab_random" type="id" />
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+
+    <string name="fav_scut">Favorites</string>
+    <string name="saved_scut">Saved</string>
+    <string name="hist_scut">History</string>
+    <string name="set_scut">Settings</string>
 </resources>
 
 

@@ -6,9 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.WallpaperManager
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -21,9 +19,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
@@ -43,8 +39,9 @@ import com.mehul.redditwall.rest.RestQuery
 import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONException
-import java.io.File
-import java.io.FileOutputStream
+import java.io.*
+import java.net.HttpURLConnection
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -55,6 +52,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var jsonList: String? = ""
     private var notifyManager: NotificationManager? = null
     private var wallPreview: ImageView? = null
+    private var bottomUp = false
     private var isGif: Boolean = false
     private var downloadOriginal = false
     private var fromFav: Boolean = false
@@ -65,6 +63,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var height: Int = 0
     private var fname: String? = null
     private var imgUrl: String? = null
+    private var postLink: String? = null
     private var imageList: ArrayList<BitURL> = ArrayList()
     private var detector: GestureDetector? = null
     private var imageJob: Job? = null
@@ -72,6 +71,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var filledStar: Drawable? = null
     private var openStar: Drawable? = null
     private var starred: Menu? = null
+    private var bottomSheet: LinearLayout? = null
+    private var expandButton: Button? = null
     private var load: ProgressBar? = null
     private var favViewModel: FavViewModel? = null
     private var histViewModel: HistViewModel? = null
@@ -225,6 +226,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.wall_menu, menu)
+        bottomSheet = findViewById(R.id.bottom_sheet)
+        expandButton = findViewById(R.id.expand_button)
         load = findViewById(R.id.load_more)
         wallPreview = findViewById(R.id.wall_holder)
         detector = GestureDetector(this, this)
@@ -240,6 +243,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
         index = incoming.getIntExtra(INDEX, 0)
         imgUrl = incoming.getStringExtra(WALL_URL)
+        postLink = incoming.getStringExtra(PostActivity.POST_LINK)
         isGif = incoming.getBooleanExtra(GIF, false)
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
         downloadOriginal = preferences!!.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
@@ -266,6 +270,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         filledStar = ContextCompat.getDrawable(applicationContext, filled)
         openStar = ContextCompat.getDrawable(applicationContext, open)
         starred = menu
+        bottomSheet!!.findViewById<TextView>(R.id.subreddit).text = "Subreddit: $query"
         uiScope.launch {
             startUp(getCon())
         }
@@ -273,9 +278,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     fun launchPost(view: View) {
-        val currPost = imageList[index]
         val postIntent = Intent(this, PostActivity::class.java)
-        postIntent.putExtra(PostActivity.POST_LINK, currPost.postLink)
+        postIntent.putExtra(PostActivity.POST_LINK, postLink)
         startActivity(postIntent)
     }
 
@@ -400,6 +404,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         if ((index - 1) >= 0) {
             index--
             val curr = imageList[index]
+            postLink = curr.postLink
             imgUrl = curr.url
             isGif = curr.hasGif()
             val con = this
@@ -420,6 +425,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         if (inBound) {
             index++
             val curr = imageList[index]
+            postLink = curr.postLink
             imgUrl = curr.url
             isGif = curr.hasGif()
             val con = this
@@ -481,6 +487,113 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     override fun onLongPress(motionEvent: MotionEvent) {}
 
+    private suspend fun loadUps(con: Context) {
+        val upText = bottomSheet?.findViewById<TextView>(R.id.upvotes)
+        val titleText = bottomSheet?.findViewById<TextView>(R.id.post_title)
+        val sizeText = bottomSheet?.findViewById<TextView>(R.id.image_size)
+        val subText = bottomSheet?.findViewById<TextView>(R.id.subreddit)
+        upText?.text = "Upvotes: Loading..."
+        titleText?.text = "Loading..."
+        sizeText?.text = "Size: Loading..."
+        subText?.text = "Subreddit: Loading..."
+        withContext(Dispatchers.Default) {
+            val postJson = async { getPostJSON() }
+
+            try {
+                val jsonList = JSONArray(postJson.await())
+                var json = jsonList.getJSONObject(0)
+                json = json.getJSONObject("data")
+                json = json.getJSONArray("children").getJSONObject(0).getJSONObject("data")
+                val sub = json.getString("subreddit")
+                val title = json.getString("title").trim()
+                val ups = json.getInt("ups")
+
+                withContext(Dispatchers.Main) {
+                    query = sub
+                    subText?.text = "Subreddit: $sub"
+                    upText?.text = "Upvotes: $ups"
+                    titleText?.text = title
+                }
+
+                while (wallPreview?.drawable == null) {
+                }
+                val bitmap = if (preferences!!.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)) {
+                    currentBitmap
+                } else {
+                    (wallPreview!!.drawable as BitmapDrawable).bitmap
+                }
+
+                val stream = ByteArrayOutputStream()
+                bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                val imageInByte = stream.toByteArray()
+                val length = imageInByte.size
+                val size = length / 1000000.00
+                withContext(Dispatchers.Main) {
+                    sizeText?.text = "Size: $size MB"
+                }
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private suspend fun getPostJSON(): String {
+        var jsonString = ""
+        Log.e("POST", postLink)
+        withContext(Dispatchers.IO) {
+            val ENDPOINT = "$postLink.json"
+            var urlConnection: HttpURLConnection? = null
+            var reader: BufferedReader? = null
+            try {
+                val requestURL = URL(ENDPOINT)
+
+                urlConnection = requestURL.openConnection() as HttpURLConnection
+                urlConnection.requestMethod = "GET"
+                urlConnection.connect()
+
+                val inputStream = urlConnection.inputStream
+                reader = BufferedReader(InputStreamReader(inputStream))
+                val builder = StringBuilder()
+
+                var line: String? = reader.readLine()
+                while (line != null) {
+                    if (!isActive) {
+                        break
+                    }
+
+                    builder.append(line)
+                    builder.append("\n")
+                    line = reader.readLine()
+                }
+
+                if (!isActive) {
+                    jsonString = ""
+                }
+
+                if (builder.isEmpty()) {
+                    jsonString = ""
+                }
+
+                jsonString = builder.toString()
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                urlConnection?.disconnect()
+                if (reader != null) {
+                    try {
+                        reader.close()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+
+                }
+            }
+        }
+        Log.e("JSONN", jsonString)
+        return jsonString
+    }
+
     private suspend fun startUp(con: Context) {
         load?.visibility = View.VISIBLE
         wallPreview?.visibility = View.GONE
@@ -517,6 +630,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         } else {
             with(con).load(imgUrl).override(width, height).centerCrop().into(wallPreview!!)
         }
+
+        loadUps(con)
     }
 
     private suspend fun loadImages(con: Context?, queryString: String) {
@@ -552,6 +667,33 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         fun listToJson(imgs: ArrayList<BitURL>?): String {
             val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
             return gson.toJson(imgs)
+        }
+    }
+
+    fun launchSearch(view: View) {
+        val launchMain = Intent(this, MainActivity::class.java)
+        launchMain.apply {
+            putExtra(MainActivity.SAVED, query)
+            putExtra(MainActivity.OVERRIDE, true)
+        }
+        val clipboard: ClipboardManager? = this.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("Copied Text", query)
+        assert(clipboard != null)
+        clipboard?.setPrimaryClip(clip)
+        Toast.makeText(this, "Saved to clipboard", Toast.LENGTH_SHORT).show()
+        finish()
+        this.startActivity(launchMain)
+    }
+
+    fun toggleBottom(view: View) {
+        bottomUp = !bottomUp
+
+        if (bottomUp) {
+            expandButton?.visibility = View.GONE
+            bottomSheet?.visibility = View.VISIBLE
+        } else {
+            expandButton?.visibility = View.VISIBLE
+            bottomSheet?.visibility = View.GONE
         }
     }
 }

@@ -41,7 +41,6 @@ class HistoryRepository internal constructor(application: Context) {
             mAsyncTaskDao?.deleteHistoryItem(params[0])
             return null
         }
-
     }
 
     init {

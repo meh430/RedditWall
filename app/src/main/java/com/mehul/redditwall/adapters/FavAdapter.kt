@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.mehul.redditwall.R
 import com.mehul.redditwall.activities.MainActivity
+import com.mehul.redditwall.activities.PostActivity
 import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.activities.WallActivity
 import com.mehul.redditwall.favorites.FavImage
@@ -53,6 +54,7 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
         holder.itemView.setOnClickListener {
             val wallIntent = Intent(con, WallActivity::class.java)
             wallIntent.apply {
+                putExtra(PostActivity.POST_LINK, current.postLink)
                 putExtra(WallActivity.WALL_URL, current.url)
                 putExtra(WallActivity.GIF, current.hasGif())
                 putExtra(WallActivity.INDEX, position)

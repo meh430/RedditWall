@@ -73,6 +73,8 @@
             android:parentActivityName=".activities.MainActivity"
             android:windowSoftInputMode="stateHidden" />
         <activity
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"
             android:name=".activities.WallActivity"
             android:label="Image Preview"
             android:parentActivityName=".activities.MainActivity"
@@ -87,6 +89,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
     </application>
 

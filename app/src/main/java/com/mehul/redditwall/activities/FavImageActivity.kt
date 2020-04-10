@@ -14,7 +14,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
-import android.widget.Toast
+import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.FavAdapter
@@ -42,6 +43,7 @@ class FavImageActivity : AppCompatActivity() {
     private var favViewModel: FavViewModel? = null
     private var loading: ProgressBar? = null
     private var remaining: ProgressBar? = null
+    private var rootLayout: RelativeLayout? = null
     private var favImages: List<FavImage?>? = ArrayList()
     private var uiScope = CoroutineScope(Dispatchers.Main)
     private var favJob: Job? = null
@@ -53,6 +55,7 @@ class FavImageActivity : AppCompatActivity() {
         supportActionBar?.elevation = 0F
         loading = findViewById(R.id.fav_loading)
         remaining = findViewById(R.id.remaining)
+        rootLayout = findViewById(R.id.fav_root)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
         adapt = FavAdapter(this, ArrayList())
         val recycler = findViewById<RecyclerView>(R.id.fav_scroll).apply {
@@ -95,10 +98,12 @@ class FavImageActivity : AppCompatActivity() {
 
                                 setPositiveButton("Yes") { _, _ ->
                                     favViewModel!!.deleteAll()
-                                    Toast.makeText(this@FavImageActivity, "Deleted favorite images", Toast.LENGTH_SHORT).show()
+                                    Snackbar.make(rootLayout!!, "Deleted favorite images", Snackbar.LENGTH_SHORT).show()
+                                    //Toast.makeText(this@FavImageActivity, "Deleted favorite images", Toast.LENGTH_SHORT).show()
                                 }
                                 setNegativeButton("No") { _, _ ->
-                                    Toast.makeText(this@FavImageActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                                    //Toast.makeText(this@FavImageActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                                    Snackbar.make(rootLayout!!, "Cancelled", Snackbar.LENGTH_SHORT).show()
                                 }
                             }
                     confirmDelete.show()
@@ -111,7 +116,8 @@ class FavImageActivity : AppCompatActivity() {
                                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), WallActivity.WRITE)
                     } else {
                         if (favImages!!.isEmpty()) {
-                            Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
+                            //Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
+                            Snackbar.make(rootLayout!!, "No items", Snackbar.LENGTH_SHORT).show()
                             return@OnActionSelectedListener false
                         }
 
@@ -124,7 +130,8 @@ class FavImageActivity : AppCompatActivity() {
                 }
                 R.id.random -> {
                     if (adapt!!.itemCount == 0) {
-                        Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
+                        Snackbar.make(rootLayout!!, "No items", Snackbar.LENGTH_SHORT).show()
                         return@OnActionSelectedListener false
                     }
 
@@ -139,6 +146,7 @@ class FavImageActivity : AppCompatActivity() {
                         putExtra(WallActivity.WALL_URL, current.url)
                         putExtra(WallActivity.GIF, current.hasGif())
                         putExtra(WallActivity.INDEX, randomNum)
+                        putExtra(PostActivity.POST_LINK, current.postLink)
                         putExtra(WallActivity.FROM_FAV, true)
                         putExtra(WallActivity.LIST, WallActivity.listToJson(adapt!!.getFavs()))
                         putExtra(WallActivity.FAV_LIST, favImages!![randomNum]?.favName)
@@ -221,7 +229,8 @@ class FavImageActivity : AppCompatActivity() {
                     downloadAllImages()
                 }
             } else {
-                Toast.makeText(this, "Cannot download, please grant permissions", Toast.LENGTH_SHORT).show()
+                Snackbar.make(rootLayout!!, "Cannot download, please grant permissions", Snackbar.LENGTH_SHORT).show()
+                //Toast.makeText(this, "Cannot download, please grant permissions", Toast.LENGTH_SHORT).show()
             }
         }
     }

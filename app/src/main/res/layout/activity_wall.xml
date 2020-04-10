@@ -16,55 +16,218 @@
         android:id="@+id/wall_holder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:contentDescription="IMAGE"
         android:scaleType="centerCrop"
+        android:visibility="gone"
         tools:ignore="HardcodedText" />
+    <!--
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/set_wall"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="6dp"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            tools:ignore="HardcodedText">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/set_wall"
-        android:weightSum="2"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="6dp"
-        android:orientation="horizontal"
-        tools:ignore="HardcodedText">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_button_2"
+                android:foreground="@drawable/ripple"
+                android:onClick="downloadImage"
+                android:text="Download"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/load_post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_button_3"
+                android:foreground="@drawable/ripple"
+                android:onClick="launchPost"
+                android:text="Visit Post"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
 
         <Button
-            android:layout_width="wrap_content"
+            android:id="@+id/set_wall"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_button_2"
-            android:onClick="downloadImage"
-            android:text="Download"
-            android:textColor="@android:color/white" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_button_3"
-            android:onClick="launchPost"
-            android:text="Visit Post"
-            android:textColor="@android:color/white" />
-    </LinearLayout>
-
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="14dp"
+            android:layout_marginBottom="14dp"
+            android:background="@drawable/rounded_button"
+            android:foreground="@drawable/ripple"
+            android:onClick="setWallpaper"
+            android:text="Set Wallpaper"
+            android:textColor="@android:color/white" />-->
     <Button
-        android:id="@+id/set_wall"
-        android:layout_width="match_parent"
+        android:id="@+id/expand_button"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="14dp"
-        android:layout_marginEnd="14dp"
-        android:layout_marginBottom="14dp"
-        android:background="@drawable/rounded_button"
-        android:onClick="setWallpaper"
-        android:text="Set Wallpaper"
-        android:textColor="@android:color/white" />
+        android:layout_margin="16dp"
+        android:background="@drawable/up_button"
+        android:drawableStart="@drawable/ic_up"
+        android:drawablePadding="12dp"
+        android:onClick="toggleBottom"
+        android:padding="12dp"
+        android:paddingEnd="24dp"
+        android:text="EXPAND"
+        android:textColor="@color/textColor" />
+
+    <LinearLayout
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/sheet"
+        android:elevation="10dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:onClick="toggleBottom"
+            android:src="@drawable/ic_down" />
+
+        <TextView
+            android:id="@+id/post_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="25dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="TITLE"
+            android:textColor="@color/textColor"
+            android:textSize="20sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="85dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="85dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/grey" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="12dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/ic_wallpaper"
+                android:gravity="center"
+                android:onClick="setWallpaper"
+                android:text="SET"
+                android:textColor="@color/textColor"
+                android:textSize="16sp" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/grey" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/ic_download"
+                android:gravity="center"
+                android:onClick="downloadImage"
+                android:text="SAVE"
+                android:textColor="@color/textColor"
+                android:textSize="16sp" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="18dp"
+                android:background="@color/grey" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/ic_post"
+                android:gravity="center"
+                android:onClick="launchPost"
+                android:text="POST"
+                android:textColor="@color/textColor"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="85dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="85dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/grey" />
+
+        <TextView
+            android:id="@+id/upvotes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="25dp"
+            android:text="Upvotes: "
+            android:textColor="@color/secondary"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/image_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="25dp"
+            android:text="Size: "
+            android:textColor="@color/secondary"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/subreddit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="25dp"
+            android:layout_marginBottom="20dp"
+            android:onClick="launchSearch"
+            android:text="Subreddit: "
+            android:textColor="@color/secondary"
+            android:textSize="18sp" />
+    </LinearLayout>
 </RelativeLayout>

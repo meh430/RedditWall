@@ -21,14 +21,15 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.GsonBuilder
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.ImageAdapter
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var newImages = ArrayList<BitURL>()
     private var adapter: ImageAdapter? = null
     private var loading: ProgressBar? = null
+    private var rootLayout: CoordinatorLayout? = null
     private var bottomLoading: ProgressBar? = null
     private var info: TextView? = null
     private var imageJob: Job? = null
@@ -69,6 +71,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         newChip = findViewById(R.id.new_chip)
         topChip = findViewById(R.id.top_chip)
         loading = findViewById(R.id.loading)
+        rootLayout = findViewById(R.id.main_root)
         info = findViewById(R.id.info)
         bottomLoading = findViewById(R.id.progressBar)
         search = findViewById(R.id.search)
@@ -92,6 +95,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     putExtra(WallActivity.WALL_URL, current.getUrl())
                     putExtra(WallActivity.GIF, current.hasGif())
                     putExtra(WallActivity.FROM_FAV, false)
+                    putExtra(PostActivity.POST_LINK, current.postLink)
                     putExtra(QUERY, queryString)
                 }
                 val prevs = ArrayList<BitURL>()
@@ -353,7 +357,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                         (getCon() as Activity).finishAffinity()
                     }
                     setNegativeButton("No") { _, _ ->
-                        Toast.makeText(this@MainActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(this@MainActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                        Snackbar.make(rootLayout!!, "Cancelled", Snackbar.LENGTH_SHORT).show()
                     }
                 }
         confirmExit.show()
@@ -368,7 +373,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             else -> null
         }
         if (imageJob != null && imageJob!!.isActive && temp == null) {
-            Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
+            Snackbar.make(rootLayout!!, "Please wait", Snackbar.LENGTH_SHORT).show()
             return
         }
 

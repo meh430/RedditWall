@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/hist_root"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".activities.MainActivity"
     tools:ignore="HardcodedText">
@@ -34,6 +35,16 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             tools:context=".activities.HistoryActivity">
+
+            <ProgressBar
+                android:id="@+id/wait"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:indeterminate="true"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/hist_empty"

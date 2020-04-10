@@ -9,9 +9,9 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.SubAdapter
 import com.mehul.redditwall.savedsub.SubSaved
@@ -32,11 +33,13 @@ class SavedActivity : AppCompatActivity() {
     private var currSort = R.id.recent
     private var adapter: SubAdapter? = null
     private var saveText: EditText? = null
+    private var rootLayout: CoordinatorLayout? = null
     private var subs: List<SubSaved?>? = ArrayList()
     private var subViewModel: SubViewModel? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_saved)
+        rootLayout = findViewById(R.id.saved_root)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         val sortIcon: Drawable = ContextCompat.getDrawable(applicationContext, R.drawable.ic_sort)!!
@@ -110,9 +113,10 @@ class SavedActivity : AppCompatActivity() {
                     setMessage("Do you want to clear ${subs?.size ?: 0} saved subreddits?")
                     setPositiveButton("Yes") { _, _ ->
                         subViewModel!!.deleteAll()
-                        Toast.makeText(this@SavedActivity, "Deleted saved subs", Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(this@SavedActivity, "Deleted saved subs", Toast.LENGTH_SHORT).show()
+                        Snackbar.make(rootLayout!!, "Deleted saved subs", Snackbar.LENGTH_SHORT).show()
                     }
-                    setNegativeButton("No") { _, _ -> Toast.makeText(this@SavedActivity, "Cancelled", Toast.LENGTH_SHORT).show() }
+                    setNegativeButton("No") { _, _ -> Snackbar.make(rootLayout!!, "Cancelled", Snackbar.LENGTH_SHORT).show() }
                 }
                 confirmSubs.show()
                 return true
@@ -134,7 +138,8 @@ class SavedActivity : AppCompatActivity() {
     fun saveSub(view: View) {
         var saveVal = saveText!!.text.toString().replace(" ", "")
         saveVal = if (saveVal.length == 1) {
-            Toast.makeText(this, "Please enter something to save", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(this, "Please enter something to save", Toast.LENGTH_SHORT).show()
+            Snackbar.make(rootLayout!!, "Please enter something to save", Snackbar.LENGTH_SHORT).show()
             return
         } else {
             saveText!!.setText("")
@@ -145,12 +150,14 @@ class SavedActivity : AppCompatActivity() {
                 InputMethodManager.HIDE_NOT_ALWAYS)
         for (saved in subViewModel!!.allSubs!!.value!!) {
             if (saved?.subName.equals(saveVal, ignoreCase = true)) {
-                Toast.makeText(this, saved!!.subName + " has already been saved", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, saved!!.subName + " has already been saved", Toast.LENGTH_SHORT).show()
+                Snackbar.make(rootLayout!!, "${saved!!.subName} has already been saved", Snackbar.LENGTH_SHORT).show()
                 return
             }
         }
         subViewModel!!.insert(SubSaved((Math.random() * 10000).toInt() + 1,
                 saveVal, SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date())))
-        Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
+        Snackbar.make(rootLayout!!, "Saved", Snackbar.LENGTH_SHORT).show()
     }
 }

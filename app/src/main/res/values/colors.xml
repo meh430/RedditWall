@@ -10,4 +10,5 @@
     <color name="secondary">#5D5B5B</color>
     <color name="edit">#CBC8C8</color>
     <color name="fill">#000000</color>
+    <color name="grey">#D4D1D1</color>
 </resources>

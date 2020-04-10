@@ -1,8 +1,6 @@
 package com.mehul.redditwall.activities
 
 import android.Manifest
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,9 +15,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -29,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.GsonBuilder
 import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.R
@@ -55,6 +54,8 @@ class HistoryActivity : AppCompatActivity() {
     private var histViewModel: HistViewModel? = null
     private var histories: List<HistoryItem?> = ArrayList()
     private var loading: ProgressBar? = null
+    private var waitLoad: ProgressBar? = null
+    private var rootLayout: CoordinatorLayout? = null
     private var width = 1080
     private var height = 1920
 
@@ -79,6 +80,8 @@ class HistoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        rootLayout = findViewById(R.id.hist_root)
+        waitLoad = findViewById(R.id.wait)
         setSupportActionBar(toolbar)
         val sortIcon: Drawable = ContextCompat.getDrawable(applicationContext, R.drawable.ic_sort)!!
         val prefs = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
@@ -119,34 +122,27 @@ class HistoryActivity : AppCompatActivity() {
         histViewModel!!.allHist!!.observe(this, Observer { hists ->
             this.histories = sortList(currSort, hists!!)
             adapt!!.setHistories(histories)
-            uiScope.launch {
+            histJob = uiScope.launch {
                 json = convertToJSON(histories)
             }
             findViewById<View>(R.id.hist_empty).visibility = if (adapt!!.itemCount == 0) View.VISIBLE else View.GONE
         })
         recycler.addOnItemTouchListener(RecyclerListener(this, recycler, object : RecyclerListener.OnItemClickListener {
-            override fun onLongItemClick(view: View?, position: Int) {
-                cancelThreads()
-                val launchMain = Intent(getCon(), MainActivity::class.java)
-                launchMain.apply {
-                    putExtra(MainActivity.SAVED, histories[position]?.subName)
-                    putExtra(MainActivity.OVERRIDE, true)
-                }
-                val clipboard: ClipboardManager? = getCon().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("Copied Text", histories[position]?.subName)
-                assert(clipboard != null)
-                clipboard?.setPrimaryClip(clip)
-                Toast.makeText(getCon(), "Saved to clipboard", Toast.LENGTH_SHORT).show()
-                getCon().startActivity(launchMain)
-            }
+            override fun onLongItemClick(view: View?, position: Int) {}
 
             override fun onItemClick(view: View, position: Int) {
+                if (histJob!!.isActive) {
+                    Snackbar.make(rootLayout!!, "Please wait...", Snackbar.LENGTH_SHORT).show()
+                    return
+                }
+
                 cancelThreads()
                 val current = histories[position]
                 val wallIntent = Intent(getCon(), WallActivity::class.java)
                 wallIntent.apply {
                     putExtra(WallActivity.WALL_URL, current?.url)
                     putExtra(WallActivity.GIF, false)
+                    putExtra(PostActivity.POST_LINK, current?.postLink)
                     putExtra(WallActivity.FROM_HIST, true)
                     putExtra(WallActivity.FAV_LIST, current?.subName)
                     putExtra(WallActivity.INDEX, position)
@@ -169,10 +165,12 @@ class HistoryActivity : AppCompatActivity() {
                                 setMessage("Do you want to clear ${histories.size} history items?")
                                 setPositiveButton("Yes") { _, _ ->
                                     histViewModel!!.deleteAll()
-                                    Toast.makeText(this@HistoryActivity, "Cleared history", Toast.LENGTH_SHORT).show()
+                                    Snackbar.make(rootLayout!!, "Cleared history", Snackbar.LENGTH_SHORT).show()
+                                    //Toast.makeText(this@HistoryActivity, "Cleared history", Toast.LENGTH_SHORT).show()
                                 }
                                 setNegativeButton("No") { _, _ ->
-                                    Toast.makeText(this@HistoryActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                                    //Toast.makeText(this@HistoryActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+                                    Snackbar.make(rootLayout!!, "Cancelled", Snackbar.LENGTH_SHORT).show()
                                 }
                             }
                     confirmDelete.show()
@@ -185,7 +183,8 @@ class HistoryActivity : AppCompatActivity() {
                                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), WallActivity.WRITE)
                     } else {
                         if (histories.isEmpty()) {
-                            Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
+                            //Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
+                            Snackbar.make(rootLayout!!, "No items", Snackbar.LENGTH_SHORT).show()
                             return@OnActionSelectedListener false
                         }
                         uiScope.launch {
@@ -196,7 +195,8 @@ class HistoryActivity : AppCompatActivity() {
                 }
                 R.id.random -> {
                     if (histories.isEmpty()) {
-                        Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
+                        Snackbar.make(rootLayout!!, "No items", Snackbar.LENGTH_SHORT).show()
                         return@OnActionSelectedListener false
                     }
 
@@ -256,7 +256,7 @@ class HistoryActivity : AppCompatActivity() {
 
         if (item.itemId != android.R.id.home) {
             adapt?.setHistories(histories)
-            uiScope.launch {
+            histJob = uiScope.launch {
                 json = convertToJSON(histories)
             }
         }
@@ -276,7 +276,8 @@ class HistoryActivity : AppCompatActivity() {
                     downloadAllImages()
                 }
             } else {
-                Toast.makeText(this, "Cannot download, please grant permissions", Toast.LENGTH_SHORT).show()
+                Snackbar.make(rootLayout!!, "Cannot download, please grant permissions", Snackbar.LENGTH_SHORT).show()
+                //Toast.makeText(this, "Cannot download, please grant permissions", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -330,15 +331,21 @@ class HistoryActivity : AppCompatActivity() {
 
     private suspend fun convertToJSON(hists: List<HistoryItem?>): String {
         var json = ""
+        waitLoad?.visibility = View.VISIBLE
         withContext(Dispatchers.Default) {
             val bits = ArrayList<BitURL>()
             for (i in hists) {
+                if (!isActive) {
+                    break
+                }
+
                 val temp = BitURL(null, i!!.url, i.postLink)
                 temp.setGif(false)
                 bits.add(temp)
             }
             json = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(bits)
         }
+        waitLoad?.visibility = View.GONE
         return json
     }
 

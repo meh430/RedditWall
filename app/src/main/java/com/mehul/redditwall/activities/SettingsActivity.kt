@@ -47,6 +47,7 @@ class SettingsActivity : AppCompatActivity() {
         wallChangeIntent?.action = "CHANGE_WALL"
         pending = PendingIntent.getBroadcast(this, 2, wallChangeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         val refreshTitle = findViewById<TextView>(R.id.change_interval)
+        val refreshLocSetting = findViewById<LinearLayout>(R.id.refresh_location_setting)
         refreshTitle.visibility = View.GONE
         intervalSeek = findViewById(R.id.interval_seek)
         intervalSeek!!.visibility = View.GONE
@@ -67,6 +68,7 @@ class SettingsActivity : AppCompatActivity() {
         downloadOrigin.isChecked = preferences!!.getBoolean(DOWNLOAD_ORIGIN, false)
         randomSwitch.isChecked = preferences!!.getBoolean(RANDOM_ENABLED, false)
         if (randomSwitch.isChecked) {
+            refreshLocSetting.visibility = View.VISIBLE
             refreshTitle.visibility = View.VISIBLE
             intervalCount!!.visibility = View.VISIBLE
             intervalSeek!!.visibility = View.VISIBLE
@@ -79,10 +81,12 @@ class SettingsActivity : AppCompatActivity() {
             preferences!!.edit().putBoolean(RANDOM_ENABLED, b).apply()
             alarmChanged = b
             if (b) {
+                refreshLocSetting.visibility = View.VISIBLE
                 intervalSeek!!.visibility = View.VISIBLE
                 intervalCount!!.visibility = View.VISIBLE
                 refreshTitle.visibility = View.VISIBLE
             } else {
+                refreshLocSetting.visibility = View.GONE
                 refreshTitle.visibility = View.GONE
                 intervalSeek!!.visibility = View.GONE
                 intervalCount!!.visibility = View.GONE
