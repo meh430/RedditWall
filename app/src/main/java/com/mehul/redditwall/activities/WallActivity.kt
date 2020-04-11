@@ -50,6 +50,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 @Suppress("PrivatePropertyName", "DEPRECATION", "RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
@@ -83,6 +84,13 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private val uiScope = CoroutineScope(Dispatchers.Main)
     private var query = ""
     private var currentBitmap: Bitmap? = null
+    private var upText: TextView? = null
+    private var titleText: TextView? = null
+    private var sizeText: TextView? = null
+    private var subText: TextView? = null
+    private var authorText: TextView? = null
+    private var dateText: TextView? = null
+    private var commentText: TextView? = null
     private val notificationBuilder: NotificationCompat.Builder
         get() {
             //TODO: replace deprecated methods with scoped storage solutions
@@ -231,6 +239,13 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.wall_menu, menu)
         bottomSheet = findViewById(R.id.bottom_sheet)
+        upText = bottomSheet?.findViewById(R.id.upvotes)
+        titleText = bottomSheet?.findViewById(R.id.post_title)
+        sizeText = bottomSheet?.findViewById(R.id.image_size)
+        subText = bottomSheet?.findViewById(R.id.subreddit)
+        authorText = bottomSheet?.findViewById(R.id.author)
+        dateText = bottomSheet?.findViewById(R.id.upload_date)
+        commentText = bottomSheet?.findViewById(R.id.comments)
         expandButton = findViewById(R.id.expand_button)
         load = findViewById(R.id.load_more)
         wallPreview = findViewById(R.id.wall_holder)
@@ -491,13 +506,28 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     override fun onLongPress(motionEvent: MotionEvent) {}
 
+    private fun convertUTC(utc: Long): String {
+        val format = SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date(utc * 1000))
+        val tempDate = format.trim().split(" at ")
+        val date = tempDate[0].trim().split("-")
+        val time = tempDate[1].trim().split(":")
+        val month = HistoryItem.months[Integer.parseInt(date[0])]
+        var hours = Integer.parseInt(time[0])
+        val pmam = if (hours > 12) {
+            hours -= 12
+            "p.m"
+        } else {
+            "a.m"
+        }
+        return "$month ${HistoryItem.getOrdinal(Integer.parseInt(date[1]))}, ${date[2]} | ${hours}:${time[1]} $pmam"
+    }
+
     @SuppressLint("SetTextI18n")
-    private suspend fun loadUps(con: Context) {
-        val upText = bottomSheet?.findViewById<TextView>(R.id.upvotes)
-        val titleText = bottomSheet?.findViewById<TextView>(R.id.post_title)
-        val sizeText = bottomSheet?.findViewById<TextView>(R.id.image_size)
-        val subText = bottomSheet?.findViewById<TextView>(R.id.subreddit)
+    private suspend fun loadUps() {
         upText?.text = "Upvotes: Loading..."
+        commentText?.text = "Comments: Loading..."
+        dateText?.text = "Date: Loading..."
+        authorText?.text = "Author: Loading..."
         titleText?.text = "Loading..."
         sizeText?.text = "Size: Loading..."
         subText?.text = "Subreddit: Loading..."
@@ -509,15 +539,21 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 var json = jsonList.getJSONObject(0)
                 json = json.getJSONObject("data")
                 json = json.getJSONArray("children").getJSONObject(0).getJSONObject("data")
-                val sub = json.getString("subreddit")
+                val sub = "r/" + json.getString("subreddit")
                 val title = json.getString("title").trim()
                 val ups = json.getInt("ups")
-
+                val utcTime = json.getLong("created_utc")
+                val author = "u/" + json.getString("author")
+                val commentNum = json.getString("num_comments")
+                val uploadDate = convertUTC(utcTime)
                 withContext(Dispatchers.Main) {
                     query = sub
                     subText?.text = "Subreddit: $sub"
                     upText?.text = "Upvotes: $ups"
                     titleText?.text = title
+                    authorText?.text = "Author: $author"
+                    commentText?.text = "Comments: $commentNum"
+                    dateText?.text = "Date: $uploadDate"
                 }
 
                 while (wallPreview?.drawable == null) {
@@ -538,7 +574,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                     bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, stream)
                     val imageInByte = stream.toByteArray()
                     val length = imageInByte.size
-                    val size = length / 1000000.00
+                    val size = ((length / 1000000.00) * 100).roundToInt() / 100.00
                     withContext(Dispatchers.Main) {
                         sizeText?.text = "Size: $size MB"
                     }
@@ -643,7 +679,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             with(con).load(imgUrl).override(width, height).centerCrop().into(wallPreview!!)
         }
 
-        loadUps(con)
+        loadUps()
     }
 
     private suspend fun loadImages(con: Context?, queryString: String) {
@@ -714,7 +750,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private fun toggle(show: Boolean) {
         val parent: ViewGroup = findViewById(R.id.wall_root)
         val transition: Transition = Slide(Gravity.BOTTOM)
-        transition.duration = 600
+        transition.duration = 400
         transition.addTarget(R.id.bottom_sheet)
         TransitionManager.beginDelayedTransition(parent, transition)
         bottomSheet?.visibility = if (show) View.VISIBLE else View.GONE
@@ -723,7 +759,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         } else {
             Handler().postDelayed(Runnable {
                 expandButton?.visibility = View.VISIBLE
-            }, 600)
+            }, 400)
         }
     }
 }

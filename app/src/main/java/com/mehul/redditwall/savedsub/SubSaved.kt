@@ -3,6 +3,7 @@ package com.mehul.redditwall.savedsub
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.mehul.redditwall.history.HistoryItem
 
 @Entity(tableName = "sub_table")
 class SubSaved(@field:PrimaryKey(autoGenerate = true) var id: Int,
@@ -23,7 +24,7 @@ class SubSaved(@field:PrimaryKey(autoGenerate = true) var id: Int,
         val tempDate = subDate.trim().split(" at ")
         val date = tempDate[0].trim().split("-")
         val time = tempDate[1].trim().split(":")
-        val month = months[Integer.parseInt(date[0])]
+        val month = HistoryItem.months[Integer.parseInt(date[0])]
         var hours = Integer.parseInt(time[0])
         val pmam = if (hours > 12) {
             hours -= 12
@@ -31,26 +32,7 @@ class SubSaved(@field:PrimaryKey(autoGenerate = true) var id: Int,
         } else {
             "a.m"
         }
-        subDate = "$month ${getOrdinal(Integer.parseInt(date[1]))}, ${date[2]} | ${hours}:${time[1]} $pmam"
+        subDate = "$month ${HistoryItem.getOrdinal(Integer.parseInt(date[1]))}, ${date[2]} | ${hours}:${time[1]} $pmam"
 
-    }
-
-    private fun getOrdinal(n: Int): String {
-        val suffix = if (n > 0) {
-            ordinals[if (n in 4..20 || n % 10 > 3) {
-                0
-            } else {
-                n % 10
-            }]
-        } else {
-            ""
-        }
-        return "$n$suffix"
-
-    }
-
-    companion object {
-        private val months = arrayOf("INIT", "Jan", "Feb", "March", "April", "May", "June", "July", "Oct", "Nov", "Dec")
-        private val ordinals = arrayOf("th", "st", "nd", "rd")
     }
 }

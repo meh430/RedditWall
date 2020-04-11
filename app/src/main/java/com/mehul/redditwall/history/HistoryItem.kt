@@ -38,24 +38,11 @@ class HistoryItem(@field:PrimaryKey(autoGenerate = true) var id: Int,
         }
         setDate = "$month ${getOrdinal(Integer.parseInt(date[1]))}, ${date[2]} | ${hours}:${time[1]} $pmam"
         Log.e("DATE", setDate)
-    }
-
-    private fun getOrdinal(n: Int): String {
-        val suffix = if (n > 0) {
-            ordinals[if (n in 4..20 || n % 10 > 3) {
-                0
-            } else {
-                n % 10
-            }]
-        } else {
-            ""
-        }
-        return "$n$suffix"
 
     }
 
     companion object {
-        private val months = arrayOf("INIT", "Jan", "Feb", "March", "April", "May", "June", "July", "Oct", "Nov", "Dec")
+        val months = arrayOf("INIT", "Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec")
         private val ordinals = arrayOf("th", "st", "nd", "rd")
         val sources = arrayOf("Downloaded", "Set on home screen", "Set on lock screen", "Set on both", "Set through refresh")
         const val DOWNLOADED = 0
@@ -63,5 +50,18 @@ class HistoryItem(@field:PrimaryKey(autoGenerate = true) var id: Int,
         const val LOCK_SCREEN = 2
         const val BOTH = 3
         const val REFRESH = 4
+
+        fun getOrdinal(n: Int): String {
+            val suffix = if (n > 0) {
+                ordinals[if (n in 4..20 || n % 10 > 3) {
+                    0
+                } else {
+                    n % 10
+                }]
+            } else {
+                ""
+            }
+            return "$n$suffix"
+        }
     }
 }

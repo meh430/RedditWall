@@ -187,7 +187,7 @@ class FavImageActivity : AppCompatActivity() {
                 var bitmap: Bitmap? = null
                 withContext(Dispatchers.IO) {
                     try {
-                        if (!fav!!.isGif && i % 2 == 0) {
+                        if (!fav!!.isGif && i % 1 == 0) {
                             bitmap = Glide.with(getCon()).asBitmap()
                                     .load(fav.favUrl).error(ColorDrawable(Color.GRAY)).placeholder(ColorDrawable(Color.GRAY))
                                     .override(width / scale, height / 4).centerCrop().submit().get()

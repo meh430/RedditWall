@@ -187,7 +187,7 @@ internal class QueryRequest {
                         var bitmap: Bitmap? = null
                         withContext(Dispatchers.IO) {
                             try {
-                                if (isImage && i % 3 == 0) {
+                                if (isImage && i % 1 == 0) {
                                     bitmap = Glide.with(context).asBitmap()
                                             .load(url).error(ColorDrawable(Color.GRAY)).placeholder(ColorDrawable(Color.GRAY))
                                             .override(width / scale, height / 4).centerCrop().submit().get()
@@ -202,13 +202,13 @@ internal class QueryRequest {
                             val temp = BitURL(bitmap, url, "https://www.reddit.com$postLink")
                             temp.setGif(!isImage)
                             images.add(temp)
-                            if (first && i % 2 == 0 && i != 0) {
+                            if (first && i % 3 == 0 && i != 0) {
                                 load?.visibility = View.GONE
                             } else if (!first && i % 2 == 0 && i != 0) {
                                 load?.visibility = View.INVISIBLE
                             }
 
-                            if (i % 2 == 0 && i != 0) {
+                            if (i % 3 == 0 && i != 0) {
                                 adapter?.notifyDataSetChanged()
                             }
                             //Log.e("ADDING", "$i")
