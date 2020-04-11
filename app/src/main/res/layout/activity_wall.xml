@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/wall_root"
     tools:context=".activities.WallActivity">
 
     <ProgressBar
@@ -88,6 +89,7 @@
         android:textColor="@color/textColor" />
 
     <LinearLayout
+        android:backgroundTint="@color/sheetCol"
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -105,129 +107,140 @@
             android:onClick="toggleBottom"
             android:src="@drawable/ic_down" />
 
-        <TextView
-            android:id="@+id/post_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="25dp"
-            android:layout_marginBottom="20dp"
-            android:gravity="center"
-            android:text="TITLE"
-            android:textColor="@color/textColor"
-            android:textSize="20sp" />
-
-        <View
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="85dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginEnd="85dp"
-            android:layout_marginBottom="6dp"
-            android:background="@color/grey" />
+            android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="12dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                android:layout_weight="1"
-                android:drawableTop="@drawable/ic_wallpaper"
-                android:gravity="center"
-                android:onClick="setWallpaper"
-                android:text="SET"
-                android:textColor="@color/textColor"
-                android:textSize="16sp" />
+                android:orientation="vertical">
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_marginTop="18dp"
-                android:layout_marginBottom="16dp"
-                android:background="@color/grey" />
+                <TextView
+                    android:id="@+id/post_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="25dp"
+                    android:layout_marginBottom="20dp"
+                    android:gravity="center"
+                    android:text="TITLE"
+                    android:textColor="@color/textColor"
+                    android:textSize="24sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                android:layout_weight="1"
-                android:drawableTop="@drawable/ic_download"
-                android:gravity="center"
-                android:onClick="downloadImage"
-                android:text="SAVE"
-                android:textColor="@color/textColor"
-                android:textSize="16sp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="85dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="85dp"
+                    android:layout_marginBottom="6dp"
+                    android:background="@color/grey" />
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_marginTop="18dp"
-                android:layout_marginBottom="18dp"
-                android:background="@color/grey" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="12dp"
+                    android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                android:layout_weight="1"
-                android:drawableTop="@drawable/ic_post"
-                android:gravity="center"
-                android:onClick="launchPost"
-                android:text="POST"
-                android:textColor="@color/textColor"
-                android:textSize="16sp" />
-        </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="6dp"
+                        android:layout_weight="1"
+                        android:drawableTop="@drawable/ic_wallpaper"
+                        android:gravity="center"
+                        android:onClick="setWallpaper"
+                        android:text="SET"
+                        android:textColor="@color/textColor"
+                        android:textSize="16sp" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="85dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginEnd="85dp"
-            android:layout_marginBottom="6dp"
-            android:background="@color/grey" />
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="18dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@color/grey" />
 
-        <TextView
-            android:id="@+id/upvotes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="25dp"
-            android:text="Upvotes: "
-            android:textColor="@color/secondary"
-            android:textSize="18sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="6dp"
+                        android:layout_weight="1"
+                        android:drawableTop="@drawable/ic_download"
+                        android:gravity="center"
+                        android:onClick="downloadImage"
+                        android:text="SAVE"
+                        android:textColor="@color/textColor"
+                        android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/image_size"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="25dp"
-            android:text="Size: "
-            android:textColor="@color/secondary"
-            android:textSize="18sp" />
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="18dp"
+                        android:layout_marginBottom="18dp"
+                        android:background="@color/grey" />
 
-        <TextView
-            android:id="@+id/subreddit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="25dp"
-            android:layout_marginBottom="20dp"
-            android:onClick="launchSearch"
-            android:text="Subreddit: "
-            android:textColor="@color/secondary"
-            android:textSize="18sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="6dp"
+                        android:layout_weight="1"
+                        android:drawableTop="@drawable/ic_post"
+                        android:gravity="center"
+                        android:onClick="launchPost"
+                        android:text="POST"
+                        android:textColor="@color/textColor"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="85dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="85dp"
+                    android:layout_marginBottom="6dp"
+                    android:background="@color/grey" />
+
+                <TextView
+                    android:id="@+id/upvotes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="28dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="28dp"
+                    android:text="Upvotes: "
+                    android:textColor="@color/secondary"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/image_size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="28dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="28dp"
+                    android:text="Size: "
+                    android:textColor="@color/secondary"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/subreddit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="28dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="28dp"
+                    android:layout_marginBottom="25dp"
+                    android:onClick="launchSearch"
+                    android:text="Subreddit: "
+                    android:textColor="@color/secondary"
+                    android:textSize="20sp" />
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
 </RelativeLayout>

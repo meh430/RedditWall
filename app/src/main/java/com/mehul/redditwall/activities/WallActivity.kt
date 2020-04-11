@@ -16,6 +16,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
@@ -26,6 +27,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.transition.Slide
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
 import com.bumptech.glide.Glide.with
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.GsonBuilder
@@ -450,25 +454,25 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
     }
 
-    override fun onFling(evt1: MotionEvent, evt2: MotionEvent, vX: Float, vY: Float): Boolean {
-        var ret = false
-        try {
-            val diffY = evt2.y - evt1.y
-            val diffX = evt2.x - evt1.x
-            if (abs(diffX) > abs(diffY)) {
-                if (abs(diffX) > abs(diffY) && abs(diffX) > 100 && abs(vX) > 100) {
-                    if (diffX > 0)
-                        swipedRight()
-                    else
-                        swipedLeft()
-                    ret = true
-                }
+    override fun onFling(e1: MotionEvent, e2: MotionEvent, vX: Float, vY: Float): Boolean {
+        val SWIPE_DISTANCE_THRESHOLD = 50
+        val SWIPE_VELOCITY_THRESHOLD = 50
+        val distanceX: Float = e2.x - e1.x
+        val distanceY: Float = e2.y - e1.y
+        if (abs(distanceX) > abs(distanceY) && abs(distanceX) > SWIPE_DISTANCE_THRESHOLD && abs(vX) > SWIPE_VELOCITY_THRESHOLD) {
+            if (distanceX > 0) swipedRight() else swipedLeft()
+            return true
+        } else if (abs(distanceY) > SWIPE_DISTANCE_THRESHOLD && abs(vY) > SWIPE_VELOCITY_THRESHOLD) {
+            if (distanceY > 0) {
+                bottomUp = false
+                toggle(bottomUp)
+            } else {
+                bottomUp = true
+                toggle(bottomUp)
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+            return true
         }
-
-        return ret
+        return false
     }
 
     override fun onDown(motionEvent: MotionEvent): Boolean {
@@ -487,6 +491,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     override fun onLongPress(motionEvent: MotionEvent) {}
 
+    @SuppressLint("SetTextI18n")
     private suspend fun loadUps(con: Context) {
         val upText = bottomSheet?.findViewById<TextView>(R.id.upvotes)
         val titleText = bottomSheet?.findViewById<TextView>(R.id.post_title)
@@ -517,19 +522,26 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
                 while (wallPreview?.drawable == null) {
                 }
-                val bitmap = if (preferences!!.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)) {
-                    currentBitmap
-                } else {
-                    (wallPreview!!.drawable as BitmapDrawable).bitmap
-                }
 
-                val stream = ByteArrayOutputStream()
-                bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-                val imageInByte = stream.toByteArray()
-                val length = imageInByte.size
-                val size = length / 1000000.00
-                withContext(Dispatchers.Main) {
-                    sizeText?.text = "Size: $size MB"
+                if (isGif) {
+                    withContext(Dispatchers.Main) {
+                        sizeText?.text = "Size: GIF"
+                    }
+                } else {
+                    val bitmap = if (preferences!!.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)) {
+                        currentBitmap
+                    } else {
+                        (wallPreview!!.drawable as BitmapDrawable).bitmap
+                    }
+
+                    val stream = ByteArrayOutputStream()
+                    bitmap!!.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                    val imageInByte = stream.toByteArray()
+                    val length = imageInByte.size
+                    val size = length / 1000000.00
+                    withContext(Dispatchers.Main) {
+                        sizeText?.text = "Size: $size MB"
+                    }
                 }
             } catch (e: JSONException) {
                 e.printStackTrace()
@@ -687,13 +699,22 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     fun toggleBottom(view: View) {
         bottomUp = !bottomUp
+        toggle(bottomUp)
+    }
 
-        if (bottomUp) {
+    private fun toggle(show: Boolean) {
+        val parent: ViewGroup = findViewById(R.id.wall_root)
+        val transition: Transition = Slide(Gravity.BOTTOM)
+        transition.duration = 600
+        transition.addTarget(R.id.bottom_sheet)
+        TransitionManager.beginDelayedTransition(parent, transition)
+        bottomSheet?.visibility = if (show) View.VISIBLE else View.GONE
+        if (show) {
             expandButton?.visibility = View.GONE
-            bottomSheet?.visibility = View.VISIBLE
         } else {
-            expandButton?.visibility = View.VISIBLE
-            bottomSheet?.visibility = View.GONE
+            Handler().postDelayed(Runnable {
+                expandButton?.visibility = View.VISIBLE
+            }, 600)
         }
     }
 }

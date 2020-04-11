@@ -11,4 +11,5 @@
     <color name="edit">#807F7F</color>
     <color name="fill">#FFFFFF</color>
     <color name="grey">#272626</color>
+    <color name="sheetCol">#D9000000</color>
 </resources>
