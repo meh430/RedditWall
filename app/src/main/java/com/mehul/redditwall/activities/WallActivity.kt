@@ -702,6 +702,15 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         toggle(bottomUp)
     }
 
+    override fun onBackPressed() {
+        if (bottomUp) {
+            toggle(false)
+            bottomUp = false
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     private fun toggle(show: Boolean) {
         val parent: ViewGroup = findViewById(R.id.wall_root)
         val transition: Transition = Slide(Gravity.BOTTOM)
