@@ -20,6 +20,7 @@ class PostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post)
         postLink = intent.getStringExtra(POST_LINK)
+        supportActionBar?.title = intent.getStringExtra(POST_TITLE)
         post = findViewById(R.id.web_post)
         val client = WebViewClient()
         post?.webViewClient = client
@@ -67,5 +68,6 @@ class PostActivity : AppCompatActivity() {
 
     companion object {
         const val POST_LINK = "POSTLINK"
+        const val POST_TITLE = "POSTTITLE"
     }
 }

@@ -89,6 +89,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var sizeText: TextView? = null
     private var subText: TextView? = null
     private var authorText: TextView? = null
+    private var rootLayout: ViewGroup? = null
     private var dateText: TextView? = null
     private var commentText: TextView? = null
     private val notificationBuilder: NotificationCompat.Builder
@@ -110,6 +111,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wall)
+        rootLayout = findViewById(R.id.wall_root)
         supportActionBar?.elevation = 0F
         histViewModel = ViewModelProvider(this).get(HistViewModel::class.java)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
@@ -297,8 +299,13 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     fun launchPost(view: View) {
+        if (titleText!!.text.contains("Loading")) {
+            Toast.makeText(this, "Please wait...", Toast.LENGTH_SHORT).show()
+            return
+        }
         val postIntent = Intent(this, PostActivity::class.java)
         postIntent.putExtra(PostActivity.POST_LINK, postLink)
+        postIntent.putExtra(PostActivity.POST_TITLE, "${titleText?.text}")
         startActivity(postIntent)
     }
 
@@ -539,19 +546,19 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 var json = jsonList.getJSONObject(0)
                 json = json.getJSONObject("data")
                 json = json.getJSONArray("children").getJSONObject(0).getJSONObject("data")
-                val sub = "r/" + json.getString("subreddit")
+                val sub = json.getString("subreddit")
                 val title = json.getString("title").trim()
                 val ups = json.getInt("ups")
                 val utcTime = json.getLong("created_utc")
-                val author = "u/" + json.getString("author")
+                val author = json.getString("author")
                 val commentNum = json.getString("num_comments")
                 val uploadDate = convertUTC(utcTime)
                 withContext(Dispatchers.Main) {
                     query = sub
-                    subText?.text = "Subreddit: $sub"
+                    subText?.text = "Subreddit: r/$sub"
                     upText?.text = "Upvotes: $ups"
                     titleText?.text = title
-                    authorText?.text = "Author: $author"
+                    authorText?.text = "Author: u/$author"
                     commentText?.text = "Comments: $commentNum"
                     dateText?.text = "Date: $uploadDate"
                 }
@@ -748,11 +755,10 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     private fun toggle(show: Boolean) {
-        val parent: ViewGroup = findViewById(R.id.wall_root)
         val transition: Transition = Slide(Gravity.BOTTOM)
         transition.duration = 400
         transition.addTarget(R.id.bottom_sheet)
-        TransitionManager.beginDelayedTransition(parent, transition)
+        TransitionManager.beginDelayedTransition(rootLayout!!, transition)
         bottomSheet?.visibility = if (show) View.VISIBLE else View.GONE
         if (show) {
             expandButton?.visibility = View.GONE
@@ -761,5 +767,18 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 expandButton?.visibility = View.VISIBLE
             }, 400)
         }
+    }
+
+    fun launchUser(view: View) {
+        if (authorText!!.text.contains("Loading")) {
+            Toast.makeText(this, "Please wait...", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val postIntent = Intent(this, PostActivity::class.java)
+        var author = authorText!!.text.trim().split(":")[1].trim()
+        author = author.replace("u/", "")
+        postIntent.putExtra(PostActivity.POST_LINK, "https://www.reddit.com/user/$author/")
+        postIntent.putExtra(PostActivity.POST_TITLE, "u/${author}")
+        startActivity(postIntent)
     }
 }

@@ -251,6 +251,7 @@
                     android:textSize="18sp" />
 
                 <TextView
+                    android:onClick="launchUser"
                     android:id="@+id/author"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
