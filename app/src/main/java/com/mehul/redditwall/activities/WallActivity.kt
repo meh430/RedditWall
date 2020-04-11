@@ -303,10 +303,17 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             Toast.makeText(this, "Please wait...", Toast.LENGTH_SHORT).show()
             return
         }
-        val postIntent = Intent(this, PostActivity::class.java)
-        postIntent.putExtra(PostActivity.POST_LINK, postLink)
-        postIntent.putExtra(PostActivity.POST_TITLE, "${titleText?.text}")
-        startActivity(postIntent)
+
+        val post = Intent(Intent.ACTION_VIEW, Uri.parse(postLink))
+
+        if (post.resolveActivity(packageManager) != null) {
+            startActivity(post)
+        } else {
+            val postIntent = Intent(this, PostActivity::class.java)
+            postIntent.putExtra(PostActivity.POST_LINK, postLink)
+            postIntent.putExtra(PostActivity.POST_TITLE, "${titleText?.text}")
+            startActivity(postIntent)
+        }
     }
 
     fun downloadImage(view: View) {
@@ -774,11 +781,17 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             Toast.makeText(this, "Please wait...", Toast.LENGTH_SHORT).show()
             return
         }
-        val postIntent = Intent(this, PostActivity::class.java)
         var author = authorText!!.text.trim().split(":")[1].trim()
         author = author.replace("u/", "")
-        postIntent.putExtra(PostActivity.POST_LINK, "https://www.reddit.com/user/$author/")
-        postIntent.putExtra(PostActivity.POST_TITLE, "u/${author}")
-        startActivity(postIntent)
+        val user = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.reddit.com/user/$author/"))
+
+        if (user.resolveActivity(packageManager) != null) {
+            startActivity(user)
+        } else {
+            val postIntent = Intent(this, PostActivity::class.java)
+            postIntent.putExtra(PostActivity.POST_LINK, "https://www.reddit.com/user/$author/")
+            postIntent.putExtra(PostActivity.POST_TITLE, "u/${author}")
+            startActivity(postIntent)
+        }
     }
 }
