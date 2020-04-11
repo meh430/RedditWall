@@ -1,6 +1,7 @@
 package com.mehul.redditwall.adapters
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -62,6 +63,7 @@ class SubAdapter(private val con: Context) : RecyclerView.Adapter<SubAdapter.Sub
                 clipboard?.setPrimaryClip(clip)
                 Toast.makeText(con, "Saved to clipboard", Toast.LENGTH_SHORT).show()
                 con.startActivity(launchMain)
+                (con as Activity).finish()
             }
         }
     }

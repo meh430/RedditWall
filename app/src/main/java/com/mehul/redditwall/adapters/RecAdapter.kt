@@ -1,5 +1,6 @@
 package com.mehul.redditwall.adapters
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -53,6 +54,7 @@ class RecAdapter internal constructor(private val context: Context,
                 clipboard!!.setPrimaryClip(clip)
                 Toast.makeText(context, "Saved to clipboard", Toast.LENGTH_SHORT).show()
                 context.startActivity(launchMain)
+                (context as Activity).finish()
             }
 
             holder.itemView.setOnLongClickListener {
