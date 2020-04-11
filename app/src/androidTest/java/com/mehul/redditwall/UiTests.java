@@ -56,16 +56,20 @@ public class UiTests {
     public void favsTest() {
         onView(withId(R.id.fav_pics)).perform(click());
         try {
-            Thread.sleep(5000);
+            Thread.sleep(20000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i <= 90; i++) {
+
+        onView(withId(R.id.fav_scroll)).perform(RecyclerViewActions.actionOnItemAtPosition(179, scrollTo()));
+        onView(withId(R.id.fav_scroll)).perform(RecyclerViewActions.actionOnItemAtPosition(0, scrollTo()));
+        for (int i = 0; i <= 179; i++) {
             onView(withId(R.id.fav_scroll)).perform(RecyclerViewActions.actionOnItemAtPosition(i, click()));
-            onView(withId(R.id.load_post)).perform(click());
-            onView(isRoot()).perform(pressBack());
+            onView(withId(R.id.expand_button)).perform(click());
+            onView(withId(R.id.collapse_sheet)).perform(click());
             onView(isRoot()).perform(pressBack());
         }
+        onView(withId(R.id.fav_scroll)).perform(RecyclerViewActions.actionOnItemAtPosition(0, scrollTo()));
     }
 
 

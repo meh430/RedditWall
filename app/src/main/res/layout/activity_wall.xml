@@ -102,6 +102,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:id="@+id/collapse_sheet"
             android:layout_marginTop="20dp"
             android:onClick="toggleBottom"
             android:src="@drawable/ic_down" />
