@@ -15,6 +15,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.gson.GsonBuilder
 import com.mehul.redditwall.R
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.PostActivity
@@ -53,13 +54,15 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
         }
         holder.itemView.setOnClickListener {
             val wallIntent = Intent(con, WallActivity::class.java)
+            val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
+            val jsonList = gson.toJson(favList)
             wallIntent.apply {
                 putExtra(PostActivity.POST_LINK, current.postLink)
                 putExtra(WallActivity.WALL_URL, current.url)
                 putExtra(WallActivity.GIF, current.hasGif())
                 putExtra(WallActivity.INDEX, position)
                 putExtra(WallActivity.FROM_FAV, true)
-                putExtra(WallActivity.LIST, WallActivity.listToJson(favs))
+                putExtra(WallActivity.LIST, jsonList)
                 putExtra(WallActivity.FAV_LIST, favList[position]?.favName)
             }
             con.startActivity(wallIntent)
