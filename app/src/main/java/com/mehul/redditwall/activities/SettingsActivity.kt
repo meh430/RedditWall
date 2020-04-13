@@ -274,4 +274,5 @@ class SettingsActivity : AppCompatActivity() {
 
         Toast.makeText(this, "Deleted downloaded images", Toast.LENGTH_SHORT).show()
     }
+
 }

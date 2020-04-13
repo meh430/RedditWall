@@ -12,7 +12,6 @@
         android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/buttons"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true">
 
@@ -239,36 +238,36 @@
                 android:textColor="@color/textColor"
                 android:textSize="16sp"
                 android:theme="@style/ThemeOverlay.AppCompat.DayNight" />
+
+            <LinearLayout
+                android:id="@+id/buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="8dp"
+                android:orientation="vertical">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/rounded_button"
+                    android:foreground="@drawable/ripple"
+                    android:onClick="deleteDownloads"
+                    android:text="Delete Downloads"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/rounded_button"
+                    android:foreground="@drawable/ripple"
+                    android:onClick="clearCache"
+                    android:text="Clear Image Cache"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
-
-    <LinearLayout
-        android:id="@+id/buttons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="8dp"
-        android:orientation="vertical">
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/rounded_button"
-            android:foreground="@drawable/ripple"
-            android:onClick="deleteDownloads"
-            android:text="Delete Downloads"
-            android:textColor="@android:color/white" />
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/rounded_button"
-            android:foreground="@drawable/ripple"
-            android:onClick="clearCache"
-            android:text="Clear Image Cache"
-            android:textColor="@android:color/white" />
-    </LinearLayout>
 </RelativeLayout>

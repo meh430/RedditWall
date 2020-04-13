@@ -72,6 +72,22 @@ public class UiTests {
         onView(withId(R.id.fav_scroll)).perform(RecyclerViewActions.actionOnItemAtPosition(0, scrollTo()));
     }
 
+    @Test
+    public void randomsTest() {
+        onView(withId(R.id.fav_pics)).perform(click());
+        for (int i = 0; i < 100; i++) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            onView(withId(R.id.speedDial)).perform(click());
+            onView(withId(R.id.random)).perform(click());
+            onView(isRoot()).perform(pressBack());
+        }
+    }
+
 
     @Test
     public void useAppContext() {

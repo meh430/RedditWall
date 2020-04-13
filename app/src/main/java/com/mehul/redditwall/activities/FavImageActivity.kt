@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.GsonBuilder
 import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.FavAdapter
@@ -129,27 +130,29 @@ class FavImageActivity : AppCompatActivity() {
                     return@OnActionSelectedListener false // false will close it without animation
                 }
                 R.id.random -> {
-                    if (adapt!!.itemCount == 0) {
+                    if (favImages!!.isEmpty()) {
                         //Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
                         Snackbar.make(rootLayout!!, "No items", Snackbar.LENGTH_SHORT).show()
                         return@OnActionSelectedListener false
                     }
 
-                    var randomNum = (0..adapt!!.itemCount).random()
-                    while (randomNum >= adapt!!.itemCount || randomNum < 0) {
-                        randomNum = (0..adapt!!.itemCount).random()
+                    var randomNum = (0..favImages!!.size).random()
+                    while (randomNum >= favImages!!.size || randomNum < 0) {
+                        randomNum = (0..favImages!!.size).random()
                     }
-                    if (randomNum == adapt!!.itemCount) randomNum = adapt!!.itemCount - 1
-                    val current = adapt!!.getFavAtPosition(randomNum)
+                    if (randomNum == favImages!!.size) randomNum = favImages!!.size - 1
+                    val current = favImages!![randomNum]
                     val wallIntent = Intent(getCon(), WallActivity::class.java)
+                    val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
+                    val jsonList = gson.toJson(favImages)
                     wallIntent.apply {
-                        putExtra(WallActivity.WALL_URL, current.url)
-                        putExtra(WallActivity.GIF, current.hasGif())
+                        putExtra(WallActivity.WALL_URL, current?.favUrl)
+                        putExtra(WallActivity.GIF, current?.isGif)
                         putExtra(WallActivity.INDEX, randomNum)
-                        putExtra(PostActivity.POST_LINK, current.postLink)
+                        putExtra(PostActivity.POST_LINK, current?.postLink)
                         putExtra(WallActivity.FROM_FAV, true)
-                        putExtra(WallActivity.LIST, WallActivity.listToJson(adapt!!.getFavs()))
-                        putExtra(WallActivity.FAV_LIST, favImages!![randomNum]?.favName)
+                        putExtra(WallActivity.LIST, jsonList)
+                        putExtra(WallActivity.FAV_LIST, current?.favName)
                     }
                     getCon().startActivity(wallIntent)
                     return@OnActionSelectedListener false
