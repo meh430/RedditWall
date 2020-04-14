@@ -13,9 +13,9 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SettingsActivity
-import com.mehul.redditwall.favorites.FavRepository
-import com.mehul.redditwall.history.HistoryItem
-import com.mehul.redditwall.history.HistoryRepository
+import com.mehul.redditwall.databases.FavRepository
+import com.mehul.redditwall.databases.HistoryRepository
+import com.mehul.redditwall.objects.HistoryItem
 import java.text.SimpleDateFormat
 import java.util.*
 

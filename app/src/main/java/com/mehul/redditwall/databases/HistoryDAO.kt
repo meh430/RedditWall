@@ -1,7 +1,8 @@
-package com.mehul.redditwall.history
+package com.mehul.redditwall.databases
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.mehul.redditwall.objects.HistoryItem
 
 @Dao
 interface HistoryDAO {

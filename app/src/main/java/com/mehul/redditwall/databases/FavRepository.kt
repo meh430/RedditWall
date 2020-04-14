@@ -1,8 +1,9 @@
-package com.mehul.redditwall.favorites
+package com.mehul.redditwall.databases
 
 import android.content.Context
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
+import com.mehul.redditwall.objects.FavImage
 import java.util.concurrent.ExecutionException
 
 class FavRepository constructor(application: Context) {

@@ -1,8 +1,10 @@
-package com.mehul.redditwall.favorites
+package com.mehul.redditwall.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import com.mehul.redditwall.databases.FavRepository
+import com.mehul.redditwall.objects.FavImage
 
 public class FavViewModel(application: Application) : AndroidViewModel(application) {
     private val repo: FavRepository = FavRepository(application.applicationContext)

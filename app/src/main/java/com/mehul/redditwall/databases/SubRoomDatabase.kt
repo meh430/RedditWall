@@ -1,9 +1,10 @@
-package com.mehul.redditwall.savedsub
+package com.mehul.redditwall.databases
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.mehul.redditwall.objects.SubSaved
 
 @Database(entities = [SubSaved::class], version = 3, exportSchema = false)
 abstract class SubRoomDatabase : RoomDatabase() {

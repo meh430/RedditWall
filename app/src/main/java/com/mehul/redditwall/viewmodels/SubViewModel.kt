@@ -1,8 +1,10 @@
-package com.mehul.redditwall.savedsub
+package com.mehul.redditwall.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import com.mehul.redditwall.databases.SubRepository
+import com.mehul.redditwall.objects.SubSaved
 
 public class SubViewModel(application: Application) : AndroidViewModel(application) {
     private val repo: SubRepository = SubRepository(application.applicationContext)

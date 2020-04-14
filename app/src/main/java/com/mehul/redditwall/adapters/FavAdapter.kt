@@ -21,8 +21,8 @@ import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.PostActivity
 import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.activities.WallActivity
-import com.mehul.redditwall.favorites.FavImage
 import com.mehul.redditwall.objects.BitURL
+import com.mehul.redditwall.objects.FavImage
 
 class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerView.Adapter<FavAdapter.FavViewHolder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(con)

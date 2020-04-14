@@ -1,7 +1,8 @@
-package com.mehul.redditwall.favorites
+package com.mehul.redditwall.databases
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.mehul.redditwall.objects.FavImage
 
 @Dao
 interface FavDAO {

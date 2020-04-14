@@ -16,7 +16,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mehul.redditwall.R
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SettingsActivity
-import com.mehul.redditwall.savedsub.SubSaved
+import com.mehul.redditwall.objects.SubSaved
 
 class SubAdapter(private val con: Context) : RecyclerView.Adapter<SubAdapter.SubViewHolder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(con)

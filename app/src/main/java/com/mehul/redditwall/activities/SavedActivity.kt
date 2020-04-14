@@ -22,8 +22,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.SubAdapter
-import com.mehul.redditwall.savedsub.SubSaved
-import com.mehul.redditwall.savedsub.SubViewModel
+import com.mehul.redditwall.objects.SubSaved
+import com.mehul.redditwall.viewmodels.SubViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList

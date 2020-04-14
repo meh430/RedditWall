@@ -30,10 +30,10 @@ import com.google.gson.GsonBuilder
 import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.FavAdapter
-import com.mehul.redditwall.favorites.FavImage
-import com.mehul.redditwall.favorites.FavViewModel
 import com.mehul.redditwall.objects.BitURL
+import com.mehul.redditwall.objects.FavImage
 import com.mehul.redditwall.objects.ProgressNotify
+import com.mehul.redditwall.viewmodels.FavViewModel
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
@@ -290,16 +290,11 @@ class FavImageActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (adapt?.itemCount != favImages?.size) {
+        if (adapt?.itemCount != favImages?.size && !favJob!!.isActive) {
             favJob = uiScope.launch {
                 loadFavBits(favImages, getCon())
             }
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        favJob?.cancel()
     }
 
     override fun onDestroy() {

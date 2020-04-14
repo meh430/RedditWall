@@ -1,9 +1,8 @@
-package com.mehul.redditwall.savedsub
+package com.mehul.redditwall.objects
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.mehul.redditwall.history.HistoryItem
 
 @Entity(tableName = "sub_table")
 class SubSaved(@field:PrimaryKey(autoGenerate = true) var id: Int,

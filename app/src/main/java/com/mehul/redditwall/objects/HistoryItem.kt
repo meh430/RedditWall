@@ -1,4 +1,4 @@
-package com.mehul.redditwall.history
+package com.mehul.redditwall.objects
 
 import android.util.Log
 import androidx.room.ColumnInfo

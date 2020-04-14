@@ -1,4 +1,4 @@
-package com.mehul.redditwall.favorites
+package com.mehul.redditwall.objects
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

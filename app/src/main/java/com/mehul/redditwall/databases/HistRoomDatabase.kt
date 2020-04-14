@@ -1,9 +1,10 @@
-package com.mehul.redditwall.history
+package com.mehul.redditwall.databases
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.mehul.redditwall.objects.HistoryItem
 
 @Database(entities = [HistoryItem::class], version = 1, exportSchema = false)
 abstract class HistRoomDatabase : RoomDatabase() {

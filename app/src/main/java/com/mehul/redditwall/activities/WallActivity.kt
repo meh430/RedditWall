@@ -34,12 +34,12 @@ import com.bumptech.glide.Glide.with
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.GsonBuilder
 import com.mehul.redditwall.R
-import com.mehul.redditwall.favorites.FavImage
-import com.mehul.redditwall.favorites.FavViewModel
-import com.mehul.redditwall.history.HistViewModel
-import com.mehul.redditwall.history.HistoryItem
 import com.mehul.redditwall.objects.BitURL
+import com.mehul.redditwall.objects.FavImage
+import com.mehul.redditwall.objects.HistoryItem
 import com.mehul.redditwall.rest.RestQuery
+import com.mehul.redditwall.viewmodels.FavViewModel
+import com.mehul.redditwall.viewmodels.HistViewModel
 import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONException

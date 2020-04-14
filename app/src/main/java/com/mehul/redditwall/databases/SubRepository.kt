@@ -1,8 +1,9 @@
-package com.mehul.redditwall.savedsub
+package com.mehul.redditwall.databases
 
 import android.content.Context
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
+import com.mehul.redditwall.objects.SubSaved
 
 class SubRepository internal constructor(application: Context) {
     private val subDAO: SubDAO?

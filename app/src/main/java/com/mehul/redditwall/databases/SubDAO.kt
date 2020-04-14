@@ -1,7 +1,8 @@
-package com.mehul.redditwall.savedsub
+package com.mehul.redditwall.databases
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.mehul.redditwall.objects.SubSaved
 
 @Dao
 interface SubDAO {

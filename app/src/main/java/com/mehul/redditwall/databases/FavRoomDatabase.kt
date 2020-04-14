@@ -1,9 +1,10 @@
-package com.mehul.redditwall.favorites
+package com.mehul.redditwall.databases
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.mehul.redditwall.objects.FavImage
 
 @Database(entities = [FavImage::class], version = 4, exportSchema = false)
 abstract class FavRoomDatabase : RoomDatabase() {

@@ -1,8 +1,10 @@
-package com.mehul.redditwall.history
+package com.mehul.redditwall.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import com.mehul.redditwall.databases.HistoryRepository
+import com.mehul.redditwall.objects.HistoryItem
 
 public class HistViewModel(application: Application) : AndroidViewModel(application) {
     private val repo: HistoryRepository = HistoryRepository(application.applicationContext)

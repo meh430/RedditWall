@@ -32,11 +32,11 @@ import com.google.gson.GsonBuilder
 import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.HistAdapter
-import com.mehul.redditwall.history.HistViewModel
-import com.mehul.redditwall.history.HistoryItem
 import com.mehul.redditwall.objects.BitURL
+import com.mehul.redditwall.objects.HistoryItem
 import com.mehul.redditwall.objects.ProgressNotify
 import com.mehul.redditwall.objects.RecyclerListener
+import com.mehul.redditwall.viewmodels.HistViewModel
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
