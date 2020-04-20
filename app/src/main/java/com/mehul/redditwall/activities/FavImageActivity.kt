@@ -171,7 +171,7 @@ class FavImageActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private suspend fun loadFavBits(favs: List<FavImage?>?, con: Context) {
+    private suspend fun loadFavBits(favs: List<FavImage>, con: Context) {
         loading?.visibility = View.VISIBLE
         withContext(Dispatchers.Default) {
             val bits = ArrayList<BitURL>()
@@ -181,7 +181,7 @@ class FavImageActivity : AppCompatActivity() {
             val scale = (con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
                     .getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
 
-            for (i in favs!!.indices) {
+            for (i in favs.indices) {
                 val fav = favs[i]
                 if (!isActive) {
                     break
@@ -190,7 +190,7 @@ class FavImageActivity : AppCompatActivity() {
                 var bitmap: Bitmap? = null
                 withContext(Dispatchers.IO) {
                     try {
-                        if (!fav!!.isGif && i % 1 == 0) {
+                        if (!fav.isGif && i % 1 == 0) {
                             bitmap = Glide.with(getCon()).asBitmap()
                                     .load(fav.favUrl).error(ColorDrawable(Color.GRAY)).placeholder(ColorDrawable(Color.GRAY))
                                     .override(width / scale, height / 4).centerCrop().submit().get()
@@ -201,7 +201,7 @@ class FavImageActivity : AppCompatActivity() {
                     }
                 }
 
-                val temp = BitURL(bitmap, fav!!.favUrl, fav.postLink)
+                val temp = BitURL(bitmap, fav.favUrl, fav.postLink)
                 temp.setGif(fav.isGif)
                 bits.add(temp)
 

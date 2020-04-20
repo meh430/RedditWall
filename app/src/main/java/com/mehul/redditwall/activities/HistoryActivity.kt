@@ -329,7 +329,7 @@ class HistoryActivity : AppCompatActivity() {
         notify.finish(finalName)
     }
 
-    private suspend fun convertToJSON(hists: List<HistoryItem?>): String {
+    private suspend fun convertToJSON(hists: List<HistoryItem>): String {
         var json = ""
         waitLoad?.visibility = View.VISIBLE
         withContext(Dispatchers.Default) {
@@ -339,7 +339,7 @@ class HistoryActivity : AppCompatActivity() {
                     break
                 }
 
-                val temp = BitURL(null, i!!.url, i.postLink)
+                val temp = BitURL(null, i.url, i.postLink)
                 temp.setGif(false)
                 bits.add(temp)
             }
