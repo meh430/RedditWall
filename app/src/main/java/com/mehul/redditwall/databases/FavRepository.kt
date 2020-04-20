@@ -7,10 +7,10 @@ import com.mehul.redditwall.objects.FavImage
 import java.util.concurrent.ExecutionException
 
 class FavRepository constructor(application: Context) {
-    private val favDAO: FavDAO?
-    val allFav: LiveData<List<FavImage?>?>?
+    private val favDAO: FavDAO
+    val allFav: LiveData<List<FavImage>>
 
-    val favAsList: List<FavImage?>?
+    val favAsList: List<FavImage>
         get() {
             try {
                 return GetFavListAsyncTask(favDAO).execute().get()
@@ -19,58 +19,32 @@ class FavRepository constructor(application: Context) {
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-            return null
+            return ArrayList()
         }
 
-    fun insert(saved: FavImage?) {
-        InsertAsyncTask(favDAO).execute(saved)
+    suspend fun insert(saved: FavImage) {
+        favDAO.insert(saved)
     }
 
-    fun deleteAll() {
-        DeleteAllFavAsyncTask(favDAO).execute()
+    suspend fun deleteAll() {
+        favDAO.deleteAll()
     }
 
-    fun deleteFav(saved: FavImage?) {
-        DeleteFavAsyncTask(favDAO).execute(saved)
+    suspend fun deleteFav(saved: FavImage) {
+        favDAO.deleteFavImage(saved)
     }
 
-    private class InsertAsyncTask internal constructor(private val mAsyncTaskDao: FavDAO?)
-        : AsyncTask<FavImage?, Void?, Void?>() {
-        override fun doInBackground(vararg params: FavImage?): Void? {
-            mAsyncTaskDao?.insert(params[0])
-            return null
-        }
-    }
-
-    private class DeleteAllFavAsyncTask internal constructor(private val mAsyncTaskDao: FavDAO?)
-        : AsyncTask<Void?, Void?, Void?>() {
-        override fun doInBackground(vararg voids: Void?): Void? {
-            mAsyncTaskDao?.deleteAll()
-            return null
-        }
-
-    }
-
-    private class DeleteFavAsyncTask internal constructor(private val mAsyncTaskDao: FavDAO?)
-        : AsyncTask<FavImage?, Void?, Void?>() {
-        override fun doInBackground(vararg params: FavImage?): Void? {
-            mAsyncTaskDao?.deleteFavImage(params[0])
-            return null
-        }
-
-    }
-
-    private class GetFavListAsyncTask internal constructor(private val mAsyncTaskDao: FavDAO?)
-        : AsyncTask<Void?, Void?, List<FavImage?>?>() {
-        override fun doInBackground(vararg voids: Void?): List<FavImage?>? {
-            return mAsyncTaskDao?.favAsList
+    private class GetFavListAsyncTask internal constructor(private val mAsyncTaskDao: FavDAO)
+        : AsyncTask<Void, Void, List<FavImage>>() {
+        override fun doInBackground(vararg voids: Void): List<FavImage> {
+            return mAsyncTaskDao.favAsList
         }
 
     }
 
     init {
         val db = FavRoomDatabase.getDatabase(application)
-        favDAO = db?.favDAO()
-        allFav = favDAO?.allFavImages
+        favDAO = db!!.favDAO()
+        allFav = favDAO.allFavImages
     }
 }

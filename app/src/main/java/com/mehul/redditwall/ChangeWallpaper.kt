@@ -16,6 +16,9 @@ import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.databases.FavRepository
 import com.mehul.redditwall.databases.HistoryRepository
 import com.mehul.redditwall.objects.HistoryItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -35,7 +38,8 @@ class ChangeWallpaper : BroadcastReceiver() {
             val width = pref.getInt(SettingsActivity.IMG_WIDTH, 1920)
             val height = pref.getInt(SettingsActivity.IMG_HEIGHT, 1080)
             val favs = FavRepository(con).favAsList
-            if (favs!!.isEmpty()) {
+            if (favs.isEmpty()) {
+                Toast.makeText(con, "No Favorites", Toast.LENGTH_SHORT).show()
                 return
             }
 
@@ -50,7 +54,7 @@ class ChangeWallpaper : BroadcastReceiver() {
             val wall: WallpaperManager? = con.applicationContext.getSystemService(Context.WALLPAPER_SERVICE) as WallpaperManager
             Glide.with(con)
                     .asBitmap()
-                    .load(current?.favUrl)
+                    .load(current.favUrl)
                     .override(width, height)
                     .into(object : CustomTarget<Bitmap>() {
                         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
@@ -65,16 +69,21 @@ class ChangeWallpaper : BroadcastReceiver() {
                                 }
                             }
 
-                            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, current!!.favName,
+                            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, current.favName,
                                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                                     HistoryItem.REFRESH, current.favUrl, current.postLink)
-                            HistoryRepository(con).insert(histItem)
+                            refreshHistory(histItem, con)
+                            //HistoryRepository(con).insert(histItem)
                         }
 
                         override fun onLoadCleared(placeholder: Drawable?) {}
                     })
 
 
+        }
+
+        fun refreshHistory(history: HistoryItem, con: Context) = CoroutineScope(Dispatchers.IO).launch {
+            HistoryRepository(con).insert(history)
         }
     }
 }

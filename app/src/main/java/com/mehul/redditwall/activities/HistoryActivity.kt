@@ -52,26 +52,26 @@ class HistoryActivity : AppCompatActivity() {
     private var histJob: Job? = null
     private var adapt: HistAdapter? = null
     private var histViewModel: HistViewModel? = null
-    private var histories: List<HistoryItem?> = ArrayList()
+    private var histories: List<HistoryItem> = ArrayList()
     private var loading: ProgressBar? = null
     private var waitLoad: ProgressBar? = null
     private var rootLayout: CoordinatorLayout? = null
     private var width = 1080
     private var height = 1920
 
-    private fun sortList(sort: Int, list: List<HistoryItem?>): List<HistoryItem?> {
+    private fun sortList(sort: Int, list: List<HistoryItem>): List<HistoryItem> {
         return when (sort) {
             R.id.alpha -> {
-                list.sortedWith(compareBy { it?.subName }).asReversed()
+                list.sortedWith(compareBy { it.subName }).asReversed()
             }
             R.id.oldest -> {
                 list.sortedWith(compareBy
-                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it.internalDate) })
 
             }
             else -> {
                 list.sortedWith(compareBy
-                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
+                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it.internalDate) }).asReversed()
             }
         }
     }
@@ -119,8 +119,8 @@ class HistoryActivity : AppCompatActivity() {
                     }
                 })
         helper.attachToRecyclerView(recycler)
-        histViewModel!!.allHist!!.observe(this, Observer { hists ->
-            this.histories = sortList(currSort, hists!!)
+        histViewModel!!.allHist.observe(this, Observer { hists ->
+            this.histories = sortList(currSort, hists)
             adapt!!.setHistories(histories)
             histJob = uiScope.launch {
                 json = convertToJSON(histories)
@@ -140,11 +140,11 @@ class HistoryActivity : AppCompatActivity() {
                 val current = histories[position]
                 val wallIntent = Intent(getCon(), WallActivity::class.java)
                 wallIntent.apply {
-                    putExtra(WallActivity.WALL_URL, current?.url)
+                    putExtra(WallActivity.WALL_URL, current.url)
                     putExtra(WallActivity.GIF, false)
-                    putExtra(PostActivity.POST_LINK, current?.postLink)
+                    putExtra(PostActivity.POST_LINK, current.postLink)
                     putExtra(WallActivity.FROM_HIST, true)
-                    putExtra(WallActivity.FAV_LIST, current?.subName)
+                    putExtra(WallActivity.FAV_LIST, current.subName)
                     putExtra(WallActivity.INDEX, position)
                     putExtra(WallActivity.LIST, json)
                 }
@@ -209,10 +209,10 @@ class HistoryActivity : AppCompatActivity() {
                     val current = histories[randomNum]
                     val wallIntent = Intent(getCon(), WallActivity::class.java)
                     wallIntent.apply {
-                        putExtra(WallActivity.WALL_URL, current?.url)
+                        putExtra(WallActivity.WALL_URL, current.url)
                         putExtra(WallActivity.GIF, false)
                         putExtra(WallActivity.FROM_FAV, false)
-                        putExtra(MainActivity.QUERY, current?.subName)
+                        putExtra(MainActivity.QUERY, current.subName)
                     }
                     wallIntent.putExtra(WallActivity.INDEX, randomNum)
                     wallIntent.putExtra(WallActivity.LIST, json)
@@ -293,13 +293,13 @@ class HistoryActivity : AppCompatActivity() {
         withContext(Dispatchers.IO) {
             val done = ArrayList<String?>()
             for (i in histories.indices) {
-                if (done.contains(histories[i]?.url)) {
+                if (done.contains(histories[i].url)) {
                     continue
                 }
                 val bitmap = if (downloadOriginal) {
-                    Glide.with(getCon()).asBitmap().load(histories[i]?.url).submit().get()
+                    Glide.with(getCon()).asBitmap().load(histories[i].url).submit().get()
                 } else {
-                    Glide.with(getCon()).asBitmap().load(histories[i]?.url).override(width, height).submit().get()
+                    Glide.with(getCon()).asBitmap().load(histories[i].url).override(width, height).submit().get()
                 }
 
                 val root = Environment.getExternalStorageDirectory().toString()
@@ -316,7 +316,7 @@ class HistoryActivity : AppCompatActivity() {
                     out.flush()
                     out.close()
                     MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
-                    done.add(histories[i]?.url)
+                    done.add(histories[i].url)
                     withContext(Dispatchers.Main) {
                         Log.e("PROGRESS", "$i / ${histories.size}")
                         notify.updateProgress(i)

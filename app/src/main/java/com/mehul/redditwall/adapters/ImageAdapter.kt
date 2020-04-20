@@ -19,7 +19,7 @@ import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.objects.BitURL
 
 class ImageAdapter internal constructor(private val context: Context,
-                                        private var images: ArrayList<BitURL>?) :
+                                        private var images: ArrayList<BitURL>) :
         RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
     private val inflater: LayoutInflater
     private val width: Int
@@ -40,40 +40,38 @@ class ImageAdapter internal constructor(private val context: Context,
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        if (images != null) {
-            val current = images!![position]
-            if (current.hasGif()) {
-                Glide.with(context).asGif().load(current.url).override(width / scale, height / 4).into(holder.image)
-            } else {
-                try {
-                    if (current.img == null || (current.img != null && (current.img as Bitmap).isRecycled)) {
-                        Glide.with(context).load(current.url).placeholder(ColorDrawable(Color.GRAY))
-                                .override(width / scale, height / 4).diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .centerCrop().into(holder.image)
-                        if (holder.image.drawable != null && holder.image.drawable !is ColorDrawable) {
-                            Log.e("SAVED", "saved image $position")
-                            images!![position].img = (holder.image.drawable as BitmapDrawable).bitmap
-                        }
-                    } else {
-                        holder.image.setImageBitmap(current.img)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Log.e("FAIL", "Recycler error")
+        val current = images[position]
+        if (current.hasGif()) {
+            Glide.with(context).asGif().load(current.url).override(width / scale, height / 4).into(holder.image)
+        } else {
+            try {
+                if (current.img == null || (current.img != null && (current.img as Bitmap).isRecycled)) {
                     Glide.with(context).load(current.url).placeholder(ColorDrawable(Color.GRAY))
                             .override(width / scale, height / 4).diskCacheStrategy(DiskCacheStrategy.ALL)
                             .centerCrop().into(holder.image)
                     if (holder.image.drawable != null && holder.image.drawable !is ColorDrawable) {
                         Log.e("SAVED", "saved image $position")
-                        images!![position].img = (holder.image.drawable as BitmapDrawable).bitmap
+                        images[position].img = (holder.image.drawable as BitmapDrawable).bitmap
                     }
+                } else {
+                    holder.image.setImageBitmap(current.img)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("FAIL", "Recycler error")
+                Glide.with(context).load(current.url).placeholder(ColorDrawable(Color.GRAY))
+                        .override(width / scale, height / 4).diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .centerCrop().into(holder.image)
+                if (holder.image.drawable != null && holder.image.drawable !is ColorDrawable) {
+                    Log.e("SAVED", "saved image $position")
+                    images[position].img = (holder.image.drawable as BitmapDrawable).bitmap
                 }
             }
         }
     }
 
     override fun getItemCount(): Int {
-        return images!!.size
+        return images.size
     }
 
     fun setList(list: ArrayList<BitURL>) {

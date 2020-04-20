@@ -34,7 +34,7 @@ class SavedActivity : AppCompatActivity() {
     private var adapter: SubAdapter? = null
     private var saveText: EditText? = null
     private var rootLayout: CoordinatorLayout? = null
-    private var subs: List<SubSaved?>? = ArrayList()
+    private var subs: List<SubSaved> = ArrayList()
     private var subViewModel: SubViewModel? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +73,7 @@ class SavedActivity : AppCompatActivity() {
                 })
 
         helper.attachToRecyclerView(recycler)
-        subViewModel!!.allSubs!!.observe(this, Observer { subSaveds ->
+        subViewModel!!.allSubs.observe(this, Observer { subSaveds ->
             subs = sortList(currSort, subSaveds!!)
             adapter!!.setSubs(subs)
             findViewById<View>(R.id.sub_empty).visibility = if (adapter!!.itemCount == 0) {
@@ -84,18 +84,18 @@ class SavedActivity : AppCompatActivity() {
         })
     }
 
-    private fun sortList(sort: Int, list: List<SubSaved?>): List<SubSaved?> {
+    private fun sortList(sort: Int, list: List<SubSaved>): List<SubSaved> {
         return when (sort) {
             R.id.recent -> {
                 list.sortedWith(compareBy
-                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) }).asReversed()
+                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it.internalDate) }).asReversed()
             }
             R.id.alpha -> {
-                list.sortedWith(compareBy { it!!.subName })
+                list.sortedWith(compareBy { it.subName })
             }
             else -> {
                 list.sortedWith(compareBy
-                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it!!.internalDate) })
+                { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it.internalDate) })
             }
         }
     }
@@ -110,7 +110,7 @@ class SavedActivity : AppCompatActivity() {
             56345564 -> {
                 val confirmSubs = MaterialAlertDialogBuilder(this, R.style.MyThemeOverlayAlertDialog).apply {
                     setTitle("Are You Sure?")
-                    setMessage("Do you want to clear ${subs?.size ?: 0} saved subreddits?")
+                    setMessage("Do you want to clear ${subs.size} saved subreddits?")
                     setPositiveButton("Yes") { _, _ ->
                         subViewModel!!.deleteAll()
                         //Toast.makeText(this@SavedActivity, "Deleted saved subs", Toast.LENGTH_SHORT).show()
@@ -122,7 +122,7 @@ class SavedActivity : AppCompatActivity() {
                 return true
             }
             else -> {
-                subs = sortList(currSort, subs!!)
+                subs = sortList(currSort, subs)
                 adapter?.setSubs(subs)
             }
         }
@@ -148,10 +148,10 @@ class SavedActivity : AppCompatActivity() {
         val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputManager.hideSoftInputFromWindow(view.windowToken,
                 InputMethodManager.HIDE_NOT_ALWAYS)
-        for (saved in subViewModel!!.allSubs!!.value!!) {
-            if (saved?.subName.equals(saveVal, ignoreCase = true)) {
+        for (saved in subViewModel!!.allSubs.value!!) {
+            if (saved.subName.equals(saveVal, ignoreCase = true)) {
                 //Toast.makeText(this, saved!!.subName + " has already been saved", Toast.LENGTH_SHORT).show()
-                Snackbar.make(rootLayout!!, "${saved!!.subName} has already been saved", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(rootLayout!!, "${saved.subName} has already been saved", Snackbar.LENGTH_SHORT).show()
                 return
             }
         }

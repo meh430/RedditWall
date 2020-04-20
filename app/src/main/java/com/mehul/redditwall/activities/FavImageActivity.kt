@@ -45,7 +45,7 @@ class FavImageActivity : AppCompatActivity() {
     private var loading: ProgressBar? = null
     private var remaining: ProgressBar? = null
     private var rootLayout: RelativeLayout? = null
-    private var favImages: List<FavImage?>? = ArrayList()
+    private var favImages: List<FavImage> = ArrayList()
     private var uiScope = CoroutineScope(Dispatchers.Main)
     private var favJob: Job? = null
     private var width = 1080
@@ -74,13 +74,13 @@ class FavImageActivity : AppCompatActivity() {
 
                     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                         val position = viewHolder.adapterPosition
-                        val saved = favImages?.get(position)
+                        val saved = favImages[position]
                         favViewModel!!.deleteFavImage(saved)
                         adapt!!.notifyDataSetChanged()
                     }
                 })
         helper.attachToRecyclerView(recycler)
-        favViewModel!!.allFav?.observe(this, Observer { favs ->
+        favViewModel?.allFav!!.observe(this, Observer { favs ->
             favImages = favs
             favJob = uiScope.launch {
                 loadFavBits(favs, getCon())
@@ -95,7 +95,7 @@ class FavImageActivity : AppCompatActivity() {
                     val confirmDelete =
                             MaterialAlertDialogBuilder(getCon(), R.style.MyThemeOverlayAlertDialog).apply {
                                 setTitle("Are You Sure?")
-                                setMessage("Do you want to clear ${favImages?.size ?: 0} favorite images?")
+                                setMessage("Do you want to clear ${favImages.size} favorite images?")
 
                                 setPositiveButton("Yes") { _, _ ->
                                     favViewModel!!.deleteAll()
@@ -116,7 +116,7 @@ class FavImageActivity : AppCompatActivity() {
                         ActivityCompat.requestPermissions(this,
                                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), WallActivity.WRITE)
                     } else {
-                        if (favImages!!.isEmpty()) {
+                        if (favImages.isEmpty()) {
                             //Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
                             Snackbar.make(rootLayout!!, "No items", Snackbar.LENGTH_SHORT).show()
                             return@OnActionSelectedListener false
@@ -130,29 +130,29 @@ class FavImageActivity : AppCompatActivity() {
                     return@OnActionSelectedListener false // false will close it without animation
                 }
                 R.id.random -> {
-                    if (favImages!!.isEmpty()) {
+                    if (favImages.isEmpty()) {
                         //Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
                         Snackbar.make(rootLayout!!, "No items", Snackbar.LENGTH_SHORT).show()
                         return@OnActionSelectedListener false
                     }
 
-                    var randomNum = (0..favImages!!.size).random()
-                    while (randomNum >= favImages!!.size || randomNum < 0) {
-                        randomNum = (0..favImages!!.size).random()
+                    var randomNum = (0..favImages.size).random()
+                    while (randomNum >= favImages.size || randomNum < 0) {
+                        randomNum = (0..favImages.size).random()
                     }
-                    if (randomNum == favImages!!.size) randomNum = favImages!!.size - 1
-                    val current = favImages!![randomNum]
+                    if (randomNum == favImages.size) randomNum = favImages.size - 1
+                    val current = favImages[randomNum]
                     val wallIntent = Intent(getCon(), WallActivity::class.java)
                     val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
                     val jsonList = gson.toJson(favImages)
                     wallIntent.apply {
-                        putExtra(WallActivity.WALL_URL, current?.favUrl)
-                        putExtra(WallActivity.GIF, current?.isGif)
+                        putExtra(WallActivity.WALL_URL, current.favUrl)
+                        putExtra(WallActivity.GIF, current.isGif)
                         putExtra(WallActivity.INDEX, randomNum)
-                        putExtra(PostActivity.POST_LINK, current?.postLink)
+                        putExtra(PostActivity.POST_LINK, current.postLink)
                         putExtra(WallActivity.FROM_FAV, true)
                         putExtra(WallActivity.LIST, jsonList)
-                        putExtra(WallActivity.FAV_LIST, current?.favName)
+                        putExtra(WallActivity.FAV_LIST, current.favName)
                     }
                     getCon().startActivity(wallIntent)
                     return@OnActionSelectedListener false
@@ -243,7 +243,7 @@ class FavImageActivity : AppCompatActivity() {
                 .getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
 
         val downloadOriginal = prefs.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
-        val notify = ProgressNotify(getCon(), favImages!!.size)
+        val notify = ProgressNotify(getCon(), favImages.size)
         var finalName = ""
         notify.sendNotification()
         val dims = MainActivity.getDimensions(getCon())
@@ -251,11 +251,11 @@ class FavImageActivity : AppCompatActivity() {
         height = prefs.getInt(SettingsActivity.IMG_HEIGHT, dims[1])
 
         withContext(Dispatchers.IO) {
-            for (i in favImages!!.indices) {
+            for (i in favImages.indices) {
                 val bitmap = if (downloadOriginal) {
-                    Glide.with(getCon()).asBitmap().load(favImages!![i]?.favUrl).submit().get()
+                    Glide.with(getCon()).asBitmap().load(favImages[i].favUrl).submit().get()
                 } else {
-                    Glide.with(getCon()).asBitmap().load(favImages!![i]?.favUrl).override(width, height).submit().get()
+                    Glide.with(getCon()).asBitmap().load(favImages[i].favUrl).override(width, height).submit().get()
                 }
 
                 val root = Environment.getExternalStorageDirectory().toString()
@@ -273,7 +273,7 @@ class FavImageActivity : AppCompatActivity() {
                     out.close()
                     MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
                     withContext(Dispatchers.Main) {
-                        Log.e("PROGRESS", "$i / ${favImages!!.size}")
+                        Log.e("PROGRESS", "$i / ${favImages.size}")
                         notify.updateProgress(i)
                     }
                 } catch (e: Exception) {
@@ -290,7 +290,7 @@ class FavImageActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (adapt?.itemCount != favImages?.size && !favJob!!.isActive) {
+        if (adapt?.itemCount != favImages.size && !favJob!!.isActive) {
             favJob = uiScope.launch {
                 loadFavBits(favImages, getCon())
             }

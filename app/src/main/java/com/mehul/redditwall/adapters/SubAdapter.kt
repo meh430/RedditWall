@@ -20,7 +20,7 @@ import com.mehul.redditwall.objects.SubSaved
 
 class SubAdapter(private val con: Context) : RecyclerView.Adapter<SubAdapter.SubViewHolder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(con)
-    private var subs: List<SubSaved?>? = null
+    private var subs: List<SubSaved> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubViewHolder {
         val itemView = inflater.inflate(R.layout.sub_saved_item, parent, false)
@@ -28,60 +28,55 @@ class SubAdapter(private val con: Context) : RecyclerView.Adapter<SubAdapter.Sub
     }
 
     override fun onBindViewHolder(holder: SubViewHolder, position: Int) {
-        if (subs != null) {
-            val current = subs!![position]
-            holder.itemView.apply {
-                isLongClickable = true
-                isClickable = true
-            }
-            holder.bindTo(current)
-            holder.itemView.setOnLongClickListener {
-                val defaultConfirm = MaterialAlertDialogBuilder(con, R.style.MyThemeOverlayAlertDialog).apply {
-                    setTitle("Set as default?")
-                    setMessage("Are you sure you want " + current?.subName + " to be your default subreddit?")
-                    setPositiveButton("Yes") { _, _ ->
-                        val preferences = con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-                        val prefEdit = preferences.edit()
-                        prefEdit.putString(SettingsActivity.DEFAULT, current?.subName)
-                        prefEdit.apply()
-                        Toast.makeText(con, "Set " + current?.subName + " as default", Toast.LENGTH_SHORT).show()
-                    }
-                    setNegativeButton("No") { _, _ -> Toast.makeText(con, "Cancelled", Toast.LENGTH_SHORT).show() }
+        val current = subs[position]
+        holder.itemView.apply {
+            isLongClickable = true
+            isClickable = true
+        }
+        holder.bindTo(current)
+        holder.itemView.setOnLongClickListener {
+            val defaultConfirm = MaterialAlertDialogBuilder(con, R.style.MyThemeOverlayAlertDialog).apply {
+                setTitle("Set as default?")
+                setMessage("Are you sure you want " + current.subName + " to be your default subreddit?")
+                setPositiveButton("Yes") { _, _ ->
+                    val preferences = con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+                    val prefEdit = preferences.edit()
+                    prefEdit.putString(SettingsActivity.DEFAULT, current.subName)
+                    prefEdit.apply()
+                    Toast.makeText(con, "Set " + current.subName + " as default", Toast.LENGTH_SHORT).show()
                 }
-                defaultConfirm.show()
-                true
+                setNegativeButton("No") { _, _ -> Toast.makeText(con, "Cancelled", Toast.LENGTH_SHORT).show() }
             }
-            holder.itemView.setOnClickListener {
-                val launchMain = Intent(con, MainActivity::class.java)
-                launchMain.apply {
-                    putExtra(MainActivity.SAVED, current?.subName)
-                    putExtra(MainActivity.OVERRIDE, true)
-                }
-                val clipboard: ClipboardManager? = con.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("Copied Text", current?.subName)
-                assert(clipboard != null)
-                clipboard?.setPrimaryClip(clip)
-                Toast.makeText(con, "Saved to clipboard", Toast.LENGTH_SHORT).show()
-                con.startActivity(launchMain)
-                (con as Activity).finish()
+            defaultConfirm.show()
+            true
+        }
+        holder.itemView.setOnClickListener {
+            val launchMain = Intent(con, MainActivity::class.java)
+            launchMain.apply {
+                putExtra(MainActivity.SAVED, current.subName)
+                putExtra(MainActivity.OVERRIDE, true)
             }
+            val clipboard: ClipboardManager? = con.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("Copied Text", current.subName)
+            assert(clipboard != null)
+            clipboard?.setPrimaryClip(clip)
+            Toast.makeText(con, "Saved to clipboard", Toast.LENGTH_SHORT).show()
+            con.startActivity(launchMain)
+            (con as Activity).finish()
         }
     }
 
-    fun setSubs(subs: List<SubSaved?>?) {
+    fun setSubs(subs: List<SubSaved>) {
         this.subs = subs
         notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
-        return if (subs != null)
-            subs!!.size
-        else
-            0
+        return subs.size
     }
 
-    fun getSubAtPosition(position: Int): SubSaved? {
-        return subs!![position]
+    fun getSubAtPosition(position: Int): SubSaved {
+        return subs[position]
     }
 
     inner class SubViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -89,8 +84,8 @@ class SubAdapter(private val con: Context) : RecyclerView.Adapter<SubAdapter.Sub
         private val dateTv: TextView = itemView.findViewById(R.id.sub_date)
 
         @SuppressLint("SetTextI18n")
-        fun bindTo(saved: SubSaved?) {
-            val date = saved!!.subDate
+        fun bindTo(saved: SubSaved) {
+            val date = saved.subDate
             val name = saved.subName
 
             subTv.text = name

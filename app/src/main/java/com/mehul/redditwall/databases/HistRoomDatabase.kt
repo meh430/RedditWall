@@ -8,7 +8,7 @@ import com.mehul.redditwall.objects.HistoryItem
 
 @Database(entities = [HistoryItem::class], version = 1, exportSchema = false)
 abstract class HistRoomDatabase : RoomDatabase() {
-    abstract fun historyDAO(): HistoryDAO?
+    abstract fun historyDAO(): HistoryDAO
 
     companion object {
         private var SINGLETON: HistRoomDatabase? = null

@@ -32,7 +32,6 @@ import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import com.bumptech.glide.Glide.with
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.gson.GsonBuilder
 import com.mehul.redditwall.R
 import com.mehul.redditwall.objects.BitURL
 import com.mehul.redditwall.objects.FavImage
@@ -66,9 +65,9 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var index: Int = 0
     private var width: Int = 0
     private var height: Int = 0
-    private var fname: String? = null
-    private var imgUrl: String? = null
-    private var postLink: String? = null
+    private var fname: String = ""
+    private var imgUrl: String = ""
+    private var postLink: String = ""
     private var imageList: ArrayList<BitURL> = ArrayList()
     private var detector: GestureDetector? = null
     private var imageJob: Job? = null
@@ -167,7 +166,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                             Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
                             val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query,
                                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
-                                    wallSource, imgUrl!!, imageList[index].postLink)
+                                    wallSource, imgUrl, imageList[index].postLink)
                             histViewModel?.insert(histItem)
                         } catch (e: Exception) {
                             Log.e("MainActivity", "Error setting wallpaper")
@@ -180,7 +179,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                             Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
                             val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query,
                                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
-                                    HistoryItem.BOTH, imgUrl!!, imageList[index].postLink)
+                                    HistoryItem.BOTH, imgUrl, imageList[index].postLink)
                             histViewModel?.insert(histItem)
                         } catch (e: Exception) {
                             Log.e("MainActivity", "Error setting wallpaper")
@@ -196,8 +195,9 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             super.onBackPressed()
             return true
         } else if (item.itemId == R.id.fav_image) {
-            for (img in favViewModel!!.favList!!) {
-                if (imgUrl!!.equals(img?.favUrl, ignoreCase = true)) {
+            val favs = favViewModel!!.favList
+            for (img in favs) {
+                if (imgUrl.equals(img.favUrl, ignoreCase = true)) {
                     item.icon = openStar
                     favViewModel?.deleteFavImage(img)
                     Toast.makeText(this, "Unfavorited", Toast.LENGTH_SHORT).show()
@@ -206,7 +206,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             }
             item.icon = filledStar
             Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
-            favViewModel?.insert(FavImage((Math.random() * 10000).toInt() + 1, imgUrl!!,
+            favViewModel?.insert(FavImage((Math.random() * 10000).toInt() + 1, imgUrl,
                     isGif, imageList[index].postLink, query))
             return true
         }
@@ -238,6 +238,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         return ret
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.wall_menu, menu)
         bottomSheet = findViewById(R.id.bottom_sheet)
@@ -263,8 +264,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             }
         }
         index = incoming.getIntExtra(INDEX, 0)
-        imgUrl = incoming.getStringExtra(WALL_URL)
-        postLink = incoming.getStringExtra(PostActivity.POST_LINK)
+        imgUrl = incoming.getStringExtra(WALL_URL) ?: ""
+        postLink = incoming.getStringExtra(PostActivity.POST_LINK) ?: ""
         isGif = incoming.getBooleanExtra(GIF, false)
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
         downloadOriginal = preferences!!.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
@@ -347,7 +348,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         myDir.mkdirs()
         fname = (0..999999999).random().toString().replace(" ", "") + ".jpg"
 
-        val file = File(myDir, fname!!)
+        val file = File(myDir, fname)
         if (file.exists())
             file.delete()
         try {
@@ -359,7 +360,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             sendNotification()
             val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query,
                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
-                    HistoryItem.DOWNLOADED, imgUrl!!, imageList[index].postLink)
+                    HistoryItem.DOWNLOADED, imgUrl, imageList[index].postLink)
             histViewModel?.insert(histItem)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -661,9 +662,10 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         wallPreview?.visibility = View.GONE
         var saved = false
         withContext(Dispatchers.Default) {
+            val favs = favViewModel!!.favList
             if (!fromFav) {
-                for (fav in favViewModel?.favList!!) {
-                    if (fav?.favUrl == imgUrl) {
+                for (fav in favs) {
+                    if (fav.favUrl == imgUrl) {
                         saved = true
                         break
                     }
@@ -725,11 +727,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         var AFTER_NEW_WALL: String? = null
         var AFTER_HOT_WALL: String? = null
         var AFTER_TOP_WALL: String? = null
-
-        fun listToJson(imgs: ArrayList<BitURL>?): String {
-            val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
-            return gson.toJson(imgs)
-        }
     }
 
     fun launchSearch(view: View) {

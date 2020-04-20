@@ -8,7 +8,7 @@ import com.mehul.redditwall.objects.SubSaved
 
 @Database(entities = [SubSaved::class], version = 3, exportSchema = false)
 abstract class SubRoomDatabase : RoomDatabase() {
-    abstract fun subDao(): SubDAO?
+    abstract fun subDao(): SubDAO
 
     companion object {
         private var SINGLETON: SubRoomDatabase? = null

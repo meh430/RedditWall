@@ -8,10 +8,12 @@ import com.mehul.redditwall.objects.FavImage
 
 @Database(entities = [FavImage::class], version = 4, exportSchema = false)
 abstract class FavRoomDatabase : RoomDatabase() {
-    abstract fun favDAO(): FavDAO?
+    abstract fun favDAO(): FavDAO
 
     companion object {
+        @Volatile
         private var SINGLETON: FavRoomDatabase? = null
+
         fun getDatabase(context: Context): FavRoomDatabase? {
             if (SINGLETON == null) {
                 synchronized(FavRoomDatabase::class.java) {

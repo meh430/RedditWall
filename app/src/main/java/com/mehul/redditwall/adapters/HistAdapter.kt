@@ -13,7 +13,7 @@ import com.mehul.redditwall.objects.HistoryItem
 
 class HistAdapter(private val con: Context) : RecyclerView.Adapter<HistAdapter.HistViewHolder>() {
     private val inflater = LayoutInflater.from(con)
-    private var histories: List<HistoryItem?>? = null
+    private var histories: List<HistoryItem> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistViewHolder {
         val itemView = inflater.inflate(R.layout.history_item, parent, false)
@@ -21,26 +21,21 @@ class HistAdapter(private val con: Context) : RecyclerView.Adapter<HistAdapter.H
     }
 
     override fun getItemCount(): Int {
-        return if (histories != null)
-            histories!!.size
-        else
-            0
+        return histories.size
     }
 
-    fun setHistories(hists: List<HistoryItem?>?) {
+    fun setHistories(hists: List<HistoryItem>) {
         this.histories = hists
         notifyDataSetChanged()
     }
 
-    fun getHistory(position: Int): HistoryItem? {
-        return histories!![position]
+    fun getHistory(position: Int): HistoryItem {
+        return histories[position]
     }
 
     override fun onBindViewHolder(holder: HistViewHolder, position: Int) {
-        if (histories != null) {
-            val current = histories!![position]
-            holder.bindTo(current)
-        }
+        val current = histories[position]
+        holder.bindTo(current)
     }
 
     inner class HistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -49,10 +44,10 @@ class HistAdapter(private val con: Context) : RecyclerView.Adapter<HistAdapter.H
         private val dateTv: TextView = itemView.findViewById(R.id.history_date)
         private val img: ImageView = itemView.findViewById(R.id.history_image)
 
-        fun bindTo(history: HistoryItem?) {
-            val name = history?.subName
-            val date = history?.setDate
-            val source = HistoryItem.sources[history!!.source]
+        fun bindTo(history: HistoryItem) {
+            val name = history.subName
+            val date = history.setDate
+            val source = HistoryItem.sources[history.source]
 
             nameTv.text = name
             sourceTv.text = source
