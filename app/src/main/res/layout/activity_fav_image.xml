@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/fav_root"
     tools:context=".activities.FavImageActivity">
 
     <ProgressBar
@@ -18,7 +17,7 @@
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/fav_scroll"
+        android:id="@+id/favRecycler"
         android:layout_below="@id/remaining"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,7 +26,7 @@
         android:paddingEnd="6dp" />
 
     <TextView
-        android:id="@+id/fav_empty"
+        android:id="@+id/favEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -40,7 +39,7 @@
         android:visibility="gone" />
 
     <ProgressBar
-        android:id="@+id/fav_loading"
+        android:id="@+id/favLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"

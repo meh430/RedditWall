@@ -20,7 +20,7 @@ import android.os.Handler
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
-import android.widget.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
@@ -33,6 +33,7 @@ import androidx.transition.TransitionManager
 import com.bumptech.glide.Glide.with
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mehul.redditwall.R
+import com.mehul.redditwall.databinding.ActivityWallBinding
 import com.mehul.redditwall.objects.BitURL
 import com.mehul.redditwall.objects.FavImage
 import com.mehul.redditwall.objects.HistoryItem
@@ -55,7 +56,6 @@ import kotlin.math.roundToInt
 class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var jsonList: String? = ""
     private var notifyManager: NotificationManager? = null
-    private var wallPreview: ImageView? = null
     private var bottomUp = false
     private var isGif: Boolean = false
     private var downloadOriginal = false
@@ -75,22 +75,12 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var filledStar: Drawable? = null
     private var openStar: Drawable? = null
     private var starred: Menu? = null
-    private var bottomSheet: LinearLayout? = null
-    private var expandButton: Button? = null
-    private var load: ProgressBar? = null
     private var favViewModel: FavViewModel? = null
     private var histViewModel: HistViewModel? = null
     private val uiScope = CoroutineScope(Dispatchers.Main)
     private var query = ""
     private var currentBitmap: Bitmap? = null
-    private var upText: TextView? = null
-    private var titleText: TextView? = null
-    private var sizeText: TextView? = null
-    private var subText: TextView? = null
-    private var authorText: TextView? = null
-    private var rootLayout: ViewGroup? = null
-    private var dateText: TextView? = null
-    private var commentText: TextView? = null
+    private lateinit var binding: ActivityWallBinding
     private val notificationBuilder: NotificationCompat.Builder
         get() {
             //TODO: replace deprecated methods with scoped storage solutions
@@ -109,8 +99,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_wall)
-        rootLayout = findViewById(R.id.wall_root)
+        binding = ActivityWallBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         supportActionBar?.elevation = 0F
         histViewModel = ViewModelProvider(this).get(HistViewModel::class.java)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
@@ -130,11 +120,11 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         val con = this
         val temp = Toast.makeText(this, "Setting wallpaper...", Toast.LENGTH_LONG)
         val wall: WallpaperManager? = this.applicationContext.getSystemService(Context.WALLPAPER_SERVICE) as WallpaperManager
-        if (wallPreview?.drawable == null) {
+        if (binding.wallHolder.drawable == null) {
             Toast.makeText(this, "LOADING...", Toast.LENGTH_SHORT).show()
             return
         }
-        val bitmap = (wallPreview?.drawable as BitmapDrawable).bitmap
+        val bitmap = (binding.wallHolder.drawable as BitmapDrawable).bitmap
         val builder = MaterialAlertDialogBuilder(this, R.style.MyThemeOverlayAlertDialog)
         builder.setTitle("Set Where?")
                 .setItems(R.array.location_options) { _, i ->
@@ -241,17 +231,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     @SuppressLint("SetTextI18n")
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.wall_menu, menu)
-        bottomSheet = findViewById(R.id.bottom_sheet)
-        upText = bottomSheet?.findViewById(R.id.upvotes)
-        titleText = bottomSheet?.findViewById(R.id.post_title)
-        sizeText = bottomSheet?.findViewById(R.id.image_size)
-        subText = bottomSheet?.findViewById(R.id.subreddit)
-        authorText = bottomSheet?.findViewById(R.id.author)
-        dateText = bottomSheet?.findViewById(R.id.upload_date)
-        commentText = bottomSheet?.findViewById(R.id.comments)
-        expandButton = findViewById(R.id.expand_button)
-        load = findViewById(R.id.load_more)
-        wallPreview = findViewById(R.id.wall_holder)
         detector = GestureDetector(this, this)
         val incoming = intent
         fromFav = incoming.getBooleanExtra(FROM_FAV, false)
@@ -292,7 +271,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         filledStar = ContextCompat.getDrawable(applicationContext, filled)
         openStar = ContextCompat.getDrawable(applicationContext, open)
         starred = menu
-        bottomSheet!!.findViewById<TextView>(R.id.subreddit).text = "Subreddit: $query"
+        binding.subreddit.text = "Subreddit: $query"
         uiScope.launch {
             startUp(getCon())
         }
@@ -300,7 +279,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     fun launchPost(view: View) {
-        if (titleText!!.text.contains("Loading")) {
+        if (binding.postTitle.text.contains("Loading")) {
             Toast.makeText(this, "Please wait...", Toast.LENGTH_SHORT).show()
             return
         }
@@ -312,7 +291,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         } else {
             val postIntent = Intent(this, PostActivity::class.java)
             postIntent.putExtra(PostActivity.POST_LINK, postLink)
-            postIntent.putExtra(PostActivity.POST_TITLE, "${titleText?.text}")
+            postIntent.putExtra(PostActivity.POST_TITLE, "${binding.postTitle.text}")
             startActivity(postIntent)
         }
     }
@@ -333,14 +312,14 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     @Suppress("DEPRECATION")
     private fun saveImage() {
-        if (wallPreview?.drawable == null) {
+        if (binding.wallHolder.drawable == null) {
             Toast.makeText(this, "LOADING...", Toast.LENGTH_SHORT).show()
             return
         }
         val bitmap = if (preferences!!.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)) {
             currentBitmap
         } else {
-            (wallPreview!!.drawable as BitmapDrawable).bitmap
+            (binding.wallHolder.drawable as BitmapDrawable).bitmap
         }
         Toast.makeText(this, "Downloading...", Toast.LENGTH_SHORT).show()
         val root = Environment.getExternalStorageDirectory().toString()
@@ -384,7 +363,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     private fun updateNotification() {
-        val bitmap = (wallPreview!!.drawable as BitmapDrawable).bitmap
+        val bitmap = (binding.wallHolder.drawable as BitmapDrawable).bitmap
         val notifyBuilder = notificationBuilder
         notifyBuilder.setStyle(NotificationCompat.BigPictureStyle()
                 .bigPicture(bitmap)
@@ -539,13 +518,13 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     @SuppressLint("SetTextI18n")
     private suspend fun loadUps() {
-        upText?.text = "Upvotes: Loading..."
-        commentText?.text = "Comments: Loading..."
-        dateText?.text = "Date: Loading..."
-        authorText?.text = "Author: Loading..."
-        titleText?.text = "Loading..."
-        sizeText?.text = "Size: Loading..."
-        subText?.text = "Subreddit: Loading..."
+        binding.upvotes.text = "Upvotes: Loading..."
+        binding.comments.text = "Comments: Loading..."
+        binding.uploadDate.text = "Date: Loading..."
+        binding.author.text = "Author: Loading..."
+        binding.postTitle.text = "Loading..."
+        binding.imageSize.text = "Size: Loading..."
+        binding.subreddit.text = "Subreddit: Loading..."
         withContext(Dispatchers.Default) {
             val postJson = async { getPostJSON() }
 
@@ -563,26 +542,26 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 val uploadDate = convertUTC(utcTime)
                 withContext(Dispatchers.Main) {
                     query = sub
-                    subText?.text = "Subreddit: r/$sub"
-                    upText?.text = "Upvotes: $ups"
-                    titleText?.text = title
-                    authorText?.text = "Author: u/$author"
-                    commentText?.text = "Comments: $commentNum"
-                    dateText?.text = "Date: $uploadDate"
+                    binding.subreddit.text = "Subreddit: r/$sub"
+                    binding.upvotes.text = "Upvotes: $ups"
+                    binding.postTitle.text = title
+                    binding.author.text = "Author: u/$author"
+                    binding.comments.text = "Comments: $commentNum"
+                    binding.uploadDate.text = "Date: $uploadDate"
                 }
 
-                while (wallPreview?.drawable == null) {
+                while (binding.wallHolder.drawable == null) {
                 }
 
                 if (isGif) {
                     withContext(Dispatchers.Main) {
-                        sizeText?.text = "Size: GIF"
+                        binding.imageSize.text = "Size: GIF"
                     }
                 } else {
                     val bitmap = if (preferences!!.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)) {
                         currentBitmap
                     } else {
-                        (wallPreview!!.drawable as BitmapDrawable).bitmap
+                        (binding.wallHolder.drawable as BitmapDrawable).bitmap
                     }
 
                     val stream = ByteArrayOutputStream()
@@ -591,7 +570,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                     val length = imageInByte.size
                     val size = ((length / 1000000.00) * 100).roundToInt() / 100.00
                     withContext(Dispatchers.Main) {
-                        sizeText?.text = "Size: $size MB"
+                        binding.imageSize.text = "Size: $size MB"
                     }
                 }
             } catch (e: JSONException) {
@@ -658,8 +637,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     private suspend fun startUp(con: Context) {
-        load?.visibility = View.VISIBLE
-        wallPreview?.visibility = View.GONE
+        binding.loadMore.visibility = View.VISIBLE
+        binding.wallHolder.visibility = View.GONE
         var saved = false
         withContext(Dispatchers.Default) {
             val favs = favViewModel!!.favList
@@ -686,20 +665,20 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         } else {
             openStar
         }
-        load?.visibility = View.GONE
-        wallPreview?.visibility = View.VISIBLE
+        binding.loadMore.visibility = View.GONE
+        binding.wallHolder.visibility = View.VISIBLE
 
         if (isGif) {
-            with(con).asGif().load(imgUrl).override(width, height).centerCrop().into(wallPreview!!)
+            with(con).asGif().load(imgUrl).override(width, height).centerCrop().into(binding.wallHolder)
         } else {
-            with(con).load(imgUrl).override(width, height).centerCrop().into(wallPreview!!)
+            with(con).load(imgUrl).override(width, height).centerCrop().into(binding.wallHolder)
         }
 
         loadUps()
     }
 
     private suspend fun loadImages(con: Context?, queryString: String) {
-        load?.visibility = View.VISIBLE
+        binding.loadMore.visibility = View.VISIBLE
         withContext(Dispatchers.IO) {
             val rq = RestQuery(queryString, con)
             val jsonRes = async { rq.getQueryJson() }
@@ -709,7 +688,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             }
         }
 
-        load?.visibility = View.GONE
+        binding.loadMore.visibility = View.GONE
         Toast.makeText(con, "Done Loading", Toast.LENGTH_SHORT).show()
     }
 
@@ -761,24 +740,24 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private fun toggle(show: Boolean) {
         val transition: Transition = Slide(Gravity.BOTTOM)
         transition.duration = 400
-        transition.addTarget(R.id.bottom_sheet)
-        TransitionManager.beginDelayedTransition(rootLayout!!, transition)
-        bottomSheet?.visibility = if (show) View.VISIBLE else View.GONE
+        transition.addTarget(R.id.bottomSheet)
+        TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
+        binding.bottomSheet.visibility = if (show) View.VISIBLE else View.GONE
         if (show) {
-            expandButton?.visibility = View.GONE
+            binding.expandButton.visibility = View.GONE
         } else {
             Handler().postDelayed(Runnable {
-                expandButton?.visibility = View.VISIBLE
+                binding.expandButton.visibility = View.VISIBLE
             }, 400)
         }
     }
 
     fun launchUser(view: View) {
-        if (authorText!!.text.contains("Loading")) {
+        if (binding.author.text.contains("Loading")) {
             Toast.makeText(this, "Please wait...", Toast.LENGTH_SHORT).show()
             return
         }
-        var author = authorText!!.text.trim().split(":")[1].trim()
+        var author = binding.author.text.trim().split(":")[1].trim()
         author = author.replace("u/", "")
         val user = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.reddit.com/user/$author/"))
 

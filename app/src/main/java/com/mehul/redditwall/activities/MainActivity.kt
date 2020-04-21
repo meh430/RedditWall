@@ -17,22 +17,17 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.Toolbar
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.GsonBuilder
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.ImageAdapter
+import com.mehul.redditwall.databinding.ActivityMainBinding
 import com.mehul.redditwall.objects.BitURL
 import com.mehul.redditwall.objects.RecyclerListener
 import com.mehul.redditwall.rest.QueryRequest
@@ -42,39 +37,25 @@ import kotlinx.coroutines.*
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var queryString = ""
     private var defaultLoad = ""
-    private var search: EditText? = null
     private var hotImages = ArrayList<BitURL>()
     private var topImages = ArrayList<BitURL>()
     private var newImages = ArrayList<BitURL>()
     private var adapter: ImageAdapter? = null
-    private var loading: ProgressBar? = null
-    private var rootLayout: CoordinatorLayout? = null
-    private var bottomLoading: ProgressBar? = null
-    private var info: TextView? = null
     private var imageJob: Job? = null
     private var scrollJob: Job? = null
     private var uiScope = CoroutineScope(Dispatchers.Main)
-    private var hotChip: Chip? = null
-    private var newChip: Chip? = null
-    private var topChip: Chip? = null
     private var currentSort: Int = 0
     private var preferences: SharedPreferences? = null
+
+    private lateinit var binding: ActivityMainBinding
 
     @InternalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val toolbar = binding.toolbar
         setSupportActionBar(toolbar)
-        hotChip = findViewById(R.id.hot_chip)
-        newChip = findViewById(R.id.new_chip)
-        topChip = findViewById(R.id.top_chip)
-        loading = findViewById(R.id.loading)
-        rootLayout = findViewById(R.id.main_root)
-        info = findViewById(R.id.info)
-        bottomLoading = findViewById(R.id.progressBar)
-        search = findViewById(R.id.search)
         val imageScroll = findViewById<RecyclerView>(R.id.imageScroll)
         imageScroll.layoutManager = GridLayoutManager(this, 2)
         imageScroll.addOnItemTouchListener(RecyclerListener(this, imageScroll, object : RecyclerListener.OnItemClickListener {
@@ -140,9 +121,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
         imageScroll.adapter = adapter
-        hotChip!!.setOnClickListener(this)
-        newChip!!.setOnClickListener(this)
-        topChip!!.setOnClickListener(this)
+        binding.hotChip.setOnClickListener(this)
+        binding.newChip.setOnClickListener(this)
+        binding.topChip.setOnClickListener(this)
         val savedIntent = intent
         defaultLoad = (if (savedIntent.getBooleanExtra(OVERRIDE, false)) {
             savedIntent.getStringExtra(SAVED)
@@ -150,14 +131,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")
         }).toString()
         queryString = defaultLoad
-        search!!.hint = defaultLoad
+        binding.search.hint = defaultLoad
         if (networkAvailable()) {
             imageJob = uiScope.launch {
                 loadImages(getCon(), defaultLoad, true, getList())
             }
         } else {
-            info!!.visibility = View.VISIBLE
-            info!!.text = "No Network"
+            binding.info.visibility = View.VISIBLE
+            binding.info.text = "No Network"
         }
         imageScroll.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -180,7 +161,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                         }
                     }
                 } else {
-                    bottomLoading?.visibility = View.INVISIBLE
+                    binding.bottomLoad.visibility = View.INVISIBLE
                 }
             }
 
@@ -189,21 +170,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 val isRunning = scrollJob?.isActive ?: false
 
                 if (!recyclerView.canScrollVertically(1) && isRunning) {
-                    bottomLoading?.visibility = View.VISIBLE
+                    binding.bottomLoad.visibility = View.VISIBLE
                 } else if (!recyclerView.canScrollVertically(1) && !isRunning) {
-                    bottomLoading?.visibility = View.VISIBLE
+                    binding.bottomLoad.visibility = View.VISIBLE
                     cancelThreads()
 
                     scrollJob = uiScope.launch {
                         loadImages(getCon(), if (queryString.isEmpty()) defaultLoad else queryString, false, getList())
                     }
                 } else {
-                    bottomLoading?.visibility = View.INVISIBLE
+                    binding.bottomLoad.visibility = View.INVISIBLE
                 }
             }
         })
 
-        search!!.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
+        binding.search.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 startSearch(findViewById(R.id.search_button))
                 return@OnEditorActionListener true
@@ -213,24 +194,24 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun changeChipColor(highlight: Int) {
-        newChip!!.setChipBackgroundColorResource(R.color.white)
-        hotChip!!.setChipBackgroundColorResource(R.color.white)
-        topChip!!.setChipBackgroundColorResource(R.color.white)
-        newChip!!.setTextColor(Color.BLACK)
-        hotChip!!.setTextColor(Color.BLACK)
-        topChip!!.setTextColor(Color.BLACK)
+        binding.newChip.setChipBackgroundColorResource(R.color.white)
+        binding.hotChip.setChipBackgroundColorResource(R.color.white)
+        binding.topChip.setChipBackgroundColorResource(R.color.white)
+        binding.newChip.setTextColor(Color.BLACK)
+        binding.hotChip.setTextColor(Color.BLACK)
+        binding.topChip.setTextColor(Color.BLACK)
         when (highlight) {
             0 -> {
-                newChip!!.setChipBackgroundColorResource(R.color.chip)
-                newChip!!.setTextColor(Color.WHITE)
+                binding.newChip.setChipBackgroundColorResource(R.color.chip)
+                binding.newChip.setTextColor(Color.WHITE)
             }
             1 -> {
-                hotChip!!.setChipBackgroundColorResource(R.color.chip)
-                hotChip!!.setTextColor(Color.WHITE)
+                binding.hotChip.setChipBackgroundColorResource(R.color.chip)
+                binding.hotChip.setTextColor(Color.WHITE)
             }
             2 -> {
-                topChip!!.setChipBackgroundColorResource(R.color.chip)
-                topChip!!.setTextColor(Color.WHITE)
+                binding.topChip.setChipBackgroundColorResource(R.color.chip)
+                binding.topChip.setTextColor(Color.WHITE)
             }
             else -> return
         }
@@ -265,13 +246,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         AFTER_TOP = ""
         cancelThreads()
         queryString = ""
-        loading!!.visibility = View.VISIBLE
-        info!!.visibility = View.INVISIBLE
+        binding.loading.visibility = View.VISIBLE
+        binding.info.visibility = View.INVISIBLE
         newImages.clear()
         hotImages.clear()
         topImages.clear()
         adapter!!.notifyDataSetChanged()
-        queryString = search!!.text.toString().replace(" ", "")
+        queryString = binding.search.text.toString().replace(" ", "")
         val inputManager: InputMethodManager? = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputManager?.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
 
@@ -287,8 +268,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
         } else {
-            info!!.visibility = View.VISIBLE
-            info!!.text = "No Network"
+            binding.info.visibility = View.VISIBLE
+            binding.info.text = "No Network"
         }
     }
 
@@ -331,12 +312,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private fun cancelThreads() {
 
         if (imageJob != null) {
-            loading!!.visibility = View.GONE
+            binding.loading.visibility = View.GONE
             imageJob!!.cancel()
         }
 
         if (scrollJob != null) {
-            bottomLoading!!.visibility = View.GONE
+            binding.bottomLoad.visibility = View.GONE
             scrollJob!!.cancel()
         }
     }
@@ -359,7 +340,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
                     setNegativeButton("No") { _, _ ->
                         //Toast.makeText(this@MainActivity, "Cancelled", Toast.LENGTH_SHORT).show()
-                        Snackbar.make(rootLayout!!, "Cancelled", Snackbar.LENGTH_SHORT).show()
+                        Snackbar.make(binding.root, "Cancelled", Snackbar.LENGTH_SHORT).show()
                     }
                 }
         confirmExit.show()
@@ -375,7 +356,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
         if (imageJob != null && imageJob!!.isActive && temp == null) {
             //Toast.makeText(this, "Please Wait", Toast.LENGTH_SHORT).show()
-            Snackbar.make(rootLayout!!, "Please wait", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, "Please wait", Snackbar.LENGTH_SHORT).show()
             return
         }
 
@@ -385,7 +366,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         adapter!!.notifyDataSetChanged()
         val prefEdit = preferences!!.edit()
-        if (view == hotChip) {
+        if (view == binding.hotChip) {
             currentSort = HOT
             Log.e("CLICk", "CLICKED HOT")
             prefEdit.putInt(SettingsActivity.SORT_METHOD, HOT)
@@ -397,7 +378,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 adapter!!.setList(hotImages)
                 runQuery()
             }
-        } else if (view == newChip) {
+        } else if (view == binding.newChip) {
             currentSort = NEW
             Log.e("CLICk", "CLICKED NEW")
             prefEdit.putInt(SettingsActivity.SORT_METHOD, NEW)
@@ -409,7 +390,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 adapter!!.setList(newImages)
                 runQuery()
             }
-        } else if (view == topChip) {
+        } else if (view == binding.topChip) {
             currentSort = TOP
             Log.e("CLICk", "CLICKED TOP")
             prefEdit.putInt(SettingsActivity.SORT_METHOD, TOP)
@@ -427,26 +408,26 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     @InternalCoroutinesApi
     private suspend fun loadImages(con: Context, query: String, first: Boolean, images: ArrayList<BitURL>) {
         if (first) {
-            loading?.visibility = View.VISIBLE
+            binding.loading.visibility = View.VISIBLE
         }
-        info?.visibility = View.GONE
+        binding.info.visibility = View.GONE
         withContext(Dispatchers.IO) {
             val json = QueryRequest.getQueryJson(query, first, con)
             withContext(Dispatchers.Default) {
-                QueryRequest.loadImgsFromJSON(json, adapter, con, images, if (first) loading else bottomLoading, first)
+                QueryRequest.loadImgsFromJSON(json, adapter, con, images, if (first) binding.loading else binding.bottomLoad, first)
             }
         }
         adapter?.notifyDataSetChanged()
         if (first) {
-            loading?.visibility = View.GONE
+            binding.loading.visibility = View.GONE
         } else {
-            bottomLoading?.visibility = View.INVISIBLE
+            binding.bottomLoad.visibility = View.INVISIBLE
         }
 
         if (first && adapter?.itemCount == 0) {
             Log.e("LIST", getList().toString())
-            info?.visibility = View.VISIBLE
-            info?.text = "Subreddit does not exist or it has no images"
+            binding.info.visibility = View.VISIBLE
+            binding.info.text = "Subreddit does not exist or it has no images"
         }
     }
 

@@ -5,30 +5,30 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
-import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import com.mehul.redditwall.R
+import com.mehul.redditwall.databinding.ActivityPostBinding
 
 
 class PostActivity : AppCompatActivity() {
-    private var post: WebView? = null
     private var postLink: String? = ""
-
+    private lateinit var binding: ActivityPostBinding
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_post)
+        binding = ActivityPostBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         postLink = intent.getStringExtra(POST_LINK)
         supportActionBar?.title = intent.getStringExtra(POST_TITLE)
-        post = findViewById(R.id.web_post)
         val client = WebViewClient()
-        post?.webViewClient = client
-        post?.settings?.javaScriptEnabled = true
-        post?.settings?.setAppCacheEnabled(true)
-        post?.settings?.builtInZoomControls = true
-        post?.settings?.saveFormData = true
-        post?.loadUrl(postLink)
+
+        binding.webPost.webViewClient = client
+        binding.webPost.settings?.javaScriptEnabled = true
+        binding.webPost.settings?.setAppCacheEnabled(true)
+        binding.webPost.settings?.builtInZoomControls = true
+        binding.webPost.settings?.saveFormData = true
+        binding.webPost.loadUrl(postLink)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -39,7 +39,7 @@ class PostActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id: Int = item.itemId
         if (id == R.id.refresh_web) {
-            post?.loadUrl(postLink)
+            binding.webPost.loadUrl(postLink)
             return true
         } else if (id == android.R.id.home) {
             super.onBackPressed()
@@ -50,13 +50,13 @@ class PostActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        post?.destroy()
+        binding.webPost.destroy()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (post?.canGoBack()!!) {
-                post?.goBack()
+            if (binding.webPost.canGoBack()) {
+                binding.webPost.goBack()
                 return true
             } else {
                 super.onBackPressed()

@@ -17,7 +17,6 @@
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:theme="@style/AppTheme.AppBarOverlay"
             app:elevation="0dp">
 
@@ -37,7 +36,7 @@
             tools:context=".activities.SavedActivity">
 
             <TextView
-                android:id="@+id/sub_empty"
+                android:id="@+id/subEmpty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -85,7 +84,7 @@
                     tools:ignore="LabelFor" />
 
                 <Button
-                    android:id="@+id/search_button"
+                    android:id="@+id/searchButton"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_margin="8dp"

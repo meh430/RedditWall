@@ -13,8 +13,6 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.ProgressBar
-import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -30,6 +28,7 @@ import com.google.gson.GsonBuilder
 import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.FavAdapter
+import com.mehul.redditwall.databinding.ActivityFavImageBinding
 import com.mehul.redditwall.objects.BitURL
 import com.mehul.redditwall.objects.FavImage
 import com.mehul.redditwall.objects.ProgressNotify
@@ -42,24 +41,21 @@ import java.io.FileOutputStream
 class FavImageActivity : AppCompatActivity() {
     private var adapt: FavAdapter? = null
     private var favViewModel: FavViewModel? = null
-    private var loading: ProgressBar? = null
-    private var remaining: ProgressBar? = null
-    private var rootLayout: RelativeLayout? = null
     private var favImages: List<FavImage> = ArrayList()
     private var uiScope = CoroutineScope(Dispatchers.Main)
     private var favJob: Job? = null
     private var width = 1080
     private var height = 1920
+
+    private lateinit var binding: ActivityFavImageBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_fav_image)
+        binding = ActivityFavImageBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         supportActionBar?.elevation = 0F
-        loading = findViewById(R.id.fav_loading)
-        remaining = findViewById(R.id.remaining)
-        rootLayout = findViewById(R.id.fav_root)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
         adapt = FavAdapter(this, ArrayList())
-        val recycler = findViewById<RecyclerView>(R.id.fav_scroll).apply {
+        val recycler = binding.favRecycler.apply {
             adapter = adapt
             layoutManager = GridLayoutManager(getCon(), 2)
         }
@@ -87,7 +83,7 @@ class FavImageActivity : AppCompatActivity() {
             }
         })
 
-        val speedView = findViewById<SpeedDialView>(R.id.speedDial)
+        val speedView = binding.speedDial
         speedView.inflate(R.menu.fab_menu)
         speedView.setOnActionSelectedListener(SpeedDialView.OnActionSelectedListener { actionItem ->
             when (actionItem.id) {
@@ -99,12 +95,12 @@ class FavImageActivity : AppCompatActivity() {
 
                                 setPositiveButton("Yes") { _, _ ->
                                     favViewModel!!.deleteAll()
-                                    Snackbar.make(rootLayout!!, "Deleted favorite images", Snackbar.LENGTH_SHORT).show()
+                                    Snackbar.make(binding.root, "Deleted favorite images", Snackbar.LENGTH_SHORT).show()
                                     //Toast.makeText(this@FavImageActivity, "Deleted favorite images", Toast.LENGTH_SHORT).show()
                                 }
                                 setNegativeButton("No") { _, _ ->
                                     //Toast.makeText(this@FavImageActivity, "Cancelled", Toast.LENGTH_SHORT).show()
-                                    Snackbar.make(rootLayout!!, "Cancelled", Snackbar.LENGTH_SHORT).show()
+                                    Snackbar.make(binding.root, "Cancelled", Snackbar.LENGTH_SHORT).show()
                                 }
                             }
                     confirmDelete.show()
@@ -118,7 +114,7 @@ class FavImageActivity : AppCompatActivity() {
                     } else {
                         if (favImages.isEmpty()) {
                             //Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
-                            Snackbar.make(rootLayout!!, "No items", Snackbar.LENGTH_SHORT).show()
+                            Snackbar.make(binding.root, "No items", Snackbar.LENGTH_SHORT).show()
                             return@OnActionSelectedListener false
                         }
 
@@ -132,7 +128,7 @@ class FavImageActivity : AppCompatActivity() {
                 R.id.random -> {
                     if (favImages.isEmpty()) {
                         //Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
-                        Snackbar.make(rootLayout!!, "No items", Snackbar.LENGTH_SHORT).show()
+                        Snackbar.make(binding.root, "No items", Snackbar.LENGTH_SHORT).show()
                         return@OnActionSelectedListener false
                     }
 
@@ -172,7 +168,7 @@ class FavImageActivity : AppCompatActivity() {
     }
 
     private suspend fun loadFavBits(favs: List<FavImage>, con: Context) {
-        loading?.visibility = View.VISIBLE
+        binding.favLoading.visibility = View.VISIBLE
         withContext(Dispatchers.Default) {
             val bits = ArrayList<BitURL>()
             val dims = MainActivity.getDimensions(con)
@@ -207,22 +203,22 @@ class FavImageActivity : AppCompatActivity() {
 
                 withContext(Dispatchers.Main) {
                     if (i == 0) {
-                        remaining?.visibility = View.VISIBLE
+                        binding.remaining.visibility = View.VISIBLE
                     } else if (i % 3 == 0) {
                         adapt!!.setFavs(bits, favs)
-                        loading?.visibility = View.GONE
+                        binding.favLoading.visibility = View.GONE
                     }
                 }
             }
 
             withContext(Dispatchers.Main) {
                 adapt!!.setFavs(bits, favs)
-                remaining?.visibility = View.GONE
+                binding.remaining.visibility = View.GONE
             }
         }
 
-        loading?.visibility = View.GONE
-        findViewById<View>(R.id.fav_empty).visibility = if (adapt!!.itemCount == 0) View.VISIBLE else View.GONE
+        binding.favLoading.visibility = View.GONE
+        binding.favEmpty.visibility = if (adapt!!.itemCount == 0) View.VISIBLE else View.GONE
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -232,7 +228,7 @@ class FavImageActivity : AppCompatActivity() {
                     downloadAllImages()
                 }
             } else {
-                Snackbar.make(rootLayout!!, "Cannot download, please grant permissions", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, "Cannot download, please grant permissions", Snackbar.LENGTH_SHORT).show()
                 //Toast.makeText(this, "Cannot download, please grant permissions", Toast.LENGTH_SHORT).show()
             }
         }

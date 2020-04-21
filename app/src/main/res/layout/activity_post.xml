@@ -6,7 +6,7 @@
     tools:context=".activities.PostActivity">
 
     <WebView
-        android:id="@+id/web_post"
+        android:id="@+id/webPost"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true" />

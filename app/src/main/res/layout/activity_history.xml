@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/hist_root"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".activities.MainActivity"
     tools:ignore="HardcodedText">
@@ -17,7 +16,6 @@
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:theme="@style/AppTheme.AppBarOverlay"
             app:elevation="0dp">
 
@@ -47,7 +45,7 @@
                 android:visibility="gone" />
 
             <TextView
-                android:id="@+id/hist_empty"
+                android:id="@+id/histEmpty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -60,7 +58,7 @@
                 android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/hist_scroll"
+                android:id="@+id/histScroll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -71,7 +69,7 @@
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
             <ProgressBar
-                android:id="@+id/hist_loading"
+                android:id="@+id/histLoading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"

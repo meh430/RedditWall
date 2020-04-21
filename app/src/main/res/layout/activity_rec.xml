@@ -6,7 +6,7 @@
     tools:context=".activities.RecActivity">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rec_scroll"
+        android:id="@+id/recScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
@@ -14,14 +14,14 @@
         android:layout_marginEnd="8dp" />
 
     <ProgressBar
-        android:id="@+id/rec_loading"
+        android:id="@+id/recLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/rec_empty"
+        android:id="@+id/recEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"

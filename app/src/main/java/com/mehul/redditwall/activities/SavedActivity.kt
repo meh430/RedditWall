@@ -8,10 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -22,6 +19,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.SubAdapter
+import com.mehul.redditwall.databinding.ActivitySavedBinding
 import com.mehul.redditwall.objects.SubSaved
 import com.mehul.redditwall.viewmodels.SubViewModel
 import java.text.SimpleDateFormat
@@ -32,15 +30,15 @@ import kotlin.collections.ArrayList
 class SavedActivity : AppCompatActivity() {
     private var currSort = R.id.recent
     private var adapter: SubAdapter? = null
-    private var saveText: EditText? = null
-    private var rootLayout: CoordinatorLayout? = null
     private var subs: List<SubSaved> = ArrayList()
     private var subViewModel: SubViewModel? = null
+    private lateinit var binding: ActivitySavedBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_saved)
-        rootLayout = findViewById(R.id.saved_root)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        binding = ActivitySavedBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val toolbar = binding.toolbar
         setSupportActionBar(toolbar)
         val sortIcon: Drawable = ContextCompat.getDrawable(applicationContext, R.drawable.ic_sort)!!
         val dark = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
@@ -50,8 +48,7 @@ class SavedActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         subViewModel = ViewModelProvider(this@SavedActivity).get(SubViewModel(application)::class.java)
-        val recycler = findViewById<RecyclerView>(R.id.saveScroll)
-        saveText = findViewById(R.id.search)
+        val recycler = binding.saveScroll
         adapter = SubAdapter(this)
         recycler.adapter = adapter
         recycler.layoutManager = LinearLayoutManager(this)
@@ -76,7 +73,7 @@ class SavedActivity : AppCompatActivity() {
         subViewModel!!.allSubs.observe(this, Observer { subSaveds ->
             subs = sortList(currSort, subSaveds!!)
             adapter!!.setSubs(subs)
-            findViewById<View>(R.id.sub_empty).visibility = if (adapter!!.itemCount == 0) {
+            binding.subEmpty.visibility = if (adapter!!.itemCount == 0) {
                 View.VISIBLE
             } else {
                 View.GONE
@@ -114,9 +111,11 @@ class SavedActivity : AppCompatActivity() {
                     setPositiveButton("Yes") { _, _ ->
                         subViewModel!!.deleteAll()
                         //Toast.makeText(this@SavedActivity, "Deleted saved subs", Toast.LENGTH_SHORT).show()
-                        Snackbar.make(rootLayout!!, "Deleted saved subs", Snackbar.LENGTH_SHORT).show()
+                        Snackbar.make(binding.root, "Deleted saved subs", Snackbar.LENGTH_SHORT).show()
                     }
-                    setNegativeButton("No") { _, _ -> Snackbar.make(rootLayout!!, "Cancelled", Snackbar.LENGTH_SHORT).show() }
+                    setNegativeButton("No") { _, _ ->
+                        Snackbar.make(binding.root, "Cancelled", Snackbar.LENGTH_SHORT).show()
+                    }
                 }
                 confirmSubs.show()
                 return true
@@ -136,13 +135,13 @@ class SavedActivity : AppCompatActivity() {
     }
 
     fun saveSub(view: View) {
-        var saveVal = saveText!!.text.toString().replace(" ", "")
+        var saveVal = binding.search.text.toString().replace(" ", "")
         saveVal = if (saveVal.length == 1) {
             //Toast.makeText(this, "Please enter something to save", Toast.LENGTH_SHORT).show()
-            Snackbar.make(rootLayout!!, "Please enter something to save", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, "Please enter something to save", Snackbar.LENGTH_SHORT).show()
             return
         } else {
-            saveText!!.setText("")
+            binding.search.setText("")
             saveVal.toLowerCase(Locale.ROOT)
         }
         val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -151,13 +150,13 @@ class SavedActivity : AppCompatActivity() {
         for (saved in subViewModel!!.allSubs.value!!) {
             if (saved.subName.equals(saveVal, ignoreCase = true)) {
                 //Toast.makeText(this, saved!!.subName + " has already been saved", Toast.LENGTH_SHORT).show()
-                Snackbar.make(rootLayout!!, "${saved.subName} has already been saved", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, "${saved.subName} has already been saved", Snackbar.LENGTH_SHORT).show()
                 return
             }
         }
         subViewModel!!.insert(SubSaved((Math.random() * 10000).toInt() + 1,
                 saveVal, SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date())))
         //Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
-        Snackbar.make(rootLayout!!, "Saved", Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(binding.root, "Saved", Snackbar.LENGTH_SHORT).show()
     }
 }

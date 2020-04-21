@@ -14,10 +14,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -32,6 +29,7 @@ import com.google.gson.GsonBuilder
 import com.leinardi.android.speeddial.SpeedDialView
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.HistAdapter
+import com.mehul.redditwall.databinding.ActivityHistoryBinding
 import com.mehul.redditwall.objects.BitURL
 import com.mehul.redditwall.objects.HistoryItem
 import com.mehul.redditwall.objects.ProgressNotify
@@ -53,11 +51,9 @@ class HistoryActivity : AppCompatActivity() {
     private var adapt: HistAdapter? = null
     private var histViewModel: HistViewModel? = null
     private var histories: List<HistoryItem> = ArrayList()
-    private var loading: ProgressBar? = null
-    private var waitLoad: ProgressBar? = null
-    private var rootLayout: CoordinatorLayout? = null
     private var width = 1080
     private var height = 1920
+    private lateinit var binding: ActivityHistoryBinding
 
     private fun sortList(sort: Int, list: List<HistoryItem>): List<HistoryItem> {
         return when (sort) {
@@ -78,10 +74,9 @@ class HistoryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_history)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        rootLayout = findViewById(R.id.hist_root)
-        waitLoad = findViewById(R.id.wait)
+        binding = ActivityHistoryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val toolbar = binding.toolbar
         setSupportActionBar(toolbar)
         val sortIcon: Drawable = ContextCompat.getDrawable(applicationContext, R.drawable.ic_sort)!!
         val prefs = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
@@ -94,10 +89,9 @@ class HistoryActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
         }
-        loading = findViewById(R.id.hist_loading)
         histViewModel = ViewModelProvider(this@HistoryActivity).get(HistViewModel(application)::class.java)
         adapt = HistAdapter(this)
-        val recycler = findViewById<RecyclerView>(R.id.hist_scroll).apply {
+        val recycler = binding.histScroll.apply {
             adapter = adapt
             layoutManager = LinearLayoutManager(getCon())
         }
@@ -125,14 +119,14 @@ class HistoryActivity : AppCompatActivity() {
             histJob = uiScope.launch {
                 json = convertToJSON(histories)
             }
-            findViewById<View>(R.id.hist_empty).visibility = if (adapt!!.itemCount == 0) View.VISIBLE else View.GONE
+            binding.histEmpty.visibility = if (adapt!!.itemCount == 0) View.VISIBLE else View.GONE
         })
         recycler.addOnItemTouchListener(RecyclerListener(this, recycler, object : RecyclerListener.OnItemClickListener {
             override fun onLongItemClick(view: View?, position: Int) {}
 
             override fun onItemClick(view: View, position: Int) {
                 if (histJob!!.isActive) {
-                    Snackbar.make(rootLayout!!, "Please wait...", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, "Please wait...", Snackbar.LENGTH_SHORT).show()
                     return
                 }
 
@@ -154,7 +148,7 @@ class HistoryActivity : AppCompatActivity() {
             }
         }))
 
-        val speedView = findViewById<SpeedDialView>(R.id.speedDial)
+        val speedView = binding.speedDial
         speedView.inflate(R.menu.fab_menu)
         speedView.setOnActionSelectedListener(SpeedDialView.OnActionSelectedListener { actionItem ->
             when (actionItem.id) {
@@ -165,12 +159,12 @@ class HistoryActivity : AppCompatActivity() {
                                 setMessage("Do you want to clear ${histories.size} history items?")
                                 setPositiveButton("Yes") { _, _ ->
                                     histViewModel!!.deleteAll()
-                                    Snackbar.make(rootLayout!!, "Cleared history", Snackbar.LENGTH_SHORT).show()
+                                    Snackbar.make(binding.root, "Cleared history", Snackbar.LENGTH_SHORT).show()
                                     //Toast.makeText(this@HistoryActivity, "Cleared history", Toast.LENGTH_SHORT).show()
                                 }
                                 setNegativeButton("No") { _, _ ->
                                     //Toast.makeText(this@HistoryActivity, "Cancelled", Toast.LENGTH_SHORT).show()
-                                    Snackbar.make(rootLayout!!, "Cancelled", Snackbar.LENGTH_SHORT).show()
+                                    Snackbar.make(binding.root, "Cancelled", Snackbar.LENGTH_SHORT).show()
                                 }
                             }
                     confirmDelete.show()
@@ -184,7 +178,7 @@ class HistoryActivity : AppCompatActivity() {
                     } else {
                         if (histories.isEmpty()) {
                             //Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
-                            Snackbar.make(rootLayout!!, "No items", Snackbar.LENGTH_SHORT).show()
+                            Snackbar.make(binding.root, "No items", Snackbar.LENGTH_SHORT).show()
                             return@OnActionSelectedListener false
                         }
                         uiScope.launch {
@@ -196,7 +190,7 @@ class HistoryActivity : AppCompatActivity() {
                 R.id.random -> {
                     if (histories.isEmpty()) {
                         //Toast.makeText(getCon(), "No items", Toast.LENGTH_SHORT).show()
-                        Snackbar.make(rootLayout!!, "No items", Snackbar.LENGTH_SHORT).show()
+                        Snackbar.make(binding.root, "No items", Snackbar.LENGTH_SHORT).show()
                         return@OnActionSelectedListener false
                     }
 
@@ -276,7 +270,7 @@ class HistoryActivity : AppCompatActivity() {
                     downloadAllImages()
                 }
             } else {
-                Snackbar.make(rootLayout!!, "Cannot download, please grant permissions", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, "Cannot download, please grant permissions", Snackbar.LENGTH_SHORT).show()
                 //Toast.makeText(this, "Cannot download, please grant permissions", Toast.LENGTH_SHORT).show()
             }
         }
@@ -331,7 +325,7 @@ class HistoryActivity : AppCompatActivity() {
 
     private suspend fun convertToJSON(hists: List<HistoryItem>): String {
         var json = ""
-        waitLoad?.visibility = View.VISIBLE
+        binding.wait.visibility = View.VISIBLE
         withContext(Dispatchers.Default) {
             val bits = ArrayList<BitURL>()
             for (i in hists) {
@@ -345,7 +339,7 @@ class HistoryActivity : AppCompatActivity() {
             }
             json = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(bits)
         }
-        waitLoad?.visibility = View.GONE
+        binding.wait.visibility = View.GONE
         return json
     }
 
