@@ -43,7 +43,6 @@
                 tools:ignore="UselessParent">
 
                 <EditText
-                    android:imeOptions="actionSearch"
                     android:id="@+id/search"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -52,6 +51,7 @@
                     android:layout_weight="5"
                     android:background="@drawable/edit_states"
                     android:hint="mobilewallpaper"
+                    android:imeOptions="actionSearch"
                     android:importantForAutofill="no"
                     android:inputType="text"
                     android:padding="10dp"
@@ -140,64 +140,89 @@
                     android:textColor="@color/textColor"
                     android:textSize="22sp" />
 
-                <LinearLayout
-                    android:id="@+id/subInfoLayout"
+                <ScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
+                    android:onClick="toggleSubInfo">
 
-                    <TextView
-                        android:id="@+id/subName"
+                    <LinearLayout
+                        android:id="@+id/subInfoLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="14dp"
-                        android:layout_marginTop="14dp"
-                        android:layout_marginEnd="14dp"
-                        android:drawableStart="@drawable/ic_android"
-                        android:drawablePadding="12dp"
-                        android:gravity="center_vertical"
-                        android:text="Name"
-                        android:textColor="@color/textColor"
-                        android:textSize="24sp" />
-
-                    <TextView
-                        android:id="@+id/subSubs"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="14dp"
-                        android:layout_marginTop="6dp"
-                        android:layout_marginEnd="14dp"
-                        android:layout_marginBottom="8dp"
-                        android:gravity="center_vertical"
-                        android:text="Subscribers: 1,000,000"
-                        android:textColor="@color/secondary"
-                        android:textSize="20sp" />
-
-                    <TextView
-                        android:id="@+id/subDesc"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="14dp"
-                        android:layout_marginEnd="14dp"
-                        android:layout_marginBottom="2dp"
-                        android:gravity="center_vertical"
-                        android:text="This is a description of the subreddit"
-                        android:textColor="@color/textColor"
-                        android:textSize="18sp" />
-
-                    <ImageView
-                        android:id="@+id/collapseInfo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:contentDescription="Collapse"
                         android:onClick="toggleSubInfo"
-                        android:src="@drawable/ic_up" />
-                </LinearLayout>
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/subIcon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:layout_marginTop="14dp"
+                                android:layout_marginEnd="14dp"
+                                android:background="@drawable/rounded_sub"
+                                android:contentDescription="sub icon"
+                                android:padding="4dp"
+                                android:src="@drawable/ic_android" />
+
+                            <TextView
+                                android:id="@+id/subName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginStart="2dp"
+                                android:layout_marginTop="14dp"
+                                android:layout_marginEnd="14dp"
+                                android:drawableStart="@drawable/ic_android"
+                                android:drawablePadding="12dp"
+                                android:gravity="center_vertical"
+                                android:text="Name"
+                                android:textColor="@color/textColor"
+                                android:textSize="24sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/subSubs"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="14dp"
+                            android:layout_marginTop="6dp"
+                            android:layout_marginEnd="14dp"
+                            android:layout_marginBottom="8dp"
+                            android:gravity="center_vertical"
+                            android:text="Subscribers: 1,000,000"
+                            android:textColor="@color/secondary"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/subDesc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="14dp"
+                            android:layout_marginEnd="14dp"
+                            android:layout_marginBottom="2dp"
+                            android:gravity="center_vertical"
+                            android:text="This is a description of the subreddit"
+                            android:textColor="@color/textColor"
+                            android:textSize="18sp" />
+
+                        <ImageView
+                            android:id="@+id/collapseInfo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:contentDescription="Collapse"
+                            android:onClick="toggleSubInfo"
+                            android:src="@drawable/ic_up" />
+                    </LinearLayout>
+                </ScrollView>
             </androidx.cardview.widget.CardView>
 
             <TextView
@@ -206,8 +231,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center"
-                android:gravity="center"
                 android:layout_margin="16dp"
+                android:gravity="center"
                 android:text="LOADING..."
                 android:textColor="@color/textColor"
                 android:textSize="26sp"
@@ -224,14 +249,14 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/imageScroll"
-                android:clipToPadding="false"
-                android:paddingBottom="70dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/subInfo"
                 android:layout_marginStart="6dp"
                 android:layout_marginTop="-2dp"
                 android:layout_marginEnd="6dp"
+                android:clipToPadding="false"
+                android:paddingBottom="70dp"
                 android:scrollbars="vertical"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 

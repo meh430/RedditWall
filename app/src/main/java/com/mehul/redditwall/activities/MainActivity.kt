@@ -10,7 +10,6 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.os.Bundle
@@ -452,10 +451,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                             .into(object : CustomTarget<Bitmap>() {
                                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                                     Log.e("FLAG", "GOT HERE")
-                                    binding.subName.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                                            BitmapDrawable(resources, resource),
-                                            null, null, null)
-
+                                    binding.subIcon.setImageBitmap(resource)
                                 }
 
                                 override fun onLoadCleared(placeholder: Drawable?) {}
@@ -468,8 +464,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     if (iconUrl.isEmpty() || iconUrl.isBlank()) {
                         Log.e("FLAG", "GOT HERE2")
                         val def = ContextCompat.getDrawable(applicationContext, R.drawable.ic_android)
-                        def?.setTint(resources.getColor(R.color.textColor))
-                        binding.subName.setCompoundDrawablesRelativeWithIntrinsicBounds(def, null, null, null)
+                        def?.setTint(resources.getColor(R.color.colorPrimary))
+                        binding.subIcon.setImageDrawable(def)
                     }
                 }
             } catch (e: JSONException) {
