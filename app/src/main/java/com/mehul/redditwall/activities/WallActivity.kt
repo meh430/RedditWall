@@ -43,9 +43,9 @@ import com.mehul.redditwall.viewmodels.HistViewModel
 import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONException
-import java.io.*
-import java.net.HttpURLConnection
-import java.net.URL
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -526,7 +526,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         binding.imageSize.text = "Size: Loading..."
         binding.subreddit.text = "Subreddit: Loading..."
         withContext(Dispatchers.Default) {
-            val postJson = async { getPostJSON() }
+            val postJson = async { MainActivity.getJsonData("$postLink.json") }
 
             try {
                 val jsonList = JSONArray(postJson.await())
@@ -577,63 +577,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                 e.printStackTrace()
             }
         }
-    }
-
-    private suspend fun getPostJSON(): String {
-        var jsonString = ""
-        Log.e("POST", postLink)
-        withContext(Dispatchers.IO) {
-            val ENDPOINT = "$postLink.json"
-            var urlConnection: HttpURLConnection? = null
-            var reader: BufferedReader? = null
-            try {
-                val requestURL = URL(ENDPOINT)
-
-                urlConnection = requestURL.openConnection() as HttpURLConnection
-                urlConnection.requestMethod = "GET"
-                urlConnection.connect()
-
-                val inputStream = urlConnection.inputStream
-                reader = BufferedReader(InputStreamReader(inputStream))
-                val builder = StringBuilder()
-
-                var line: String? = reader.readLine()
-                while (line != null) {
-                    if (!isActive) {
-                        break
-                    }
-
-                    builder.append(line)
-                    builder.append("\n")
-                    line = reader.readLine()
-                }
-
-                if (!isActive) {
-                    jsonString = ""
-                }
-
-                if (builder.isEmpty()) {
-                    jsonString = ""
-                }
-
-                jsonString = builder.toString()
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                urlConnection?.disconnect()
-                if (reader != null) {
-                    try {
-                        reader.close()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-
-                }
-            }
-        }
-        Log.e("JSONN", jsonString)
-        return jsonString
     }
 
     private suspend fun startUp(con: Context) {

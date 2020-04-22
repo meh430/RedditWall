@@ -79,7 +79,6 @@
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="-8dp"
                 android:layout_marginEnd="4dp"
-                android:layout_marginBottom="4dp"
                 android:padding="8dp"
                 android:paddingStart="14dp"
                 android:paddingEnd="8dp">
@@ -118,6 +117,89 @@
                     app:checkedIconEnabled="false" />
             </com.google.android.material.chip.ChipGroup>
 
+            <androidx.cardview.widget.CardView
+                android:id="@+id/subInfo"
+                style="@style/cardViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/sorting"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="12dp"
+                android:onClick="toggleSubInfo"
+                android:padding="6dp">
+
+                <TextView
+                    android:id="@+id/infoTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="14dp"
+                    android:gravity="center"
+                    android:text="Sub Info"
+                    android:textColor="@color/textColor"
+                    android:textSize="22sp" />
+
+                <LinearLayout
+                    android:id="@+id/subInfoLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/subName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginTop="14dp"
+                        android:layout_marginEnd="14dp"
+                        android:drawableStart="@drawable/ic_android"
+                        android:drawablePadding="12dp"
+                        android:gravity="center_vertical"
+                        android:text="Name"
+                        android:textColor="@color/textColor"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/subSubs"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="14dp"
+                        android:layout_marginBottom="8dp"
+                        android:gravity="center_vertical"
+                        android:text="Subscribers: 1,000,000"
+                        android:textColor="@color/secondary"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/subDesc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginEnd="14dp"
+                        android:layout_marginBottom="2dp"
+                        android:gravity="center_vertical"
+                        android:text="This is a description of the subreddit"
+                        android:textColor="@color/textColor"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:id="@+id/collapseInfo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:contentDescription="Collapse"
+                        android:onClick="toggleSubInfo"
+                        android:src="@drawable/ic_up" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
             <TextView
                 android:id="@+id/info"
                 android:layout_width="wrap_content"
@@ -145,10 +227,10 @@
                 android:clipToPadding="false"
                 android:paddingBottom="70dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/sorting"
+                android:layout_height="match_parent"
+                android:layout_below="@id/subInfo"
                 android:layout_marginStart="6dp"
-                android:layout_marginTop="-4dp"
+                android:layout_marginTop="-2dp"
                 android:layout_marginEnd="6dp"
                 android:scrollbars="vertical"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
