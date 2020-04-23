@@ -8,22 +8,33 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mehul.redditwall.R
 import com.mehul.redditwall.databinding.ActivitySubBinding
+import com.mehul.redditwall.fragments.SavedSubsFragment
 import com.mehul.redditwall.fragments.SearchSubsFragment
 
 class SubActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySubBinding
+    private lateinit var searchFrag: SearchSubsFragment
+    private lateinit var savedFrag: SavedSubsFragment
+    private lateinit var fManager: FragmentManager
+    private lateinit var currFrag: Fragment
 
     private val bottomBarEvents = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.searchSubs -> {
-                inflateFragment(SearchSubsFragment.newInstance(), "Search Subreddits")
+                supportActionBar?.title = "Search Subreddits"
+                fManager.beginTransaction().hide(currFrag).show(searchFrag).commit()
+                currFrag = searchFrag
                 return@OnNavigationItemSelectedListener true
             }
             R.id.savedSubs -> {
+                supportActionBar?.title = "Saved Subreddits"
+                fManager.beginTransaction().hide(currFrag).show(savedFrag).commit()
+                currFrag = savedFrag
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -35,6 +46,12 @@ class SubActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySubBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        searchFrag = SearchSubsFragment.newInstance()
+        savedFrag = SavedSubsFragment.newInstance()
+        currFrag = searchFrag
+        fManager = supportFragmentManager
+        fManager.beginTransaction().add(R.id.fragment_holder, savedFrag, "save").hide(savedFrag).commit()
+        fManager.beginTransaction().add(R.id.fragment_holder, searchFrag, "search").commit()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.elevation = 0f
         supportActionBar?.title = "Search Subreddits"
@@ -45,17 +62,8 @@ class SubActivity : AppCompatActivity() {
         binding.toolbar.overflowIcon = sortIcon
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        inflateFragment(SearchSubsFragment.newInstance(), "Search Subreddits")
         binding.bottomNav.setOnNavigationItemSelectedListener(bottomBarEvents)
     }
-
-    private fun inflateFragment(fragment: Fragment, title: String) {
-        val transaction = supportFragmentManager.beginTransaction()
-        supportActionBar?.title = title
-        transaction.replace(R.id.fragment_holder, fragment)
-        transaction.commit()
-    }
-
 
     //menu stuff
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

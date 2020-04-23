@@ -16,7 +16,7 @@ import kotlin.collections.ArrayList
 class RecActivity : AppCompatActivity() {
     private var uiScope = CoroutineScope(Dispatchers.Main)
     private var recJob: Job? = null
-    private var adapter: RecAdapter? = null
+    private lateinit var adapter: RecAdapter
     private var recs = ArrayList<Recommendation>()
     private lateinit var binding: ActivityRecBinding
 
@@ -73,7 +73,7 @@ class RecActivity : AppCompatActivity() {
                 if (res.size != 0) {
                     recs.addAll(res)
                     recs.sortWith(Comparator { o1, o2 -> o1.name.compareTo(o2.name) })
-                    adapter?.notifyDataSetChanged()
+                    adapter.notifyDataSetChanged()
                 } else {
                     binding.recEmpty.visibility = View.VISIBLE
                 }

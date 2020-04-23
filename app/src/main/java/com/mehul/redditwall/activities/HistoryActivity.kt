@@ -49,7 +49,7 @@ class HistoryActivity : AppCompatActivity() {
     private var json = ""
     private var histJob: Job? = null
     private var adapt: HistAdapter? = null
-    private var histViewModel: HistViewModel? = null
+    private lateinit var histViewModel: HistViewModel
     private var histories: List<HistoryItem> = ArrayList()
     private var width = 1080
     private var height = 1920
@@ -108,12 +108,12 @@ class HistoryActivity : AppCompatActivity() {
                     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                         val position = viewHolder.adapterPosition
                         val saved = adapt!!.getHistory(position)
-                        histViewModel!!.deleteHist(saved)
+                        histViewModel.deleteHist(saved)
                         adapt!!.notifyDataSetChanged()
                     }
                 })
         helper.attachToRecyclerView(recycler)
-        histViewModel!!.allHist.observe(this, Observer { hists ->
+        histViewModel.allHist.observe(this, Observer { hists ->
             this.histories = sortList(currSort, hists)
             adapt!!.setHistories(histories)
             histJob = uiScope.launch {
@@ -158,7 +158,7 @@ class HistoryActivity : AppCompatActivity() {
                                 setTitle("Are You Sure?")
                                 setMessage("Do you want to clear ${histories.size} history items?")
                                 setPositiveButton("Yes") { _, _ ->
-                                    histViewModel!!.deleteAll()
+                                    histViewModel.deleteAll()
                                     Snackbar.make(binding.root, "Cleared history", Snackbar.LENGTH_SHORT).show()
                                     //Toast.makeText(this@HistoryActivity, "Cleared history", Toast.LENGTH_SHORT).show()
                                 }

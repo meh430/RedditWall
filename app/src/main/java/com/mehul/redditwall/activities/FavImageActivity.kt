@@ -39,8 +39,8 @@ import java.io.FileOutputStream
 
 @Suppress("DEPRECATION")
 class FavImageActivity : AppCompatActivity() {
-    private var adapt: FavAdapter? = null
-    private var favViewModel: FavViewModel? = null
+    private lateinit var adapt: FavAdapter
+    private lateinit var favViewModel: FavViewModel
     private var favImages: List<FavImage> = ArrayList()
     private var uiScope = CoroutineScope(Dispatchers.Main)
     private var favJob: Job? = null
@@ -71,12 +71,12 @@ class FavImageActivity : AppCompatActivity() {
                     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                         val position = viewHolder.adapterPosition
                         val saved = favImages[position]
-                        favViewModel!!.deleteFavImage(saved)
-                        adapt!!.notifyDataSetChanged()
+                        favViewModel.deleteFavImage(saved)
+                        adapt.notifyDataSetChanged()
                     }
                 })
         helper.attachToRecyclerView(recycler)
-        favViewModel?.allFav!!.observe(this, Observer { favs ->
+        favViewModel.allFav.observe(this, Observer { favs ->
             favImages = favs
             favJob = uiScope.launch {
                 loadFavBits(favs, getCon())
@@ -94,7 +94,7 @@ class FavImageActivity : AppCompatActivity() {
                                 setMessage("Do you want to clear ${favImages.size} favorite images?")
 
                                 setPositiveButton("Yes") { _, _ ->
-                                    favViewModel!!.deleteAll()
+                                    favViewModel.deleteAll()
                                     Snackbar.make(binding.root, "Deleted favorite images", Snackbar.LENGTH_SHORT).show()
                                     //Toast.makeText(this@FavImageActivity, "Deleted favorite images", Toast.LENGTH_SHORT).show()
                                 }
@@ -205,20 +205,20 @@ class FavImageActivity : AppCompatActivity() {
                     if (i == 0) {
                         binding.remaining.visibility = View.VISIBLE
                     } else if (i % 3 == 0) {
-                        adapt!!.setFavs(bits, favs)
+                        adapt.setFavs(bits, favs)
                         binding.favLoading.visibility = View.GONE
                     }
                 }
             }
 
             withContext(Dispatchers.Main) {
-                adapt!!.setFavs(bits, favs)
+                adapt.setFavs(bits, favs)
                 binding.remaining.visibility = View.GONE
             }
         }
 
         binding.favLoading.visibility = View.GONE
-        binding.favEmpty.visibility = if (adapt!!.itemCount == 0) View.VISIBLE else View.GONE
+        binding.favEmpty.visibility = if (adapt.itemCount == 0) View.VISIBLE else View.GONE
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -286,7 +286,7 @@ class FavImageActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (adapt?.itemCount != favImages.size && !favJob!!.isActive) {
+        if (adapt.itemCount != favImages.size && !favJob!!.isActive) {
             favJob = uiScope.launch {
                 loadFavBits(favImages, getCon())
             }

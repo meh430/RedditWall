@@ -28,7 +28,7 @@ class SearchSubsFragment : Fragment() {
 
     private val noResMessage = "No subreddits found"
     private val subsList = ArrayList<Subreddit>()
-    private var subAdapter: SubAdapter? = null
+    private lateinit var subAdapter: SubAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -56,16 +56,17 @@ class SearchSubsFragment : Fragment() {
         binding.subsScroll.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if (dy > 100) {
+                if (dy > 50) {
                     bottomBar?.visibility = View.GONE
 
                 } else {
-                    if (dy != 0 && dy < -100) {
+                    if (dy != 0 && dy < -50) {
                         bottomBar?.visibility = View.VISIBLE
                     }
                 }
             }
         })
+        subAdapter.setSubs(subsList)
     }
 
     private fun findSubreddits(v: View) {
@@ -109,11 +110,11 @@ class SearchSubsFragment : Fragment() {
             binding.noResults.text = noResMessage
             binding.noResults.visibility = View.VISIBLE
         } else {
-            subAdapter?.notifyDataSetChanged()
+            subAdapter.notifyDataSetChanged()
         }
         binding.subLoading.visibility = View.GONE
         binding.subsScroll.visibility = View.VISIBLE
-        subAdapter?.setSubs(subsList)
+        subAdapter.setSubs(subsList)
     }
 
     override fun onDestroyView() {
