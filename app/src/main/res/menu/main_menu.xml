@@ -30,12 +30,6 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/saved_subs"
-        android:orderInCategory="20"
-        android:title="Saved Subs"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/subreddits"
         android:orderInCategory="10"
         android:title="Subreddits"

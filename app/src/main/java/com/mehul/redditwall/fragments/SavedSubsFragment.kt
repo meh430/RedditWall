@@ -12,7 +12,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mehul.redditwall.R
+import com.mehul.redditwall.activities.SubActivity
 import com.mehul.redditwall.adapters.SubAdapter
 import com.mehul.redditwall.databinding.FragmentSavedSubsBinding
 import com.mehul.redditwall.objects.Subreddit
@@ -30,7 +32,7 @@ private var savedList: List<Subreddit> = ArrayList<Subreddit>()
 private lateinit var subViewModel: SubViewModel
 private lateinit var subAdapter: SubAdapter
 
-class SavedSubsFragment : Fragment() {
+class SavedSubsFragment : Fragment(), SubActivity.Sorting {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -50,7 +52,7 @@ class SavedSubsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         subViewModel = ViewModelProvider(this).get(SubViewModel::class.java)
-        subAdapter = SubAdapter(getCon())
+        subAdapter = SubAdapter(getCon(), subViewModel)
         binding.savedScroll.adapter = subAdapter
         binding.savedScroll.layoutManager = LinearLayoutManager(getCon())
         val helper = ItemTouchHelper(
@@ -70,6 +72,20 @@ class SavedSubsFragment : Fragment() {
                     }
                 })
         helper.attachToRecyclerView(binding.savedScroll)
+        val bottomBar = activity?.findViewById<BottomNavigationView>(R.id.bottomNav)
+        binding.savedScroll.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 50) {
+                    bottomBar?.visibility = View.GONE
+
+                } else {
+                    if (dy != 0 && dy < -50) {
+                        bottomBar?.visibility = View.VISIBLE
+                    }
+                }
+            }
+        })
         subViewModel.allSubs.observe(getCon() as LifecycleOwner, Observer { subreddits ->
             savedList = sortList(currSort, subreddits)
             subAdapter.setSubs(savedList)
@@ -101,5 +117,11 @@ class SavedSubsFragment : Fragment() {
 
         @JvmStatic
         fun newInstance() = SavedSubsFragment()
+    }
+
+    override fun sortOrder(sort: Int) {
+        savedList = sortList(sort, savedList)
+        currSort = sort
+        subAdapter.setSubs(savedList)
     }
 }

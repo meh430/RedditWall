@@ -57,7 +57,7 @@
         android:layout_gravity="center"
         android:layout_margin="16dp"
         android:gravity="center"
-        android:text="Search For A Subreddit"
+        android:text="Search for a Subreddit"
         android:textColor="@color/textColor"
         android:textSize="22sp"
         android:visibility="visible" />

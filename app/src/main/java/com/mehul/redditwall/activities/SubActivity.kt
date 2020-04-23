@@ -9,11 +9,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.mehul.redditwall.R
 import com.mehul.redditwall.databinding.ActivitySubBinding
 import com.mehul.redditwall.fragments.SavedSubsFragment
 import com.mehul.redditwall.fragments.SearchSubsFragment
+import com.mehul.redditwall.viewmodels.SubViewModel
 
 class SubActivity : AppCompatActivity() {
 
@@ -22,6 +26,8 @@ class SubActivity : AppCompatActivity() {
     private lateinit var savedFrag: SavedSubsFragment
     private lateinit var fManager: FragmentManager
     private lateinit var currFrag: Fragment
+    private lateinit var subViewModel: SubViewModel
+    private lateinit var sortChoice: Sorting
 
     private val bottomBarEvents = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -46,8 +52,13 @@ class SubActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySubBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        subViewModel = ViewModelProvider(this).get(SubViewModel::class.java)
+
         searchFrag = SearchSubsFragment.newInstance()
         savedFrag = SavedSubsFragment.newInstance()
+
+        sortChoice = savedFrag as Sorting
+
         currFrag = searchFrag
         fManager = supportFragmentManager
         fManager.beginTransaction().add(R.id.fragment_holder, savedFrag, "save").hide(savedFrag).commit()
@@ -80,11 +91,11 @@ class SubActivity : AppCompatActivity() {
                 return true
             }
             56345564 -> {
-                /*val confirmSubs = MaterialAlertDialogBuilder(this, R.style.MyThemeOverlayAlertDialog).apply {
+                val confirmSubs = MaterialAlertDialogBuilder(this, R.style.MyThemeOverlayAlertDialog).apply {
                     setTitle("Are You Sure?")
-                    setMessage("Do you want to clear ${subs.size} saved subreddits?")
+                    setMessage("Do you want to clear all saved subreddits?")
                     setPositiveButton("Yes") { _, _ ->
-                        subViewModel!!.deleteAll()
+                        subViewModel.deleteAll()
                         //Toast.makeText(this@SavedActivity, "Deleted saved subs", Toast.LENGTH_SHORT).show()
                         Snackbar.make(binding.root, "Deleted saved subs", Snackbar.LENGTH_SHORT).show()
                     }
@@ -93,14 +104,16 @@ class SubActivity : AppCompatActivity() {
                     }
                 }
                 confirmSubs.show()
-                return true*/
                 return true
             }
             else -> {
-                //subs = sortList(currSort, subs)
-                //adapter?.setSubs(subs)
+                sortChoice.sortOrder(item.itemId)
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    public interface Sorting {
+        fun sortOrder(sort: Int)
     }
 }

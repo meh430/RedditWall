@@ -69,7 +69,7 @@ class ChangeWallpaper : BroadcastReceiver() {
                                 }
                             }
 
-                            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, current.favName,
+                            val histItem = HistoryItem((0..999999999).random(), current.favName,
                                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                                     HistoryItem.REFRESH, current.favUrl, current.postLink)
                             refreshHistory(histItem, con)

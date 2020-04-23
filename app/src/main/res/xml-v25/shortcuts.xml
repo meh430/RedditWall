@@ -26,7 +26,7 @@
         android:shortcutShortLabel="@string/saved_scut">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="com.mehul.redditwall.activities.SavedActivity"
+            android:targetClass="com.mehul.redditwall.activities.SubActivity"
             android:targetPackage="com.mehul.redditwall" />
         <!-- If your shortcut is associated with multiple intents, include them
              here. The last intent in the list determines what the user sees when

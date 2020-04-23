@@ -20,9 +20,13 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
             android:name=".activities.SubActivity"
             android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:windowSoftInputMode="stateHidden"
+            tools:ignore="LockedOrientationActivity" />
 
         <receiver
             android:name=".BootReceiver"
@@ -64,12 +68,6 @@
             android:name=".activities.FavImageActivity"
             android:label="Favorite Images"
             android:parentActivityName=".activities.MainActivity" />
-        <activity
-            android:name=".activities.SavedActivity"
-            android:label="Saved Reddits"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activities.SettingsActivity"
             android:label="Settings"

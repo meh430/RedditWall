@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/saveSubreddit"
+        android:orderInCategory="50"
+        android:title="Save" />
+    <item
+        android:id="@+id/setDefault"
+        android:icon="@drawable/ic_stars"
+        android:orderInCategory="60"
+        android:title="Set As Default" />
+</menu>

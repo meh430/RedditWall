@@ -10,6 +10,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -18,6 +19,7 @@ import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.adapters.SubAdapter
 import com.mehul.redditwall.databinding.FragmentSearchSubsBinding
 import com.mehul.redditwall.objects.Subreddit
+import com.mehul.redditwall.viewmodels.SubViewModel
 import kotlinx.coroutines.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -29,6 +31,7 @@ class SearchSubsFragment : Fragment() {
     private val noResMessage = "No subreddits found"
     private val subsList = ArrayList<Subreddit>()
     private lateinit var subAdapter: SubAdapter
+    private lateinit var subViewModel: SubViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -39,10 +42,12 @@ class SearchSubsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        subViewModel = ViewModelProvider(this).get(SubViewModel::class.java)
+
         binding.searchButton.setOnClickListener {
             findSubreddits(view)
         }
-        subAdapter = SubAdapter(getCon())
+        subAdapter = SubAdapter(getCon(), subViewModel)
         binding.search.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 findSubreddits(view)
