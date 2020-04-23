@@ -2,13 +2,13 @@ package com.mehul.redditwall.databases
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import com.mehul.redditwall.objects.SubSaved
+import com.mehul.redditwall.objects.Subreddit
 
 class SubRepository internal constructor(application: Context) {
     private val subDAO: SubDAO
-    val allSubSaved: LiveData<List<SubSaved>>
+    val allSubreddit: LiveData<List<Subreddit>>
 
-    suspend fun insert(saved: SubSaved) {
+    suspend fun insert(saved: Subreddit) {
         subDAO.insert(saved)
     }
 
@@ -16,13 +16,13 @@ class SubRepository internal constructor(application: Context) {
         subDAO.deleteAll()
     }
 
-    suspend fun deleteSubSaved(saved: SubSaved) {
-        subDAO.deleteSubSaved(saved)
+    suspend fun deleteSubreddit(saved: Subreddit) {
+        subDAO.deleteSubreddit(saved)
     }
 
     init {
         val db = SubRoomDatabase.getDatabase(application)
         subDAO = db!!.subDao()
-        allSubSaved = subDAO.allSubSaved
+        allSubreddit = subDAO.allSubreddit
     }
 }

@@ -178,8 +178,6 @@
                                 android:layout_marginStart="2dp"
                                 android:layout_marginTop="14dp"
                                 android:layout_marginEnd="14dp"
-                                android:drawableStart="@drawable/ic_android"
-                                android:drawablePadding="12dp"
                                 android:gravity="center_vertical"
                                 android:text="Name"
                                 android:textColor="@color/textColor"
@@ -229,7 +227,7 @@
                 android:id="@+id/info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
+                android:layout_below="@id/subInfo"
                 android:layout_gravity="center"
                 android:layout_margin="16dp"
                 android:gravity="center"
@@ -243,7 +241,7 @@
                 style="?android:attr/progressBarStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
+                android:layout_below="@id/subInfo"
                 android:layout_margin="12dp"
                 android:visibility="gone" />
 

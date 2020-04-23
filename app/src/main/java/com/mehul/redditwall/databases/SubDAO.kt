@@ -2,22 +2,22 @@ package com.mehul.redditwall.databases
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.mehul.redditwall.objects.SubSaved
+import com.mehul.redditwall.objects.Subreddit
 
 @Dao
 interface SubDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(saved: SubSaved)
+    fun insert(saved: Subreddit)
 
     @Query("DELETE FROM sub_table")
     fun deleteAll()
 
     @get:Query("SELECT * from sub_table ORDER BY sub_name ASC")
-    val allSubSaved: LiveData<List<SubSaved>>
+    val allSubreddit: LiveData<List<Subreddit>>
 
     @get:Query("SELECT * from sub_table LIMIT 1")
-    val anySubSaved: Array<SubSaved>
+    val anySubreddit: Array<Subreddit>
 
     @Delete
-    fun deleteSubSaved(saved: SubSaved)
+    fun deleteSubreddit(saved: Subreddit)
 }

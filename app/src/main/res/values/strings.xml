@@ -16,6 +16,9 @@
     <string name="saved_scut">Saved</string>
     <string name="hist_scut">History</string>
     <string name="set_scut">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
 
 

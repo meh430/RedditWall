@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.mehul.redditwall.objects.SubSaved
+import com.mehul.redditwall.objects.Subreddit
 
-@Database(entities = [SubSaved::class], version = 3, exportSchema = false)
+@Database(entities = [Subreddit::class], version = 3, exportSchema = false)
 abstract class SubRoomDatabase : RoomDatabase() {
     abstract fun subDao(): SubDAO
 

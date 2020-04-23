@@ -164,6 +164,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
+                    if (dy > 100) {
+                        binding.subInfo.visibility = View.GONE
+                    }
                     if (imageJob != null && imageJob!!.isActive) {
                         return
                     }
@@ -182,6 +185,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 } else {
                     binding.bottomLoad.visibility = View.INVISIBLE
+                    if (dy != 0 && dy < -100) {
+                        binding.subInfo.visibility = View.VISIBLE
+                    }
                 }
             }
 
@@ -261,6 +267,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     @InternalCoroutinesApi
     fun startSearch(view: View) {
+        binding.subInfo.visibility = View.VISIBLE
+
         AFTER_HOT = ""
         AFTER_NEW = ""
         AFTER_TOP = ""
@@ -302,11 +310,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.saved_subs -> {
-                val launchSaved = Intent(this, SavedActivity::class.java)
-                startActivity(launchSaved)
-                return true
-            }
             R.id.settings -> {
                 val launchSettings = Intent(this, SettingsActivity::class.java)
                 startActivity(launchSettings)
@@ -325,6 +328,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             R.id.history -> {
                 val launchHist = Intent(this, HistoryActivity::class.java)
                 startActivity(launchHist)
+                return true
+            }
+            R.id.subreddits -> {
+                val launchSubs = Intent(this, SubActivity::class.java)
+                startActivity(launchSubs)
                 return true
             }
         }
@@ -370,6 +378,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     @InternalCoroutinesApi
     override fun onClick(view: View) {
+        binding.subInfo.visibility = View.VISIBLE
+
         val temp: String? = when (currentSort) {
             NEW -> AFTER_NEW
             HOT -> AFTER_HOT
@@ -434,14 +444,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         binding.subSubs.text = "Loading..."
         binding.subDesc.text = "Loading..."
         withContext(Dispatchers.Default) {
-            val jsonString = async { getJsonData("https://www.reddit.com/r/${query}/about/.json") }
             try {
-                var json = JSONObject(jsonString.await())
-                json = json.getJSONObject("data")
-                val iconUrl = json.getString("icon_img")
-                val title = json.getString("display_name_prefixed")
-                val desc = json.getString("public_description")
-                val subs = json.getInt("subscribers")
+                val json = async { getSubInfo(query) }
+                val result = json.await().getJSONObject("data")
+                val iconUrl = result.getString("icon_img")
+                val title = result.getString("display_name_prefixed")
+                val desc = result.getString("public_description")
+                val subs = result.getInt("subscribers")
                 Log.e("ICON", iconUrl.toString())
                 if (iconUrl.isNotEmpty() || iconUrl.isNotBlank()) {
                     Glide.with(getCon())
@@ -464,7 +473,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     if (iconUrl.isEmpty() || iconUrl.isBlank()) {
                         Log.e("FLAG", "GOT HERE2")
                         val def = ContextCompat.getDrawable(applicationContext, R.drawable.ic_android)
-                        def?.setTint(resources.getColor(R.color.colorPrimary))
+                        def?.setTint(Color.BLACK)
                         binding.subIcon.setImageDrawable(def)
                     }
                 }
@@ -516,6 +525,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             val disp = DisplayMetrics()
             (con as Activity).windowManager.defaultDisplay.getMetrics(disp)
             return intArrayOf(disp.widthPixels, disp.heightPixels)
+        }
+
+        public suspend fun getSubInfo(subName: String): JSONObject {
+            var subInfo = JSONObject()
+            withContext(Dispatchers.Default) {
+                val endpoint = "https://www.reddit.com/r/$subName/about/.json"
+                val jsonString = async { MainActivity.getJsonData(endpoint) }
+                try {
+                    subInfo = JSONObject(jsonString.await())
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            }
+
+            return subInfo
         }
 
         public suspend fun getJsonData(endpoint: String): String {

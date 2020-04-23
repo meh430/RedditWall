@@ -19,6 +19,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".activities.SubActivity"
+            android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"
@@ -28,7 +33,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
         <receiver android:name=".NextWallpaper">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -38,7 +42,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/next_wallpaper_info" />
         </receiver>
-
         <receiver
             android:name=".ChangeWallpaper"
             android:enabled="true"
@@ -73,9 +76,8 @@
             android:parentActivityName=".activities.MainActivity"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="portrait"
             android:name=".activities.WallActivity"
+            android:configChanges="orientation|keyboardHidden"
             android:label="Image Preview"
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.ActionBar" />

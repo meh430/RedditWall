@@ -154,7 +154,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                                 if (wallLoc == WallpaperManager.FLAG_LOCK) HistoryItem.LOCK_SCREEN else HistoryItem.HOME_SCREEN
                             }
                             Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
-                            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query,
+                            val histItem = HistoryItem((0..999999999).random(), query,
                                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                                     wallSource, imgUrl, imageList[index].postLink)
                             histViewModel?.insert(histItem)
@@ -167,7 +167,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                             assert(wall != null)
                             wall?.setBitmap(bitmap)
                             Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
-                            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query,
+                            val histItem = HistoryItem((0..999999999).random(), query,
                                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                                     HistoryItem.BOTH, imgUrl, imageList[index].postLink)
                             histViewModel?.insert(histItem)
@@ -196,7 +196,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             }
             item.icon = filledStar
             Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
-            favViewModel?.insert(FavImage((Math.random() * 10000).toInt() + 1, imgUrl,
+            favViewModel?.insert(FavImage((0..999999999).random(), imgUrl,
                     isGif, imageList[index].postLink, query))
             return true
         }
@@ -337,7 +337,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             out.close()
             MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
             sendNotification()
-            val histItem = HistoryItem((Math.random() * 10000).toInt() + 1, query,
+            val histItem = HistoryItem((0..999999999).random(), query,
                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                     HistoryItem.DOWNLOADED, imgUrl, imageList[index].postLink)
             histViewModel?.insert(histItem)
