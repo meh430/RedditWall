@@ -2,6 +2,7 @@ package com.mehul.redditwall.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,11 +15,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mehul.redditwall.R
+import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SubActivity
 import com.mehul.redditwall.adapters.SubAdapter
 import com.mehul.redditwall.databinding.FragmentSavedSubsBinding
 import com.mehul.redditwall.objects.Subreddit
 import com.mehul.redditwall.viewmodels.SubViewModel
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -28,7 +31,7 @@ private var currSort = R.id.recent
 private var _binding: FragmentSavedSubsBinding? = null
 private val binding get() = _binding!!
 
-private var savedList: List<Subreddit> = ArrayList<Subreddit>()
+private var savedList: List<Subreddit> = ArrayList()
 private lateinit var subViewModel: SubViewModel
 private lateinit var subAdapter: SubAdapter
 
@@ -94,6 +97,10 @@ class SavedSubsFragment : Fragment(), SubActivity.Sorting {
             } else {
                 View.GONE
             }
+
+            CoroutineScope(Dispatchers.Main).launch {
+                updateInfo()
+            }
         })
     }
 
@@ -111,6 +118,25 @@ class SavedSubsFragment : Fragment(), SubActivity.Sorting {
                 { SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).parse(it.internalDate!!) })
             }
         }
+    }
+
+    private suspend fun updateInfo() {
+        withContext(Dispatchers.Default) {
+            for (sub in savedList) {
+                Log.e("SUBNAME", sub.subName)
+                val json = async { MainActivity.getSubInfo(sub.subName.replace("r/", "")) }
+                val result = json.await().getJSONObject("data")
+                sub.subIcon = result.getString("icon_img")
+                sub.subName = result.getString("display_name_prefixed")
+                sub.subDesc = result.getString("public_description")
+                sub.subscribers = result.getInt("subscribers")
+                if (sub.subName.contains("anime")) {
+                    Log.e("ANISUBS", sub.subscribers.toString())
+                }
+            }
+        }
+
+        subAdapter.notifyDataSetChanged()
     }
 
     companion object {
