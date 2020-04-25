@@ -15,7 +15,7 @@ import java.net.URL
 import java.util.*
 
 object RestRecs {
-    private val ENDPOINT = "https://reddtwalls-8176.restdb.io/rest/recommendations"
+    private const val ENDPOINT = "https://reddtwalls-8176.restdb.io/rest/recommendations"
 
     suspend fun getRecsJSON(): String {
         var jsonString = ""

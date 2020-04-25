@@ -52,7 +52,7 @@ import kotlin.collections.ArrayList
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-@Suppress("PrivatePropertyName", "DEPRECATION", "RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+@Suppress("PrivatePropertyName", "DEPRECATION", "RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "LocalVariableName")
 class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var jsonList: String? = ""
     private var notifyManager: NotificationManager? = null
@@ -201,31 +201,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             return true
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private suspend fun jsonToList(json: String): ArrayList<BitURL> {
-        val ret = ArrayList<BitURL>()
-        withContext(Dispatchers.Default) {
-            try {
-                val list = JSONArray(json)
-                for (i in 0 until list.length()) {
-                    val curr = list.getJSONObject(i)
-                    var gif = false
-                    if (curr.getBoolean("gif")) {
-                        gif = true
-                    }
-                    val temp = BitURL(null, curr.getString("url"), curr.getString("post"))
-                    temp.setGif(gif)
-                    withContext(Dispatchers.Main) {
-                        ret.add(temp)
-                    }
-                }
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-        }
-
-        return ret
     }
 
     @SuppressLint("SetTextI18n")
@@ -635,22 +610,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         Toast.makeText(con, "Done Loading", Toast.LENGTH_SHORT).show()
     }
 
-    companion object {
-        private const val PRIMARY_CHANNEL_ID = "primary_notification_channel"
-        private const val NOTIFICATION_ID = 0
-        const val WRITE = 1231
-        const val WALL_URL = "WALLURL"
-        const val GIF = "GIF"
-        const val LIST = "LIST"
-        const val INDEX = "INDEX"
-        const val FROM_FAV = "FAV_IMAGES"
-        const val FROM_HIST = "HIST_IMAGES"
-        const val FAV_LIST = "FAV_LIST"
-        var AFTER_NEW_WALL: String? = null
-        var AFTER_HOT_WALL: String? = null
-        var AFTER_TOP_WALL: String? = null
-    }
-
     fun launchSearch(view: View) {
         val launchMain = Intent(this, MainActivity::class.java)
         launchMain.apply {
@@ -711,6 +670,47 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             postIntent.putExtra(PostActivity.POST_LINK, "https://www.reddit.com/user/$author/")
             postIntent.putExtra(PostActivity.POST_TITLE, "u/${author}")
             startActivity(postIntent)
+        }
+    }
+
+    companion object {
+        private const val PRIMARY_CHANNEL_ID = "primary_notification_channel"
+        private const val NOTIFICATION_ID = 0
+        const val WRITE = 1231
+        const val WALL_URL = "WALLURL"
+        const val GIF = "GIF"
+        const val LIST = "LIST"
+        const val INDEX = "INDEX"
+        const val FROM_FAV = "FAV_IMAGES"
+        const val FROM_HIST = "HIST_IMAGES"
+        const val FAV_LIST = "FAV_LIST"
+        var AFTER_NEW_WALL: String? = null
+        var AFTER_HOT_WALL: String? = null
+        var AFTER_TOP_WALL: String? = null
+
+        suspend fun jsonToList(json: String): ArrayList<BitURL> {
+            val ret = ArrayList<BitURL>()
+            withContext(Dispatchers.Default) {
+                try {
+                    val list = JSONArray(json)
+                    for (i in 0 until list.length()) {
+                        val curr = list.getJSONObject(i)
+                        var gif = false
+                        if (curr.getBoolean("gif")) {
+                            gif = true
+                        }
+                        val temp = BitURL(null, curr.getString("url"), curr.getString("post"))
+                        temp.setGif(gif)
+                        withContext(Dispatchers.Main) {
+                            ret.add(temp)
+                        }
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            }
+
+            return ret
         }
     }
 }

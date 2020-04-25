@@ -9,7 +9,7 @@ import com.mehul.redditwall.objects.FavImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-public class FavViewModel(application: Application) : AndroidViewModel(application) {
+class FavViewModel(application: Application) : AndroidViewModel(application) {
     private val repo: FavRepository = FavRepository(application.applicationContext)
     val allFav: LiveData<List<FavImage>>
 

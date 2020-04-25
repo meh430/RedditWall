@@ -9,7 +9,7 @@ import com.mehul.redditwall.objects.Subreddit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-public class SubViewModel(application: Application) : AndroidViewModel(application) {
+class SubViewModel(application: Application) : AndroidViewModel(application) {
     private val repo: SubRepository = SubRepository(application.applicationContext)
     val allSubs: LiveData<List<Subreddit>>
 

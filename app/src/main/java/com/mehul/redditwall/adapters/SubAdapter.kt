@@ -135,7 +135,7 @@ class SubAdapter(private val con: Context, private val vm: SubViewModel)
         return subs[position]
     }
 
-    fun alreadySaved(name: String): Boolean {
+    private fun alreadySaved(name: String): Boolean {
         for (saved in saves) {
             if (saved.subName.equals(name, true)) {
                 return true
@@ -144,7 +144,7 @@ class SubAdapter(private val con: Context, private val vm: SubViewModel)
         return false
     }
 
-    fun findSaved(name: String): Subreddit? {
+    private fun findSaved(name: String): Subreddit? {
         for (saved in saves) {
             if (saved.subName.equals(name, true)) {
                 return saved

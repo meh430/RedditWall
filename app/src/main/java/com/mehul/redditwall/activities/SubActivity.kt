@@ -57,7 +57,7 @@ class SubActivity : AppCompatActivity() {
         searchFrag = SearchSubsFragment.newInstance()
         savedFrag = SavedSubsFragment.newInstance()
 
-        sortChoice = savedFrag as Sorting
+        sortChoice = savedFrag
 
         currFrag = searchFrag
         fManager = supportFragmentManager
@@ -113,7 +113,7 @@ class SubActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    public interface Sorting {
+    interface Sorting {
         fun sortOrder(sort: Int)
     }
 }

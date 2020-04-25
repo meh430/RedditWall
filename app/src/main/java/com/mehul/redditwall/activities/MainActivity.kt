@@ -146,7 +146,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         defaultLoad = (if (intent.getBooleanExtra(OVERRIDE, false)) {
             intent.getStringExtra(SAVED)
         } else {
-            if (intent.hasExtra(SplashActivity.MAIN) && intent.getBooleanExtra(SplashActivity.MAIN, false)) {
+            if (FIRST_RUN) {
+                FIRST_RUN = false
                 preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")
             } else {
                 preferences!!.getString(QUERY, preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper"))
@@ -155,6 +156,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         queryString = defaultLoad
         binding.search.hint = defaultLoad
         preferences?.edit()?.putString(QUERY, queryString)?.apply()
+
         if (networkAvailable()) {
             imageJob = uiScope.launch {
                 loadSubInfo(queryString)
@@ -522,6 +524,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     companion object {
+        var FIRST_RUN = true
         const val SharedPrefFile = "com.mehul.redditwall"
         const val SAVED = "SAVED"
         const val OVERRIDE = "OVERRIDE"

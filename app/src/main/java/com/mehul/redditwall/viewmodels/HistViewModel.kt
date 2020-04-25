@@ -9,7 +9,7 @@ import com.mehul.redditwall.objects.HistoryItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-public class HistViewModel(application: Application) : AndroidViewModel(application) {
+class HistViewModel(application: Application) : AndroidViewModel(application) {
     private val repo: HistoryRepository = HistoryRepository(application.applicationContext)
     val allHist: LiveData<List<HistoryItem>>
 

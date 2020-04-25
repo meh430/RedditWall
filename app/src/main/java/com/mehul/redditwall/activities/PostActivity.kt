@@ -55,12 +55,12 @@ class PostActivity : AppCompatActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (binding.webPost.canGoBack()) {
+            return if (binding.webPost.canGoBack()) {
                 binding.webPost.goBack()
-                return true
+                true
             } else {
                 super.onBackPressed()
-                return true
+                true
             }
         }
         return super.onKeyDown(keyCode, event)
