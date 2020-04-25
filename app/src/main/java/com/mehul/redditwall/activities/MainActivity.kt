@@ -143,14 +143,18 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         binding.hotChip.setOnClickListener(this)
         binding.newChip.setOnClickListener(this)
         binding.topChip.setOnClickListener(this)
-        val savedIntent = intent
-        defaultLoad = (if (savedIntent.getBooleanExtra(OVERRIDE, false)) {
-            savedIntent.getStringExtra(SAVED)
+        defaultLoad = (if (intent.getBooleanExtra(OVERRIDE, false)) {
+            intent.getStringExtra(SAVED)
         } else {
-            preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")
+            if (intent.hasExtra(SplashActivity.MAIN) && intent.getBooleanExtra(SplashActivity.MAIN, false)) {
+                preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper")
+            } else {
+                preferences!!.getString(QUERY, preferences!!.getString(SettingsActivity.DEFAULT, "mobilewallpaper"))
+            }
         }).toString()
         queryString = defaultLoad
         binding.search.hint = defaultLoad
+        preferences?.edit()?.putString(QUERY, queryString)?.apply()
         if (networkAvailable()) {
             imageJob = uiScope.launch {
                 loadSubInfo(queryString)
@@ -286,12 +290,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         if (networkAvailable()) {
             if (queryString.isNotEmpty()) {
+                preferences?.edit()?.putString(QUERY, queryString)?.apply()
                 imageJob = uiScope.launch {
                     loadSubInfo(queryString)
                     loadImages(getCon(), queryString, true, getList())
                 }
             } else {
                 queryString = defaultLoad
+                preferences?.edit()?.putString(QUERY, queryString)?.apply()
                 imageJob = uiScope.launch {
                     loadSubInfo(queryString)
                     loadImages(getCon(), defaultLoad, true, getList())
@@ -509,6 +515,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    fun toggleSubInfo(view: View) {
+        infoShown = !infoShown
+        binding.subInfoLayout.visibility = if (infoShown) View.VISIBLE else View.GONE
+        binding.infoTitle.visibility = if (infoShown) View.GONE else View.VISIBLE
+    }
+
     companion object {
         const val SharedPrefFile = "com.mehul.redditwall"
         const val SAVED = "SAVED"
@@ -521,17 +533,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         var AFTER_HOT: String? = null
         var AFTER_TOP: String? = null
 
-        public fun getDimensions(con: Context): IntArray {
+        fun getDimensions(con: Context): IntArray {
             val disp = DisplayMetrics()
             (con as Activity).windowManager.defaultDisplay.getMetrics(disp)
             return intArrayOf(disp.widthPixels, disp.heightPixels)
         }
 
-        public suspend fun getSubInfo(subName: String): JSONObject {
+        suspend fun getSubInfo(subName: String): JSONObject {
             var subInfo = JSONObject()
             withContext(Dispatchers.Default) {
                 val endpoint = "https://www.reddit.com/r/$subName/about/.json"
-                val jsonString = async { MainActivity.getJsonData(endpoint) }
+                val jsonString = async { getJsonData(endpoint) }
                 try {
                     subInfo = JSONObject(jsonString.await())
                 } catch (e: JSONException) {
@@ -542,7 +554,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             return subInfo
         }
 
-        public suspend fun getJsonData(endpoint: String): String {
+        suspend fun getJsonData(endpoint: String): String {
             var jsonString = ""
             withContext(Dispatchers.IO) {
                 var urlConnection: HttpURLConnection? = null
@@ -596,11 +608,5 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             Log.e("JSON", jsonString)
             return jsonString
         }
-    }
-
-    fun toggleSubInfo(view: View) {
-        infoShown = !infoShown
-        binding.subInfoLayout.visibility = if (infoShown) View.VISIBLE else View.GONE
-        binding.infoTitle.visibility = if (infoShown) View.GONE else View.VISIBLE
     }
 }

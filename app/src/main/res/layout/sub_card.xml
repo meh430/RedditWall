@@ -21,6 +21,7 @@
             android:orientation="horizontal">
 
             <ImageView
+                android:scaleType="centerCrop"
                 android:id="@+id/subIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

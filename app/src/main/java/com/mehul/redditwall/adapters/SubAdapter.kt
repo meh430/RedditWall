@@ -172,12 +172,13 @@ class SubAdapter(private val con: Context, private val vm: SubViewModel)
             subTv.text = sub.subName
             subNumTv.text = "Subscribers: ${NumberFormat.getNumberInstance(Locale.US).format(sub.subscribers)}"
             subDescTv.text = sub.subDesc
+            icon.clipToOutline = true
             if (sub.subIcon.isEmpty() || sub.subIcon.isBlank()) {
                 val def = ContextCompat.getDrawable(con.applicationContext, R.drawable.ic_android)
                 def?.setTint(Color.BLACK)
                 icon.setImageDrawable(def)
             } else {
-                Glide.with(con).load(sub.subIcon).override(200, 200).into(icon)
+                Glide.with(con).load(sub.subIcon).override(200, 200).centerCrop().into(icon)
             }
         }
     }
