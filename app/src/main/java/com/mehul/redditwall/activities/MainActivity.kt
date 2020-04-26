@@ -63,6 +63,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var uiScope = CoroutineScope(Dispatchers.Main)
     private var currentSort: Int = 0
     private var infoShown = false
+    private var infoPref = true
     private var preferences: SharedPreferences? = null
 
     private lateinit var binding: ActivityMainBinding
@@ -112,6 +113,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
         }))
         preferences = getSharedPreferences(SharedPrefFile, Context.MODE_PRIVATE)
+
+        infoPref = preferences!!.getBoolean(SettingsActivity.SHOW_INFO, true)
+        binding.subInfo.visibility = if (infoPref) View.VISIBLE else View.GONE
         val dark = preferences!!.getBoolean(SettingsActivity.DARK, false)
         if (dark) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -171,7 +175,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
                     if (dy > 100) {
-                        binding.subInfo.visibility = View.GONE
+                        if (infoPref) {
+                            binding.subInfo.visibility = View.GONE
+                            infoShown = true
+                            toggleSubInfo(binding.subInfoLayout)
+                        }
                     }
                     if (imageJob != null && imageJob!!.isActive) {
                         return
@@ -191,8 +199,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 } else {
                     binding.bottomLoad.visibility = View.INVISIBLE
-                    if (dy != 0 && dy < -100) {
-                        binding.subInfo.visibility = View.VISIBLE
+                    if (infoPref) {
+                        if (dy != 0 && dy < -100) {
+                            binding.subInfo.visibility = View.VISIBLE
+                            infoShown = true
+                            toggleSubInfo(binding.subInfoLayout)
+                        }
                     }
                 }
             }
@@ -518,9 +530,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     fun toggleSubInfo(view: View) {
-        infoShown = !infoShown
-        binding.subInfoLayout.visibility = if (infoShown) View.VISIBLE else View.GONE
-        binding.infoTitle.visibility = if (infoShown) View.GONE else View.VISIBLE
+        if (infoPref) {
+            infoShown = !infoShown
+            binding.subInfoLayout.visibility = if (infoShown) View.VISIBLE else View.GONE
+            binding.infoTitle.visibility = if (infoShown) View.GONE else View.VISIBLE
+        }
     }
 
     companion object {

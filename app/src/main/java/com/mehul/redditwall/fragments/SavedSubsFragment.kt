@@ -58,6 +58,8 @@ class SavedSubsFragment : Fragment(), SubActivity.Sorting {
         subAdapter = SubAdapter(getCon(), subViewModel)
         binding.savedScroll.adapter = subAdapter
         binding.savedScroll.layoutManager = LinearLayoutManager(getCon())
+        currSort = getCon().getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+                .getInt(SubActivity.LIST_SORT, R.id.recent)
         val helper = ItemTouchHelper(
                 object : ItemTouchHelper.SimpleCallback(0,
                         ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {

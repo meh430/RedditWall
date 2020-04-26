@@ -24,7 +24,7 @@ import java.io.File
 
 
 class SettingsActivity : AppCompatActivity() {
-    private var preferences: SharedPreferences? = null
+    private lateinit var preferences: SharedPreferences
     private var dark = false
     private var alarmChanged = false
     private var stateChanged = false
@@ -45,22 +45,23 @@ class SettingsActivity : AppCompatActivity() {
         wallChangeIntent?.action = "CHANGE_WALL"
         pending = PendingIntent.getBroadcast(this, 2, wallChangeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         binding.changeIntervalTitle.visibility = View.GONE
-        dark = preferences!!.getBoolean(DARK, false)
+        dark = preferences.getBoolean(DARK, false)
         binding.darkSwitch.isChecked = dark
-        binding.gifSwitch.isChecked = preferences!!.getBoolean(LOAD_GIF, false)
-        binding.downloadOrigin.isChecked = preferences!!.getBoolean(DOWNLOAD_ORIGIN, false)
-        binding.randomSwitch.isChecked = preferences!!.getBoolean(RANDOM_ENABLED, false)
+        binding.gifSwitch.isChecked = preferences.getBoolean(LOAD_GIF, false)
+        binding.downloadOrigin.isChecked = preferences.getBoolean(DOWNLOAD_ORIGIN, false)
+        binding.randomSwitch.isChecked = preferences.getBoolean(RANDOM_ENABLED, false)
+        binding.showInfoCard.isChecked = preferences.getBoolean(SHOW_INFO, true)
         if (binding.randomSwitch.isChecked) {
             binding.refreshLocationSetting.visibility = View.VISIBLE
             binding.changeIntervalTitle.visibility = View.VISIBLE
             binding.randomSeekSection.visibility = View.VISIBLE
         }
-        binding.intervalSeek.progress = preferences!!.getInt(RANDOM_INTERVAL, 0)
+        binding.intervalSeek.progress = preferences.getInt(RANDOM_INTERVAL, 0)
         binding.intervalCount.text = (binding.intervalSeek.progress + 1).toString() + " hrs"
-        binding.scaleSeek.progress = preferences!!.getInt(LOAD_SCALE, 0)
+        binding.scaleSeek.progress = preferences.getInt(LOAD_SCALE, 0)
         binding.scaleCount.text = ((binding.scaleSeek.progress + 1) * 2).toString() + "X"
         binding.randomSwitch.setOnCheckedChangeListener { _, b ->
-            preferences!!.edit().putBoolean(RANDOM_ENABLED, b).apply()
+            preferences.edit().putBoolean(RANDOM_ENABLED, b).apply()
             alarmChanged = b
             if (b) {
                 binding.refreshLocationSetting.visibility = View.VISIBLE
@@ -73,10 +74,10 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
         binding.gifSwitch.setOnCheckedChangeListener { _, b ->
-            preferences!!.edit().putBoolean(LOAD_GIF, b).apply()
+            preferences.edit().putBoolean(LOAD_GIF, b).apply()
         }
         binding.downloadOrigin.setOnCheckedChangeListener { _, b ->
-            preferences!!.edit().putBoolean(DOWNLOAD_ORIGIN, b).apply()
+            preferences.edit().putBoolean(DOWNLOAD_ORIGIN, b).apply()
         }
         binding.darkSwitch.setOnCheckedChangeListener { _, b ->
             dark = b
@@ -88,6 +89,9 @@ class SettingsActivity : AppCompatActivity() {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 delegate.applyDayNight()
             }
+        }
+        binding.showInfoCard.setOnCheckedChangeListener { _, b ->
+            preferences.edit().putBoolean(SHOW_INFO, b).apply()
         }
         binding.scaleSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
@@ -115,7 +119,7 @@ class SettingsActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
         val randButton = binding.randomLocationButton
-        when (preferences!!.getInt(RANDOM_LOCATION, 2)) {
+        when (preferences.getInt(RANDOM_LOCATION, 2)) {
             0 -> {
                 randButton.text = "HOME"
             }
@@ -130,23 +134,23 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         val dims = MainActivity.getDimensions(this)
-        val width = preferences!!.getInt(IMG_WIDTH, dims[0])
-        val height = preferences!!.getInt(IMG_HEIGHT, dims[1])
+        val width = preferences.getInt(IMG_WIDTH, dims[0])
+        val height = preferences.getInt(IMG_HEIGHT, dims[1])
         binding.widthEdit.setText(width.toString() + "")
         binding.heightEdit.setText(height.toString() + "")
 
-        val defaultSub = preferences!!.getString(DEFAULT, "mobilewallpaper")
+        val defaultSub = preferences.getString(DEFAULT, "mobilewallpaper")
         binding.defaultEdit.setText(defaultSub)
     }
 
     public override fun onPause() {
         super.onPause()
         var valid = true
-        val preferenceEditor = preferences!!.edit()
+        val preferenceEditor = preferences.edit()
         preferenceEditor.putInt(LOAD_SCALE, binding.scaleSeek.progress)
         preferenceEditor.putBoolean(DARK, dark)
         preferenceEditor.putInt(RANDOM_INTERVAL, binding.intervalSeek.progress)
-        val setRefresh = preferences!!.getBoolean(RANDOM_ENABLED, false) && alarmChanged
+        val setRefresh = preferences.getBoolean(RANDOM_ENABLED, false) && alarmChanged
 
         if (setRefresh) {
             val interval = (binding.intervalSeek.progress + 1) * 60 * 60 * 1000
@@ -156,7 +160,7 @@ class SettingsActivity : AppCompatActivity() {
                 wallAlarm!!.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, interval.toLong(), pending)
             }
         } else {
-            if (wallAlarm != null && !preferences!!.getBoolean(RANDOM_ENABLED, false)) {
+            if (wallAlarm != null && !preferences.getBoolean(RANDOM_ENABLED, false)) {
                 Toast.makeText(this, "Random refresh disabled", Toast.LENGTH_SHORT).show()
                 wallAlarm!!.cancel(pending!!)
             }
@@ -194,6 +198,7 @@ class SettingsActivity : AppCompatActivity() {
 
     companion object {
         //pref keys
+        const val SHOW_INFO = "INFOCARD"
         const val SORT_METHOD = "SORTIMG"
         const val IMG_WIDTH = "WIDTH"
         const val IMG_HEIGHT = "HEIGHT"
@@ -218,17 +223,17 @@ class SettingsActivity : AppCompatActivity() {
                     when (i) {
                         0 -> {
                             but.text = "HOME"
-                            preferences?.edit()?.putInt(RANDOM_LOCATION, HOME)?.apply()
+                            preferences.edit()?.putInt(RANDOM_LOCATION, HOME)?.apply()
                         }
 
                         1 -> {
                             but.text = "LOCK"
-                            preferences?.edit()?.putInt(RANDOM_LOCATION, LOCK)?.apply()
+                            preferences.edit()?.putInt(RANDOM_LOCATION, LOCK)?.apply()
                         }
 
                         2 -> {
                             but.text = "BOTH"
-                            preferences?.edit()?.putInt(RANDOM_LOCATION, BOTH)?.apply()
+                            preferences.edit()?.putInt(RANDOM_LOCATION, BOTH)?.apply()
                         }
 
                         else -> {

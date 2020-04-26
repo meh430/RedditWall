@@ -1,6 +1,7 @@
 package com.mehul.redditwall.activities
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
@@ -28,6 +29,7 @@ class SubActivity : AppCompatActivity() {
     private lateinit var currFrag: Fragment
     private lateinit var subViewModel: SubViewModel
     private lateinit var sortChoice: Sorting
+    private lateinit var prefs: SharedPreferences
 
     private val bottomBarEvents = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -53,12 +55,12 @@ class SubActivity : AppCompatActivity() {
         binding = ActivitySubBinding.inflate(layoutInflater)
         setContentView(binding.root)
         subViewModel = ViewModelProvider(this).get(SubViewModel::class.java)
+        prefs = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
 
         searchFrag = SearchSubsFragment.newInstance()
         savedFrag = SavedSubsFragment.newInstance()
 
         sortChoice = savedFrag
-
         currFrag = searchFrag
         fManager = supportFragmentManager
         fManager.beginTransaction().add(R.id.fragment_holder, savedFrag, "save").hide(savedFrag).commit()
@@ -107,6 +109,7 @@ class SubActivity : AppCompatActivity() {
                 return true
             }
             else -> {
+                prefs.edit().putInt(LIST_SORT, item.itemId).apply()
                 sortChoice.sortOrder(item.itemId)
             }
         }
@@ -115,5 +118,9 @@ class SubActivity : AppCompatActivity() {
 
     interface Sorting {
         fun sortOrder(sort: Int)
+    }
+
+    companion object {
+        const val LIST_SORT = "LIST_SORT_ORDER"
     }
 }
