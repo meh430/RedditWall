@@ -3,15 +3,12 @@ package com.mehul.redditwall.adapters
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.ColorDrawable
-import android.util.Log
+import android.graphics.drawable.ScaleDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -84,7 +81,7 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
 
         fun bindTo(saved: BitURL, p: Int) {
             val url = saved.url
-            if (saved.hasGif()) {
+            /*if (saved.hasGif()) {
                 Glide.with(con).asGif().load(url).override(width / scale, height / 4).into(img)
             } else {
                 try {
@@ -110,12 +107,19 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
                         favs[p].img = (img.drawable as BitmapDrawable).bitmap
                     }
                 }
-            }
-            /*if (saved.hasGif()) {
+            }*/
+            val temp = ContextCompat.getDrawable(con, R.drawable.ic_android)
+            val errorDraw = ScaleDrawable(temp, 0, (width / scale).toFloat(), (height / 4).toFloat())
+            if (saved.hasGif()) {
                 Glide.with(con).asGif().load(url).override(width / scale, height / 4).centerCrop().into(img)
             } else {
-                img.setImageBitmap(saved.img)
-            }*/
+                if (saved.img == null) {
+                    Glide.with(con).load(url).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).error(errorDraw).placeholder(errorDraw)
+                            .override(width / scale, height / 4).centerCrop().into(img)
+                } else {
+                    img.setImageBitmap(saved.img)
+                }
+            }
         }
     }
 }

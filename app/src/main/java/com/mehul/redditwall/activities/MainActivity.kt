@@ -285,7 +285,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     @InternalCoroutinesApi
     fun startSearch(view: View) {
-        binding.subInfo.visibility = View.VISIBLE
+        binding.subInfo.visibility = if (infoPref) View.VISIBLE else View.GONE
 
         AFTER_HOT = ""
         AFTER_NEW = ""
@@ -398,7 +398,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     @InternalCoroutinesApi
     override fun onClick(view: View) {
-        binding.subInfo.visibility = View.VISIBLE
+        binding.subInfo.visibility = if (infoPref) View.VISIBLE else View.GONE
 
         val temp: String? = when (currentSort) {
             NEW -> AFTER_NEW
