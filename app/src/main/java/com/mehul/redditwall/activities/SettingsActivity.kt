@@ -51,11 +51,8 @@ class SettingsActivity : AppCompatActivity() {
         binding.downloadOrigin.isChecked = preferences.getBoolean(DOWNLOAD_ORIGIN, false)
         binding.randomSwitch.isChecked = preferences.getBoolean(RANDOM_ENABLED, false)
         binding.showInfoCard.isChecked = preferences.getBoolean(SHOW_INFO, true)
-        if (binding.randomSwitch.isChecked) {
-            binding.refreshLocationSetting.visibility = View.VISIBLE
-            binding.changeIntervalTitle.visibility = View.VISIBLE
-            binding.randomSeekSection.visibility = View.VISIBLE
-        }
+        showRandomSettings(binding.randomSwitch.isChecked)
+
         binding.intervalSeek.progress = preferences.getInt(RANDOM_INTERVAL, 0)
         binding.intervalCount.text = (binding.intervalSeek.progress + 1).toString() + " hrs"
         binding.scaleSeek.progress = preferences.getInt(LOAD_SCALE, 0)
@@ -63,15 +60,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.randomSwitch.setOnCheckedChangeListener { _, b ->
             preferences.edit().putBoolean(RANDOM_ENABLED, b).apply()
             alarmChanged = b
-            if (b) {
-                binding.refreshLocationSetting.visibility = View.VISIBLE
-                binding.randomSeekSection.visibility = View.VISIBLE
-                binding.changeIntervalTitle.visibility = View.VISIBLE
-            } else {
-                binding.refreshLocationSetting.visibility = View.GONE
-                binding.randomSeekSection.visibility = View.GONE
-                binding.changeIntervalTitle.visibility = View.GONE
-            }
+            showRandomSettings(b)
         }
         binding.gifSwitch.setOnCheckedChangeListener { _, b ->
             preferences.edit().putBoolean(LOAD_GIF, b).apply()
@@ -141,6 +130,13 @@ class SettingsActivity : AppCompatActivity() {
 
         val defaultSub = preferences.getString(DEFAULT, "mobilewallpaper")
         binding.defaultEdit.setText(defaultSub)
+    }
+
+    private fun showRandomSettings(show: Boolean) {
+        val setting = if (show) View.VISIBLE else View.GONE
+        binding.refreshLocationSetting.visibility = setting
+        binding.randomSeekSection.visibility = setting
+        binding.changeIntervalTitle.visibility = setting
     }
 
     public override fun onPause() {
@@ -243,6 +239,7 @@ class SettingsActivity : AppCompatActivity() {
                 }
         builder.create().show()
     }
+
 
     fun deleteDownloads(view: View) {
         val root = Environment.getExternalStorageDirectory().toString()

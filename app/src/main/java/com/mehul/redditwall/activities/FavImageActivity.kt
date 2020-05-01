@@ -204,7 +204,7 @@ class FavImageActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     if (i == 0) {
                         binding.remaining.visibility = View.VISIBLE
-                    } else if (i % 3 == 0) {
+                    } else if (i % 4 == 0) {
                         adapt.setFavs(bits, favs)
                         binding.favLoading.visibility = View.GONE
                     }

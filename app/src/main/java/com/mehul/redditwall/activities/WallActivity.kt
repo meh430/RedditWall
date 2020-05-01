@@ -285,6 +285,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
     }
 
+    //TODO: android 10 compat
     @Suppress("DEPRECATION")
     private fun saveImage() {
         if (binding.wallHolder.drawable == null) {

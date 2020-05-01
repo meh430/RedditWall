@@ -1,15 +1,12 @@
 package com.mehul.redditwall.adapters
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.ColorDrawable
-import android.util.Log
+import android.graphics.drawable.ScaleDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -41,6 +38,7 @@ class ImageAdapter internal constructor(private val context: Context,
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         val current = images[position]
+        /*
         if (current.hasGif()) {
             Glide.with(context).asGif().load(current.url).override(width / scale, height / 4).into(holder.image)
         } else {
@@ -66,6 +64,21 @@ class ImageAdapter internal constructor(private val context: Context,
                     Log.e("SAVED", "saved image $position")
                     images[position].img = (holder.image.drawable as BitmapDrawable).bitmap
                 }
+            }
+        }*/
+
+        val temp = ContextCompat.getDrawable(context, R.drawable.ic_android)
+        val errorDraw = ScaleDrawable(temp, 0, (width / scale).toFloat(), (height / 4).toFloat())
+        if (current.hasGif()) {
+            Glide.with(context).asGif().load(current.url)
+                    .override(width / scale, height / 4).centerCrop().into(holder.image)
+        } else {
+            if (current.img == null) {
+                Glide.with(context).load(current.url)
+                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).error(errorDraw).placeholder(errorDraw)
+                        .override(width / scale, height / 4).centerCrop().into(holder.image)
+            } else {
+                holder.image.setImageBitmap(current.img)
             }
         }
     }
