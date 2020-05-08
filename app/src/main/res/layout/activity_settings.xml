@@ -260,7 +260,7 @@
                 android:layout_margin="8dp"
                 android:orientation="vertical">
 
-                <Button
+                <!--<Button
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -268,7 +268,7 @@
                     android:foreground="@drawable/ripple"
                     android:onClick="deleteDownloads"
                     android:text="Delete Downloads"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/white" />-->
 
                 <Button
                     android:layout_width="match_parent"

@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -253,31 +254,39 @@ class FavImageActivity : AppCompatActivity() {
                 } else {
                     Glide.with(getCon()).asBitmap().load(favImages[i].favUrl).override(width, height).submit().get()
                 }
-
-                val root = Environment.getExternalStorageDirectory().toString()
-                val myDir = File("$root/RedditWalls")
-                myDir.mkdirs()
                 val fname = (0..999999999).random().toString().replace(" ", "") + ".jpg"
-                finalName = fname
-                val file = File(myDir, fname)
-                if (file.exists())
-                    file.delete()
-                try {
-                    val out = FileOutputStream(file)
-                    bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                    out.flush()
-                    out.close()
-                    MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    MainActivity.saveBitmap(getCon(), bitmap, fname)
                     withContext(Dispatchers.Main) {
                         Log.e("PROGRESS", "$i / ${favImages.size}")
                         notify.updateProgress(i)
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                } else {
+
+                    val root = Environment.getExternalStorageDirectory().toString()
+                    val myDir = File("$root/RedditWalls")
+                    myDir.mkdirs()
+                    finalName = fname
+                    val file = File(myDir, fname)
+                    if (file.exists())
+                        file.delete()
+                    try {
+                        val out = FileOutputStream(file)
+                        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                        out.flush()
+                        out.close()
+                        MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
+                        withContext(Dispatchers.Main) {
+                            Log.e("PROGRESS", "$i / ${favImages.size}")
+                            notify.updateProgress(i)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
             }
         }
-        notify.finish(finalName)
+        notify.finish()
     }
 
     private fun getCon(): Context {

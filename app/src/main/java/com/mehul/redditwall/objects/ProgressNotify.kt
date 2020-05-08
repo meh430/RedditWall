@@ -6,9 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import androidx.core.app.NotificationCompat
 import com.mehul.redditwall.R
 
@@ -19,6 +17,7 @@ class ProgressNotify(val context: Context, val size: Int) {
             val notifyBuilder = NotificationCompat.Builder(context, SECONDARY_CHANNEL_ID)
             notifyBuilder.apply {
                 setOngoing(true)
+                setOnlyAlertOnce(true)
                 setAutoCancel(true)
                 setContentTitle("Downloading all images")
                 setContentText("Please wait...")
@@ -47,11 +46,10 @@ class ProgressNotify(val context: Context, val size: Int) {
         notifyManager!!.notify(NOTIF_ID, notifyBuilder.build())
     }
 
-    fun finish(imagePath: String) {
+    fun finish() {
         val viewIntent = Intent()
         viewIntent.action = Intent.ACTION_VIEW
-        viewIntent.setDataAndType(Uri.parse(Environment.getExternalStorageDirectory()
-                .toString() + "/RedditWalls/$imagePath"), "image/*")
+        viewIntent.type = "image/*"
         viewIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         val viewPending = PendingIntent.getActivity(context, NOTIF_ID,
                 viewIntent, PendingIntent.FLAG_UPDATE_CURRENT)

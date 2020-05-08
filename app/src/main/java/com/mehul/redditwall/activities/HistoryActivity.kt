@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -282,7 +283,6 @@ class HistoryActivity : AppCompatActivity() {
                 .getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
         val notify = ProgressNotify(getCon(), histories.size)
         notify.sendNotification()
-        var finalName = ""
 
         withContext(Dispatchers.IO) {
             val done = ArrayList<String?>()
@@ -295,32 +295,39 @@ class HistoryActivity : AppCompatActivity() {
                 } else {
                     Glide.with(getCon()).asBitmap().load(histories[i].url).override(width, height).submit().get()
                 }
-
-                val root = Environment.getExternalStorageDirectory().toString()
-                val myDir = File("$root/RedditWalls")
-                myDir.mkdirs()
                 val fname = (0..999999999).random().toString().replace(" ", "") + ".jpg"
-                finalName = fname
-                val file = File(myDir, fname)
-                if (file.exists())
-                    file.delete()
-                try {
-                    val out = FileOutputStream(file)
-                    bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                    out.flush()
-                    out.close()
-                    MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
-                    done.add(histories[i].url)
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    MainActivity.saveBitmap(getCon(), bitmap, fname)
                     withContext(Dispatchers.Main) {
                         Log.e("PROGRESS", "$i / ${histories.size}")
                         notify.updateProgress(i)
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                } else {
+                    val root = Environment.getExternalStorageDirectory().toString()
+                    val myDir = File("$root/RedditWalls")
+                    myDir.mkdirs()
+                    val file = File(myDir, fname)
+                    if (file.exists())
+                        file.delete()
+                    try {
+                        val out = FileOutputStream(file)
+                        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                        out.flush()
+                        out.close()
+                        MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
+                        done.add(histories[i].url)
+                        withContext(Dispatchers.Main) {
+                            Log.e("PROGRESS", "$i / ${histories.size}")
+                            notify.updateProgress(i)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
             }
         }
-        notify.finish(finalName)
+        notify.finish()
     }
 
     private suspend fun convertToJSON(hists: List<HistoryItem>): String {

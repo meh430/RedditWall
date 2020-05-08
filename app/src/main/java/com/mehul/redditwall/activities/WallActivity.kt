@@ -86,8 +86,13 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             //TODO: replace deprecated methods with scoped storage solutions
             val notificationIntent = Intent()
             notificationIntent.action = Intent.ACTION_VIEW
-            notificationIntent.setDataAndType(Uri.parse(Environment.getExternalStorageDirectory()
-                    .toString() + "/RedditWalls/" + fname), "image/*")
+            notificationIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                notificationIntent.setDataAndType(Uri.parse(Environment.getExternalStorageDirectory()
+                        .toString() + "/RedditWalls/" + fname), "image/*")
+            } else {
+                notificationIntent.type = "image/*"
+            }
             val notificationPendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID,
                     notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             val notifyBuilder = NotificationCompat.Builder(this, PRIMARY_CHANNEL_ID)
@@ -285,7 +290,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
     }
 
-    //TODO: android 10 compat
     @Suppress("DEPRECATION")
     private fun saveImage() {
         if (binding.wallHolder.drawable == null) {
@@ -297,28 +301,37 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         } else {
             (binding.wallHolder.drawable as BitmapDrawable).bitmap
         }
-        Toast.makeText(this, "Downloading...", Toast.LENGTH_SHORT).show()
-        val root = Environment.getExternalStorageDirectory().toString()
-        val myDir = File("$root/RedditWalls")
-        myDir.mkdirs()
-        fname = (0..999999999).random().toString().replace(" ", "") + ".jpg"
 
-        val file = File(myDir, fname)
-        if (file.exists())
-            file.delete()
-        try {
-            val out = FileOutputStream(file)
-            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-            out.flush()
-            out.close()
-            MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            fname = (0..999999999).random().toString().replace(" ", "") + ".jpg"
+
+            MainActivity.saveBitmap(this, bitmap!!, fname)
+            Toast.makeText(this, "Downloading...", Toast.LENGTH_SHORT).show()
             sendNotification()
-            val histItem = HistoryItem((0..999999999).random(), query,
-                    SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
-                    HistoryItem.DOWNLOADED, imgUrl, imageList[index].postLink)
-            histViewModel?.insert(histItem)
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } else {
+            Toast.makeText(this, "Downloading...", Toast.LENGTH_SHORT).show()
+            val root = Environment.getExternalStorageDirectory().toString()
+            val myDir = File("$root/RedditWalls")
+            myDir.mkdirs()
+            fname = (0..999999999).random().toString().replace(" ", "") + ".jpg"
+
+            val file = File(myDir, fname)
+            if (file.exists())
+                file.delete()
+            try {
+                val out = FileOutputStream(file)
+                bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                out.flush()
+                out.close()
+                MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
+                sendNotification()
+                val histItem = HistoryItem((0..999999999).random(), query,
+                        SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
+                        HistoryItem.DOWNLOADED, imgUrl, imageList[index].postLink)
+                histViewModel?.insert(histItem)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
