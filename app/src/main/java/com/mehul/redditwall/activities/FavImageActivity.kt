@@ -47,6 +47,7 @@ class FavImageActivity : AppCompatActivity() {
     private var favJob: Job? = null
     private var width = 1080
     private var height = 1920
+    private var first = true
 
     private lateinit var binding: ActivityFavImageBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,17 +72,31 @@ class FavImageActivity : AppCompatActivity() {
 
                     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                         val position = viewHolder.adapterPosition
-                        val saved = favImages[position]
-                        favViewModel.deleteFavImage(saved)
-                        adapt.notifyDataSetChanged()
+                        val imgLoading = favJob?.isActive ?: false
+                        if (!imgLoading) {
+                            val saved = favImages[position]
+                            uiScope.launch {
+                                deleteImage(saved)
+                            }
+                            favViewModel.deleteFavImage(saved)
+                            adapt.notifyDataSetChanged()
+                        } else {
+                            Snackbar.make(binding.root, "Please wait...", Snackbar.LENGTH_SHORT).show()
+                        }
                     }
                 })
         helper.attachToRecyclerView(recycler)
         favViewModel.allFav.observe(this, Observer { favs ->
             favImages = favs
-            favJob = uiScope.launch {
-                loadFavBits(favs, getCon())
+            if (first) {
+                first = false
+                favJob = uiScope.launch {
+                    loadFavBits(favs, getCon())
+                }
+            } else {
+                adapt.setFavs(favs)
             }
+
         })
 
         val speedView = binding.speedDial
@@ -168,6 +183,25 @@ class FavImageActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    private suspend fun deleteImage(image: FavImage) {
+        binding.remaining.visibility = View.VISIBLE
+        val bits = adapt.getBitList()
+        withContext(Dispatchers.Default) {
+            val url = image.favUrl
+            for (i in 0..(bits.size)) {
+                if (url == bits[i].url) {
+                    bits.removeAt(i)
+                    break
+                }
+            }
+
+            withContext(Dispatchers.Main) {
+                adapt.setFavs(bits, favImages)
+                binding.remaining.visibility = View.GONE
+            }
+        }
+    }
+
     private suspend fun loadFavBits(favs: List<FavImage>, con: Context) {
         binding.favLoading.visibility = View.VISIBLE
         withContext(Dispatchers.Default) {
@@ -241,7 +275,6 @@ class FavImageActivity : AppCompatActivity() {
 
         val downloadOriginal = prefs.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
         val notify = ProgressNotify(getCon(), favImages.size)
-        var finalName = ""
         notify.sendNotification()
         val dims = MainActivity.getDimensions(getCon())
         width = prefs.getInt(SettingsActivity.IMG_WIDTH, dims[0])
@@ -266,7 +299,6 @@ class FavImageActivity : AppCompatActivity() {
                     val root = Environment.getExternalStorageDirectory().toString()
                     val myDir = File("$root/RedditWalls")
                     myDir.mkdirs()
-                    finalName = fname
                     val file = File(myDir, fname)
                     if (file.exists())
                         file.delete()

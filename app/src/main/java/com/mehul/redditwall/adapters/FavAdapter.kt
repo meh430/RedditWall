@@ -72,6 +72,15 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
         notifyDataSetChanged()
     }
 
+    fun setFavs(favLists: List<FavImage?>) {
+        this.favList = favLists
+        notifyDataSetChanged()
+    }
+
+    fun getBitList(): ArrayList<BitURL> {
+        return this.favs
+    }
+
     override fun getItemCount(): Int {
         return favs.size
     }
