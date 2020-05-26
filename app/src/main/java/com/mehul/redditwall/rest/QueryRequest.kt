@@ -2,12 +2,10 @@ package com.mehul.redditwall.rest
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
-import com.bumptech.glide.Glide
+import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.adapters.ImageAdapter
@@ -138,11 +136,6 @@ internal class QueryRequest {
         suspend fun loadImgsFromJSON(jsonResult: String?, adapter: ImageAdapter?, context: Context,
                                      images: ArrayList<BitURL>, load: ProgressBar?, first: Boolean) {
             withContext(Dispatchers.Default) {
-                val scale = (context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-                !!.getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
-                val dims = MainActivity.getDimensions(context)
-                val width = dims[0]
-                val height = dims[1]
                 try {
                     var json = JSONObject(jsonResult)
                     json = json.getJSONObject("data")
@@ -188,9 +181,7 @@ internal class QueryRequest {
                         withContext(Dispatchers.IO) {
                             try {
                                 if (isImage && i % 4 == 0) {
-                                    bitmap = Glide.with(context).asBitmap()
-                                            .load(url).error(ColorDrawable(Color.GRAY)).placeholder(ColorDrawable(Color.GRAY))
-                                            .override(width / scale, height / 4).centerCrop().submit().get()
+                                    bitmap = AppUtils.getGridImageBitmap(context, url)
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()

@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SettingsActivity
@@ -27,7 +28,7 @@ class RecAdapter internal constructor(private val context: Context,
     private val height: Int
 
     init {
-        val dims = MainActivity.getDimensions(context)
+        val dims = AppUtils.getDimensions(context)
         width = dims[0]
         height = dims[1]
         inflater = LayoutInflater.from(context)

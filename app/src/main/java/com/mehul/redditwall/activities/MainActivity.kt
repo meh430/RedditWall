@@ -4,7 +4,6 @@ package com.mehul.redditwall.activities
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -13,12 +12,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -26,7 +20,6 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView.OnEditorActionListener
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -38,6 +31,7 @@ import com.bumptech.glide.request.transition.Transition
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.GsonBuilder
+import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.ImageAdapter
 import com.mehul.redditwall.databinding.ActivityMainBinding
@@ -46,10 +40,6 @@ import com.mehul.redditwall.objects.RecyclerListener
 import com.mehul.redditwall.rest.QueryRequest
 import kotlinx.coroutines.*
 import org.json.JSONException
-import org.json.JSONObject
-import java.io.*
-import java.net.HttpURLConnection
-import java.net.URL
 import java.text.NumberFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -469,7 +459,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         binding.subDesc.text = "Loading..."
         withContext(Dispatchers.Default) {
             try {
-                val json = async { getSubInfo(query) }
+                val json = async { AppUtils.getSubInfo(query) }
                 val result = json.await().getJSONObject("data")
                 val iconUrl = result.getString("icon_img")
                 val title = result.getString("display_name_prefixed")
@@ -553,120 +543,5 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         var AFTER_NEW: String? = null
         var AFTER_HOT: String? = null
         var AFTER_TOP: String? = null
-
-        @RequiresApi(Build.VERSION_CODES.Q)
-        fun saveBitmap(con: Context, bitmap: Bitmap, name: String) {
-            val relativeLocation: String = Environment.DIRECTORY_PICTURES + File.separator + "RedditWalls"
-
-            val contentValues = ContentValues()
-            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, relativeLocation)
-
-            val resolver = con.contentResolver
-
-            var stream: OutputStream? = null
-            var uri: Uri? = null
-
-            try {
-                val contentUri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                uri = resolver.insert(contentUri, contentValues)
-                if (uri == null) {
-                    throw IOException("Failed to create new MediaStore record.")
-                }
-                Log.e("URI", uri.toString())
-                stream = resolver.openOutputStream(uri)
-                if (stream == null) {
-                    throw IOException("Failed to get output stream.")
-                }
-                if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)) {
-                    throw IOException("Failed to save bitmap.")
-                }
-
-            } catch (e: IOException) {
-                if (uri != null) {
-                    resolver.delete(uri, null, null)
-                }
-                throw e
-            } finally {
-                stream?.close()
-            }
-        }
-
-        fun getDimensions(con: Context): IntArray {
-            val disp = DisplayMetrics()
-            (con as Activity).windowManager.defaultDisplay.getMetrics(disp)
-            return intArrayOf(disp.widthPixels, disp.heightPixels)
-        }
-
-        suspend fun getSubInfo(subName: String): JSONObject {
-            var subInfo = JSONObject()
-            withContext(Dispatchers.Default) {
-                val endpoint = "https://www.reddit.com/r/$subName/about/.json"
-                val jsonString = async { getJsonData(endpoint) }
-                try {
-                    subInfo = JSONObject(jsonString.await())
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                }
-            }
-
-            return subInfo
-        }
-
-        suspend fun getJsonData(endpoint: String): String {
-            var jsonString = ""
-            withContext(Dispatchers.IO) {
-                var urlConnection: HttpURLConnection? = null
-                var reader: BufferedReader? = null
-                try {
-                    val requestURL = URL(endpoint)
-
-                    urlConnection = requestURL.openConnection() as HttpURLConnection
-                    urlConnection.requestMethod = "GET"
-                    urlConnection.connect()
-
-                    val inputStream = urlConnection.inputStream
-                    reader = BufferedReader(InputStreamReader(inputStream))
-                    val builder = StringBuilder()
-
-                    var line: String? = reader.readLine()
-                    while (line != null) {
-                        if (!isActive) {
-                            break
-                        }
-
-                        builder.append(line)
-                        builder.append("\n")
-                        line = reader.readLine()
-                    }
-
-                    if (!isActive) {
-                        jsonString = ""
-                    }
-
-                    if (builder.isEmpty()) {
-                        jsonString = ""
-                    }
-
-                    jsonString = builder.toString()
-
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    urlConnection?.disconnect()
-                    if (reader != null) {
-                        try {
-                            reader.close()
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
-
-                    }
-                }
-            }
-            Log.e("JSON", jsonString)
-            return jsonString
-        }
     }
 }

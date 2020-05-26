@@ -13,10 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.gson.GsonBuilder
+import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
-import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.PostActivity
-import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.activities.WallActivity
 import com.mehul.redditwall.objects.BitURL
 import com.mehul.redditwall.objects.FavImage
@@ -30,11 +29,10 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
     private val scale: Int
 
     init {
-        val dims = MainActivity.getDimensions(con)
+        val dims = AppUtils.getDimensions(con)
         width = dims[0]
         height = dims[1]
-        scale = (con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-                .getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
+        scale = AppUtils.getGridImageScale(con)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavViewHolder {

@@ -10,9 +10,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
-import com.mehul.redditwall.activities.MainActivity
-import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.objects.BitURL
 
 class ImageAdapter internal constructor(private val context: Context,
@@ -24,10 +23,10 @@ class ImageAdapter internal constructor(private val context: Context,
     private val scale: Int
 
     init {
-        val dims = MainActivity.getDimensions(context)
+        val dims = AppUtils.getDimensions(context)
         width = dims[0]
         height = dims[1]
-        scale = (context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)!!.getInt(SettingsActivity.LOAD_SCALE, 2) + 1) * 2
+        scale = AppUtils.getGridImageScale(context)
         inflater = LayoutInflater.from(context)
     }
 

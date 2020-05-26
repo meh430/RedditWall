@@ -4,13 +4,9 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -28,6 +24,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.GsonBuilder
 import com.leinardi.android.speeddial.SpeedDialView
+import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.HistAdapter
 import com.mehul.redditwall.databinding.ActivityHistoryBinding
@@ -37,8 +34,6 @@ import com.mehul.redditwall.objects.ProgressNotify
 import com.mehul.redditwall.objects.RecyclerListener
 import com.mehul.redditwall.viewmodels.HistViewModel
 import kotlinx.coroutines.*
-import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -295,35 +290,10 @@ class HistoryActivity : AppCompatActivity() {
                 } else {
                     Glide.with(getCon()).asBitmap().load(histories[i].url).override(width, height).submit().get()
                 }
-                val fname = (0..999999999).random().toString().replace(" ", "") + ".jpg"
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    MainActivity.saveBitmap(getCon(), bitmap, fname)
-                    withContext(Dispatchers.Main) {
-                        Log.e("PROGRESS", "$i / ${histories.size}")
-                        notify.updateProgress(i)
-                    }
-                } else {
-                    val root = Environment.getExternalStorageDirectory().toString()
-                    val myDir = File("$root/RedditWalls")
-                    myDir.mkdirs()
-                    val file = File(myDir, fname)
-                    if (file.exists())
-                        file.delete()
-                    try {
-                        val out = FileOutputStream(file)
-                        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                        out.flush()
-                        out.close()
-                        MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
-                        done.add(histories[i].url)
-                        withContext(Dispatchers.Main) {
-                            Log.e("PROGRESS", "$i / ${histories.size}")
-                            notify.updateProgress(i)
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
+                AppUtils.saveBitmap(bitmap, getCon())
+                withContext(Dispatchers.Main) {
+                    Log.e("PROGRESS", "$i / ${histories.size}")
+                    notify.updateProgress(i)
                 }
             }
         }

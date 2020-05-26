@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NavUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.ChangeWallpaper
 import com.mehul.redditwall.R
 import com.mehul.redditwall.databinding.ActivitySettingsBinding
@@ -122,11 +123,9 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        val dims = MainActivity.getDimensions(this)
-        val width = preferences.getInt(IMG_WIDTH, dims[0])
-        val height = preferences.getInt(IMG_HEIGHT, dims[1])
-        binding.widthEdit.setText(width.toString() + "")
-        binding.heightEdit.setText(height.toString() + "")
+        val dimensions = AppUtils.getWallDimensions(this)
+        binding.widthEdit.setText(dimensions[0].toString() + "")
+        binding.heightEdit.setText(dimensions[1].toString() + "")
 
         val defaultSub = preferences.getString(DEFAULT, "mobilewallpaper")
         binding.defaultEdit.setText(defaultSub)
@@ -161,7 +160,7 @@ class SettingsActivity : AppCompatActivity() {
                 wallAlarm!!.cancel(pending!!)
             }
         }
-        val dims = MainActivity.getDimensions(this)
+        val dims = AppUtils.getWallDimensions(this)
         var width = dims[0]
         var height = dims[1]
         try {

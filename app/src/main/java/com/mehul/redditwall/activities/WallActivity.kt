@@ -17,7 +17,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
-import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.widget.Toast
@@ -32,6 +31,7 @@ import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import com.bumptech.glide.Glide.with
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
 import com.mehul.redditwall.databinding.ActivityWallBinding
 import com.mehul.redditwall.objects.BitURL
@@ -44,8 +44,6 @@ import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONException
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -55,32 +53,35 @@ import kotlin.math.roundToInt
 @Suppress("PrivatePropertyName", "DEPRECATION", "RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "LocalVariableName")
 class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var jsonList: String? = ""
-    private var notifyManager: NotificationManager? = null
+    private var fName = ""
+    private var imgUrl = ""
+    private var postLink = ""
+    private var query = ""
+
     private var bottomUp = false
-    private var isGif: Boolean = false
+    private var isGif = false
     private var downloadOriginal = false
-    private var fromFav: Boolean = false
-    private var fromHist: Boolean = false
-    private var noQuery: Boolean = false
+    private var fromFav = false
+    private var fromHist = false
+    private var noQuery = false
+
+    private var filledStar: Drawable? = null
+    private var openStar: Drawable? = null
+
     private var index: Int = 0
-    private var width: Int = 0
-    private var height: Int = 0
-    private var fname: String = ""
-    private var imgUrl: String = ""
-    private var postLink: String = ""
     private var imageList: ArrayList<BitURL> = ArrayList()
     private var detector: GestureDetector? = null
     private var imageJob: Job? = null
-    private var preferences: SharedPreferences? = null
-    private var filledStar: Drawable? = null
-    private var openStar: Drawable? = null
     private var starred: Menu? = null
     private var favViewModel: FavViewModel? = null
     private var histViewModel: HistViewModel? = null
     private val uiScope = CoroutineScope(Dispatchers.Main)
-    private var query = ""
     private var currentBitmap: Bitmap? = null
+    private lateinit var preferences: SharedPreferences
+
     private lateinit var binding: ActivityWallBinding
+
+    private var notifyManager: NotificationManager? = null
     private val notificationBuilder: NotificationCompat.Builder
         get() {
             //TODO: replace deprecated methods with scoped storage solutions
@@ -89,7 +90,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             notificationIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 notificationIntent.setDataAndType(Uri.parse(Environment.getExternalStorageDirectory()
-                        .toString() + "/RedditWalls/" + fname), "image/*")
+                        .toString() + "/RedditWalls/" + fName), "image/*")
             } else {
                 notificationIntent.type = "image/*"
             }
@@ -109,12 +110,11 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         supportActionBar?.elevation = 0F
         histViewModel = ViewModelProvider(this).get(HistViewModel::class.java)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
-        preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+        preferences = AppUtils.getPreferences(this)
         AFTER_HOT_WALL = MainActivity.AFTER_HOT
         AFTER_NEW_WALL = MainActivity.AFTER_NEW
         AFTER_TOP_WALL = MainActivity.AFTER_TOP
     }
-
 
     @SuppressLint("NewApi")
     fun setWallpaper(view: View) {
@@ -122,7 +122,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             Toast.makeText(this, "GIF support is coming soon", Toast.LENGTH_SHORT).show()
             return
         }
-        val con = this
+
         val temp = Toast.makeText(this, "Setting wallpaper...", Toast.LENGTH_LONG)
         val wall: WallpaperManager? = this.applicationContext.getSystemService(Context.WALLPAPER_SERVICE) as WallpaperManager
         if (binding.wallHolder.drawable == null) {
@@ -158,27 +158,27 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                                 wall?.setBitmap(bitmap, null, true, wallLoc)
                                 if (wallLoc == WallpaperManager.FLAG_LOCK) HistoryItem.LOCK_SCREEN else HistoryItem.HOME_SCREEN
                             }
-                            Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(getCon(), "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
                             val histItem = HistoryItem((0..999999999).random(), query,
                                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                                     wallSource, imgUrl, imageList[index].postLink)
                             histViewModel?.insert(histItem)
                         } catch (e: Exception) {
                             Log.e("MainActivity", "Error setting wallpaper")
-                            Toast.makeText(con, "failed to set wallpaper", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(getCon(), "failed to set wallpaper", Toast.LENGTH_SHORT).show()
                         }
                     } else {
                         try {
                             assert(wall != null)
                             wall?.setBitmap(bitmap)
-                            Toast.makeText(con, "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(getCon(), "successfully changed wallpaper", Toast.LENGTH_SHORT).show()
                             val histItem = HistoryItem((0..999999999).random(), query,
                                     SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
                                     HistoryItem.BOTH, imgUrl, imageList[index].postLink)
                             histViewModel?.insert(histItem)
                         } catch (e: Exception) {
                             Log.e("MainActivity", "Error setting wallpaper")
-                            Toast.makeText(con, "failed to set wallpaper", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(getCon(), "failed to set wallpaper", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -208,7 +208,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         return super.onOptionsItemSelected(item)
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.wall_menu, menu)
         detector = GestureDetector(this, this)
@@ -227,11 +226,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         postLink = incoming.getStringExtra(PostActivity.POST_LINK) ?: ""
         isGif = incoming.getBooleanExtra(GIF, false)
         preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-        downloadOriginal = preferences!!.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
+        downloadOriginal = preferences.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
         createNotificationChannel()
-        val dims = MainActivity.getDimensions(this)
-        width = preferences!!.getInt(SettingsActivity.IMG_WIDTH, dims[0])
-        height = preferences!!.getInt(SettingsActivity.IMG_HEIGHT, dims[1])
         query = if (noQuery) {
             incoming.getStringExtra(FAV_LIST)
         } else {
@@ -290,49 +286,19 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
     }
 
-    @Suppress("DEPRECATION")
     private fun saveImage() {
         if (binding.wallHolder.drawable == null) {
             Toast.makeText(this, "LOADING...", Toast.LENGTH_SHORT).show()
             return
         }
-        val bitmap = if (preferences!!.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)) {
+        val bitmap = if (preferences.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)) {
             currentBitmap
         } else {
             (binding.wallHolder.drawable as BitmapDrawable).bitmap
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            fname = (0..999999999).random().toString().replace(" ", "") + ".jpg"
-
-            MainActivity.saveBitmap(this, bitmap!!, fname)
-            Toast.makeText(this, "Downloading...", Toast.LENGTH_SHORT).show()
-            sendNotification()
-        } else {
-            Toast.makeText(this, "Downloading...", Toast.LENGTH_SHORT).show()
-            val root = Environment.getExternalStorageDirectory().toString()
-            val myDir = File("$root/RedditWalls")
-            myDir.mkdirs()
-            fname = (0..999999999).random().toString().replace(" ", "") + ".jpg"
-
-            val file = File(myDir, fname)
-            if (file.exists())
-                file.delete()
-            try {
-                val out = FileOutputStream(file)
-                bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                out.flush()
-                out.close()
-                MediaStore.Images.Media.insertImage(contentResolver, file.absolutePath, file.name, file.name)
-                sendNotification()
-                val histItem = HistoryItem((0..999999999).random(), query,
-                        SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
-                        HistoryItem.DOWNLOADED, imgUrl, imageList[index].postLink)
-                histViewModel?.insert(histItem)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+        fName = AppUtils.saveBitmap(bitmap!!, this)
+        sendNotification()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -515,7 +481,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         binding.imageSize.text = "Size: Loading..."
         binding.subreddit.text = "Subreddit: Loading..."
         withContext(Dispatchers.Default) {
-            val postJson = async { MainActivity.getJsonData("$postLink.json") }
+            val postJson = async { AppUtils.getJsonData("$postLink.json") }
 
             try {
                 val jsonList = JSONArray(postJson.await())
@@ -547,7 +513,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                         binding.imageSize.text = "Size: GIF"
                     }
                 } else {
-                    val bitmap = if (preferences!!.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)) {
+                    val bitmap = if (preferences.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)) {
                         currentBitmap
                     } else {
                         (binding.wallHolder.drawable as BitmapDrawable).bitmap
@@ -600,10 +566,12 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         binding.loadMore.visibility = View.GONE
         binding.wallHolder.visibility = View.VISIBLE
 
+        val dimensions = AppUtils.getWallDimensions(con)
+
         if (isGif) {
-            with(con).asGif().load(imgUrl).override(width, height).centerCrop().into(binding.wallHolder)
+            with(con).asGif().load(imgUrl).override(dimensions[0], dimensions[1]).centerCrop().into(binding.wallHolder)
         } else {
-            with(con).load(imgUrl).override(width, height).centerCrop().into(binding.wallHolder)
+            with(con).load(imgUrl).override(dimensions[0], dimensions[1]).centerCrop().into(binding.wallHolder)
         }
 
         loadUps()

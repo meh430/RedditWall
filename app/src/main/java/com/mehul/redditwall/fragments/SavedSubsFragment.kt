@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SubActivity
@@ -126,7 +127,7 @@ class SavedSubsFragment : Fragment(), SubActivity.Sorting {
         withContext(Dispatchers.Default) {
             for (sub in savedList) {
                 Log.e("SUBNAME", sub.subName)
-                val json = async { MainActivity.getSubInfo(sub.subName.replace("r/", "")) }
+                val json = async { AppUtils.getSubInfo(sub.subName.replace("r/", "")) }
                 val result = json.await().getJSONObject("data")
                 sub.subIcon = result.getString("icon_img")
                 sub.subName = result.getString("display_name_prefixed")

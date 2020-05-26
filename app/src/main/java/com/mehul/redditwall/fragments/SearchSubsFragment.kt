@@ -14,8 +14,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
-import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.adapters.SubAdapter
 import com.mehul.redditwall.databinding.FragmentSearchSubsBinding
 import com.mehul.redditwall.objects.Subreddit
@@ -90,13 +90,13 @@ class SearchSubsFragment : Fragment() {
         val temp = ArrayList<Subreddit>()
         withContext(Dispatchers.Default) {
             val endpoint = "https://www.reddit.com/api/search_reddit_names/.json?query=$query"
-            val jsonString = async { MainActivity.getJsonData(endpoint) }
+            val jsonString = async { AppUtils.getJsonData(endpoint) }
             try {
                 val results = JSONObject(jsonString.await())
                 val resultsList = results.getJSONArray("names")
                 for (i in 0..resultsList.length()) {
                     val curr = resultsList.getString(i)
-                    val json = async { MainActivity.getSubInfo(curr) }
+                    val json = async { AppUtils.getSubInfo(curr) }
                     val result = json.await().getJSONObject("data")
                     val iconUrl = result.getString("icon_img")
                     val title = result.getString("display_name_prefixed")
