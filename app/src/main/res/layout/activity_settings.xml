@@ -240,17 +240,6 @@
                 android:textSize="16sp"
                 android:theme="@style/ThemeOverlay.AppCompat.DayNight" />
 
-            <Switch
-                android:id="@+id/showInfoCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                android:switchPadding="10dp"
-                android:text="Show info card on main screen"
-                android:textColor="@color/textColor"
-                android:textSize="16sp"
-                android:theme="@style/ThemeOverlay.AppCompat.DayNight" />
-
             <LinearLayout
                 android:id="@+id/buttons"
                 android:layout_width="match_parent"

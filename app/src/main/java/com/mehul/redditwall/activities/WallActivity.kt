@@ -21,7 +21,6 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -65,8 +64,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var fromHist = false
     private var noQuery = false
 
-    private var filledStar: Drawable? = null
-    private var openStar: Drawable? = null
+    private var filledHeart: Drawable? = null
+    private var openHeart: Drawable? = null
 
     private var index: Int = 0
     private var imageList: ArrayList<BitURL> = ArrayList()
@@ -107,13 +106,47 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         super.onCreate(savedInstanceState)
         binding = ActivityWallBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportActionBar?.elevation = 0F
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        supportActionBar?.hide()
+
         histViewModel = ViewModelProvider(this).get(HistViewModel::class.java)
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
         preferences = AppUtils.getPreferences(this)
         AFTER_HOT_WALL = MainActivity.AFTER_HOT
         AFTER_NEW_WALL = MainActivity.AFTER_NEW
         AFTER_TOP_WALL = MainActivity.AFTER_TOP
+        detector = GestureDetector(this, this)
+        val incoming = intent
+        fromFav = incoming.getBooleanExtra(FROM_FAV, false)
+        fromHist = incoming.getBooleanExtra(FROM_HIST, false)
+        noQuery = fromFav || fromHist
+        jsonList = incoming.getStringExtra(LIST)
+        uiScope.launch {
+            if (jsonList != null && jsonList!!.isNotEmpty()) {
+                imageList = jsonToList(jsonList!!)
+            }
+        }
+        index = incoming.getIntExtra(INDEX, 0)
+        imgUrl = incoming.getStringExtra(WALL_URL) ?: ""
+        postLink = incoming.getStringExtra(PostActivity.POST_LINK) ?: ""
+        isGif = incoming.getBooleanExtra(GIF, false)
+        preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+        downloadOriginal = preferences.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
+        createNotificationChannel()
+        query = if (noQuery) {
+            incoming.getStringExtra(FAV_LIST)
+        } else {
+            incoming.getStringExtra(MainActivity.QUERY)
+        }.toString()
+
+
+        filledHeart = ContextCompat.getDrawable(applicationContext, R.drawable.ic_heart_filled)
+        openHeart = ContextCompat.getDrawable(applicationContext, R.drawable.ic_heart)
+        binding.subreddit.text = "Subreddit: $query"
+        uiScope.launch {
+            startUp(getCon())
+        }
     }
 
     @SuppressLint("NewApi")
@@ -183,75 +216,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                     }
                 }
         builder.create().show()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            super.onBackPressed()
-            return true
-        } else if (item.itemId == R.id.fav_image) {
-            val favs = favViewModel!!.favList
-            for (img in favs) {
-                if (imgUrl.equals(img.favUrl, ignoreCase = true)) {
-                    item.icon = openStar
-                    favViewModel?.deleteFavImage(img)
-                    Toast.makeText(this, "Unfavorited", Toast.LENGTH_SHORT).show()
-                    return true
-                }
-            }
-            item.icon = filledStar
-            Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
-            favViewModel?.insert(FavImage((0..999999999).random(), imgUrl,
-                    isGif, imageList[index].postLink, query))
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.wall_menu, menu)
-        detector = GestureDetector(this, this)
-        val incoming = intent
-        fromFav = incoming.getBooleanExtra(FROM_FAV, false)
-        fromHist = incoming.getBooleanExtra(FROM_HIST, false)
-        noQuery = fromFav || fromHist
-        jsonList = incoming.getStringExtra(LIST)
-        uiScope.launch {
-            if (jsonList != null && jsonList!!.isNotEmpty()) {
-                imageList = jsonToList(jsonList!!)
-            }
-        }
-        index = incoming.getIntExtra(INDEX, 0)
-        imgUrl = incoming.getStringExtra(WALL_URL) ?: ""
-        postLink = incoming.getStringExtra(PostActivity.POST_LINK) ?: ""
-        isGif = incoming.getBooleanExtra(GIF, false)
-        preferences = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
-        downloadOriginal = preferences.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
-        createNotificationChannel()
-        query = if (noQuery) {
-            incoming.getStringExtra(FAV_LIST)
-        } else {
-            incoming.getStringExtra(MainActivity.QUERY)
-        }.toString()
-
-        val open = if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-            R.drawable.ic_open_dark
-        } else {
-            R.drawable.ic_open_light
-        }
-        val filled = if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-            R.drawable.ic_filled_dark
-        } else {
-            R.drawable.ic_filled_light
-        }
-        filledStar = ContextCompat.getDrawable(applicationContext, filled)
-        openStar = ContextCompat.getDrawable(applicationContext, open)
-        starred = menu
-        binding.subreddit.text = "Subreddit: $query"
-        uiScope.launch {
-            startUp(getCon())
-        }
-        return true
     }
 
     fun launchPost(view: View) {
@@ -558,11 +522,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             }
         }
 
-        starred!!.getItem(0)?.icon = if (saved) {
-            filledStar
-        } else {
-            openStar
-        }
+        binding.favoriteButton.setImageDrawable(if (saved) filledHeart else openHeart)
         binding.loadMore.visibility = View.GONE
         binding.wallHolder.visibility = View.VISIBLE
 
@@ -613,12 +573,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     override fun onBackPressed() {
-        if (bottomUp) {
-            toggle(false)
-            bottomUp = false
-        } else {
-            super.onBackPressed()
-        }
+        backPress(null)
     }
 
     private fun toggle(show: Boolean) {
@@ -629,9 +584,11 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         binding.bottomSheet.visibility = if (show) View.VISIBLE else View.GONE
         if (show) {
             binding.expandButton.visibility = View.GONE
+            binding.favoriteButton.visibility = View.GONE
         } else {
             Handler().postDelayed(Runnable {
                 binding.expandButton.visibility = View.VISIBLE
+                binding.favoriteButton.visibility = View.VISIBLE
             }, 400)
         }
     }
@@ -693,6 +650,31 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             }
 
             return ret
+        }
+    }
+
+    fun favoriteImage(view: View) {
+        val favs = favViewModel!!.favList
+        for (img in favs) {
+            if (imgUrl.equals(img.favUrl, ignoreCase = true)) {
+                binding.favoriteButton.setImageDrawable(openHeart)
+                favViewModel?.deleteFavImage(img)
+                Toast.makeText(this, "Unfavorited", Toast.LENGTH_SHORT).show()
+                return
+            }
+        }
+        binding.favoriteButton.setImageDrawable(filledHeart)
+        Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
+        favViewModel?.insert(FavImage((0..999999999).random(), imgUrl,
+                isGif, imageList[index].postLink, query))
+    }
+
+    fun backPress(view: View?) {
+        if (bottomUp) {
+            toggle(false)
+            bottomUp = false
+        } else {
+            super.onBackPressed()
         }
     }
 }

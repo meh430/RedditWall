@@ -61,10 +61,11 @@ class SubActivity : AppCompatActivity() {
         savedFrag = SavedSubsFragment.newInstance()
 
         sortChoice = savedFrag
-        currFrag = searchFrag
+        currFrag = savedFrag
         fManager = supportFragmentManager
-        fManager.beginTransaction().add(R.id.fragment_holder, savedFrag, "save").hide(savedFrag).commit()
-        fManager.beginTransaction().add(R.id.fragment_holder, searchFrag, "search").commit()
+        fManager.beginTransaction().add(R.id.fragment_holder, searchFrag, "search").hide(searchFrag).commit()
+        fManager.beginTransaction().add(R.id.fragment_holder, savedFrag, "save").commit()
+
         setSupportActionBar(binding.toolbar)
         supportActionBar?.elevation = 0f
         supportActionBar?.title = "Search Subreddits"

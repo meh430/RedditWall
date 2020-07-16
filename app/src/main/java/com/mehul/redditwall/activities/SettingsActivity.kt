@@ -51,7 +51,6 @@ class SettingsActivity : AppCompatActivity() {
         binding.gifSwitch.isChecked = preferences.getBoolean(LOAD_GIF, false)
         binding.downloadOrigin.isChecked = preferences.getBoolean(DOWNLOAD_ORIGIN, false)
         binding.randomSwitch.isChecked = preferences.getBoolean(RANDOM_ENABLED, false)
-        binding.showInfoCard.isChecked = preferences.getBoolean(SHOW_INFO, true)
         showRandomSettings(binding.randomSwitch.isChecked)
 
         binding.intervalSeek.progress = preferences.getInt(RANDOM_INTERVAL, 0)
@@ -80,9 +79,7 @@ class SettingsActivity : AppCompatActivity() {
                 delegate.applyDayNight()
             }
         }
-        binding.showInfoCard.setOnCheckedChangeListener { _, b ->
-            preferences.edit().putBoolean(SHOW_INFO, b).apply()
-        }
+
         binding.scaleSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
                 if (i > 0) {

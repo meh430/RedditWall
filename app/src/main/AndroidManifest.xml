@@ -75,9 +75,7 @@
         <activity
             android:name=".activities.WallActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:label="Image Preview"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme.ActionBar" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.MainActivity"
             android:label="Reddit Walls"

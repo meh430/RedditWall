@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".activities.WallActivity">
 
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/up_button"
+        android:onClick="backPress"
+        android:padding="8dp"
+        android:src="@drawable/ic_back"
+        android:textColor="@color/textColor"
+        android:translationZ="2dp" />
+
     <ProgressBar
         android:id="@+id/loadMore"
         android:layout_width="wrap_content"
@@ -72,21 +84,37 @@
             android:onClick="setWallpaper"
             android:text="Set Wallpaper"
             android:textColor="@android:color/white" />-->
-    <Button
-        android:id="@+id/expandButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_margin="16dp"
-        android:background="@drawable/up_button"
-        android:drawableStart="@drawable/ic_up"
-        android:drawablePadding="12dp"
-        android:onClick="toggleBottom"
-        android:padding="12dp"
-        android:paddingEnd="24dp"
-        android:text="EXPAND"
-        android:textColor="@color/textColor" />
+        android:gravity="center"
+        android:padding="8dp">
+
+        <ImageButton
+            android:id="@+id/expandButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="@drawable/up_button"
+            android:onClick="toggleBottom"
+            android:padding="8dp"
+            android:src="@drawable/ic_up"
+            android:textColor="@color/textColor" />
+
+        <ImageButton
+            android:id="@+id/favoriteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="@drawable/up_button"
+            android:onClick="favoriteImage"
+            android:padding="8dp"
+            android:src="@drawable/ic_heart"
+            android:textColor="@color/textColor" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/bottomSheet"
@@ -99,10 +127,10 @@
         android:visibility="gone">
 
         <ImageView
+            android:id="@+id/collapseSheet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:id="@+id/collapseSheet"
             android:layout_marginTop="20dp"
             android:onClick="toggleBottom"
             android:src="@drawable/ic_down" />
@@ -252,13 +280,13 @@
                     android:textSize="18sp" />
 
                 <TextView
-                    android:onClick="launchUser"
                     android:id="@+id/author"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="28dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="28dp"
+                    android:onClick="launchUser"
                     android:text="Author: "
                     android:textColor="@color/secondary"
                     android:textSize="18sp" />

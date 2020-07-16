@@ -7,10 +7,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
@@ -22,16 +19,11 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.GsonBuilder
-import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.ImageAdapter
 import com.mehul.redditwall.databinding.ActivityMainBinding
@@ -39,10 +31,6 @@ import com.mehul.redditwall.objects.BitURL
 import com.mehul.redditwall.objects.RecyclerListener
 import com.mehul.redditwall.rest.QueryRequest
 import kotlinx.coroutines.*
-import org.json.JSONException
-import java.text.NumberFormat
-import java.util.*
-import kotlin.collections.ArrayList
 
 @SuppressLint("SetTextI18n")
 class MainActivity : AppCompatActivity(), View.OnClickListener {
@@ -56,8 +44,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var scrollJob: Job? = null
     private var uiScope = CoroutineScope(Dispatchers.Main)
     private var currentSort: Int = 0
-    private var infoShown = false
-    private var infoPref = true
     private var preferences: SharedPreferences? = null
 
     private lateinit var binding: ActivityMainBinding
@@ -69,7 +55,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(binding.root)
         val toolbar = binding.toolbar
         setSupportActionBar(toolbar)
-        binding.infoTitle.paintFlags = binding.infoTitle.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         val imageScroll = binding.imageScroll
         imageScroll.layoutManager = GridLayoutManager(this, 2)
         imageScroll.addOnItemTouchListener(RecyclerListener(this, imageScroll, object : RecyclerListener.OnItemClickListener {
@@ -108,8 +93,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }))
         preferences = getSharedPreferences(SharedPrefFile, Context.MODE_PRIVATE)
 
-        infoPref = preferences!!.getBoolean(SettingsActivity.SHOW_INFO, true)
-        binding.subInfo.visibility = if (infoPref) View.VISIBLE else View.GONE
         val dark = preferences!!.getBoolean(SettingsActivity.DARK, false)
         if (dark) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -157,7 +140,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         if (networkAvailable()) {
             imageJob = uiScope.launch {
-                loadSubInfo(queryString)
                 loadImages(getCon(), defaultLoad, true, getList())
             }
         } else {
@@ -168,13 +150,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
-                    if (dy > 100) {
-                        if (infoPref) {
-                            binding.subInfo.visibility = View.GONE
-                            infoShown = true
-                            toggleSubInfo(binding.subInfoLayout)
-                        }
-                    }
+
                     if (imageJob != null && imageJob!!.isActive) {
                         return
                     }
@@ -193,13 +169,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 } else {
                     binding.bottomLoad.visibility = View.INVISIBLE
-                    if (infoPref) {
-                        if (dy != 0 && dy < -100) {
-                            binding.subInfo.visibility = View.VISIBLE
-                            infoShown = true
-                            toggleSubInfo(binding.subInfoLayout)
-                        }
-                    }
+
                 }
             }
 
@@ -279,7 +249,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     @InternalCoroutinesApi
     fun startSearch(view: View) {
-        binding.subInfo.visibility = if (infoPref) View.VISIBLE else View.GONE
 
         AFTER_HOT = ""
         AFTER_NEW = ""
@@ -300,14 +269,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             if (queryString.isNotEmpty()) {
                 preferences?.edit()?.putString(QUERY, queryString)?.apply()
                 imageJob = uiScope.launch {
-                    loadSubInfo(queryString)
                     loadImages(getCon(), queryString, true, getList())
                 }
             } else {
                 queryString = defaultLoad
                 preferences?.edit()?.putString(QUERY, queryString)?.apply()
                 imageJob = uiScope.launch {
-                    loadSubInfo(queryString)
                     loadImages(getCon(), defaultLoad, true, getList())
                 }
             }
@@ -392,7 +359,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     @InternalCoroutinesApi
     override fun onClick(view: View) {
-        binding.subInfo.visibility = if (infoPref) View.VISIBLE else View.GONE
 
         val temp: String? = when (currentSort) {
             NEW -> AFTER_NEW
@@ -451,51 +417,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private suspend fun loadSubInfo(query: String) {
-        binding.subName.text = "Loading..."
-        binding.subName.setCompoundDrawables(ContextCompat.getDrawable(applicationContext, R.drawable.ic_android),
-                null, null, null)
-        binding.subSubs.text = "Loading..."
-        binding.subDesc.text = "Loading..."
-        withContext(Dispatchers.Default) {
-            try {
-                val json = async { AppUtils.getSubInfo(query) }
-                val result = json.await().getJSONObject("data")
-                val iconUrl = result.getString("icon_img")
-                val title = result.getString("display_name_prefixed")
-                val desc = result.getString("public_description")
-                val subs = result.getInt("subscribers")
-                Log.e("ICON", iconUrl.toString())
-                if (iconUrl.isNotEmpty() || iconUrl.isNotBlank()) {
-                    Glide.with(getCon())
-                            .asBitmap()
-                            .load(iconUrl)
-                            .override(200, 200)
-                            .into(object : CustomTarget<Bitmap>() {
-                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                    Log.e("FLAG", "GOT HERE")
-                                    binding.subIcon.setImageBitmap(resource)
-                                }
-
-                                override fun onLoadCleared(placeholder: Drawable?) {}
-                            })
-                }
-                withContext(Dispatchers.Main) {
-                    binding.subName.text = title
-                    binding.subSubs.text = "Subscribers: ${NumberFormat.getNumberInstance(Locale.US).format(subs)}"
-                    binding.subDesc.text = desc
-                    if (iconUrl.isEmpty() || iconUrl.isBlank()) {
-                        Log.e("FLAG", "GOT HERE2")
-                        val def = ContextCompat.getDrawable(applicationContext, R.drawable.ic_android)
-                        def?.setTint(Color.BLACK)
-                        binding.subIcon.setImageDrawable(def)
-                    }
-                }
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-        }
-    }
 
     @InternalCoroutinesApi
     private suspend fun loadImages(con: Context, query: String, first: Boolean, images: ArrayList<BitURL>) {
@@ -520,14 +441,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             Log.e("LIST", getList().toString())
             binding.info.visibility = View.VISIBLE
             binding.info.text = "Subreddit does not exist or it has no images"
-        }
-    }
-
-    fun toggleSubInfo(view: View) {
-        if (infoPref) {
-            infoShown = !infoShown
-            binding.subInfoLayout.visibility = if (infoShown) View.VISIBLE else View.GONE
-            binding.infoTitle.visibility = if (infoShown) View.GONE else View.VISIBLE
         }
     }
 

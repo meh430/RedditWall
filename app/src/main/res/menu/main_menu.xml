@@ -11,7 +11,7 @@
         app:showAsAction="never" />
 
     <item
-        style="@style/filled"
+        android:icon="@drawable/ic_heart_filled"
         android:id="@+id/fav_pics"
         android:orderInCategory="50"
         android:title="FAVORITES"
