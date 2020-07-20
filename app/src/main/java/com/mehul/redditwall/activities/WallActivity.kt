@@ -659,12 +659,10 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             if (imgUrl.equals(img.favUrl, ignoreCase = true)) {
                 binding.favoriteButton.setImageDrawable(openHeart)
                 favViewModel?.deleteFavImage(img)
-                Toast.makeText(this, "Unfavorited", Toast.LENGTH_SHORT).show()
                 return
             }
         }
         binding.favoriteButton.setImageDrawable(filledHeart)
-        Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
         favViewModel?.insert(FavImage((0..999999999).random(), imgUrl,
                 isGif, imageList[index].postLink, query))
     }
