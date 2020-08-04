@@ -52,7 +52,7 @@ class HistAdapter(private val con: Context) : RecyclerView.Adapter<HistAdapter.H
             nameTv.text = name
             sourceTv.text = source
             dateTv.text = date
-            Glide.with(con).load(history.url).override(200, 325).into(img)
+            Glide.with(con).load(history.url).override(210, 350).into(img)
         }
     }
 }

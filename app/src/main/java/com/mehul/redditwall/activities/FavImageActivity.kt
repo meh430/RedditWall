@@ -199,7 +199,7 @@ class FavImageActivity : AppCompatActivity() {
                 }
 
                 var bitmap: Bitmap? = null
-                withContext(Dispatchers.IO) {
+                /*withContext(Dispatchers.IO) {
                     try {
                         if (!fav.isGif && i % 4 == 0) {
                             bitmap = AppUtils.getGridImageBitmap(con, fav.favUrl)
@@ -208,7 +208,7 @@ class FavImageActivity : AppCompatActivity() {
                         e.printStackTrace()
                         bitmap = null
                     }
-                }
+                }*/
 
                 val currLoadedImage = BitURL(bitmap, fav.favUrl, fav.postLink)
                 currLoadedImage.setGif(fav.isGif)

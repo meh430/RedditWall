@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.google.gson.GsonBuilder
 import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
@@ -121,8 +122,18 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
                 Glide.with(con).asGif().load(url).override(width / scale, height / 4).centerCrop().into(img)
             } else {
                 if (saved.img == null) {
-                    Glide.with(con).load(url).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).error(errorDraw).placeholder(errorDraw)
-                            .override(width / scale, height / 4).centerCrop().into(img)
+                    val requestOptions = RequestOptions()
+                    requestOptions.apply {
+                        diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                        centerCrop()
+                        dontAnimate()
+                        dontTransform()
+                        placeholder(errorDraw)
+                        error(errorDraw)
+                        override(width / scale, height / 4)
+                    }
+
+                    Glide.with(con).applyDefaultRequestOptions(requestOptions).load(saved.url).into(img)
                 } else {
                     img.setImageBitmap(saved.img)
                 }

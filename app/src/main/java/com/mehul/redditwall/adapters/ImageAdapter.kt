@@ -10,9 +10,11 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
 import com.mehul.redditwall.objects.BitURL
+
 
 class ImageAdapter internal constructor(private val context: Context,
                                         private var images: ArrayList<BitURL>) :
@@ -73,9 +75,18 @@ class ImageAdapter internal constructor(private val context: Context,
                     .override(width / scale, height / 4).centerCrop().into(holder.image)
         } else {
             if (current.img == null) {
-                Glide.with(context).load(current.url)
-                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).error(errorDraw).placeholder(errorDraw)
-                        .override(width / scale, height / 4).centerCrop().into(holder.image)
+                val requestOptions = RequestOptions()
+                requestOptions.apply {
+                    diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    centerCrop()
+                    dontAnimate()
+                    dontTransform()
+                    placeholder(errorDraw)
+                    error(errorDraw)
+                    override(width / scale, height / 4)
+                }
+
+                Glide.with(context).applyDefaultRequestOptions(requestOptions).load(current.url).into(holder.image)
             } else {
                 holder.image.setImageBitmap(current.img)
             }

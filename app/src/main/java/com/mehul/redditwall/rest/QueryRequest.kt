@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
-import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.adapters.ImageAdapter
@@ -178,7 +177,7 @@ internal class QueryRequest {
 
                         val url = source.getString("url").replace("amp;".toRegex(), "")
                         var bitmap: Bitmap? = null
-                        withContext(Dispatchers.IO) {
+                        /*withContext(Dispatchers.IO) {
                             try {
                                 if (isImage && i % 4 == 0) {
                                     bitmap = AppUtils.getGridImageBitmap(context, url)
@@ -187,7 +186,7 @@ internal class QueryRequest {
                                 e.printStackTrace()
                                 bitmap = null
                             }
-                        }
+                        }*/
 
                         withContext(Dispatchers.Main) {
                             val temp = BitURL(bitmap, url, "https://www.reddit.com$postLink")
