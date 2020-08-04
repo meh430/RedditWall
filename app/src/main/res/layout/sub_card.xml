@@ -20,8 +20,8 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+
             <ImageView
-                android:scaleType="centerCrop"
                 android:id="@+id/subIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -30,22 +30,22 @@
                 android:layout_marginEnd="14dp"
                 android:background="@drawable/rounded_sub"
                 android:contentDescription="sub icon"
-                android:padding="4dp"
+                android:scaleType="centerCrop"
                 android:src="@drawable/ic_android" />
 
             <TextView
                 android:id="@+id/subName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+                android:layout_gravity="top"
                 android:layout_marginStart="2dp"
                 android:layout_marginTop="14dp"
                 android:layout_marginEnd="14dp"
                 android:layout_weight="4"
-                android:gravity="center_vertical"
+                android:gravity="top"
                 android:text="Name"
                 android:textColor="@color/textColor"
-                android:textSize="24sp" />
+                android:textSize="26sp" />
 
             <TextView
                 android:id="@+id/subOptions"

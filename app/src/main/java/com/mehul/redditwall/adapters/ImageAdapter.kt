@@ -69,7 +69,7 @@ class ImageAdapter internal constructor(private val context: Context,
         }*/
 
         val temp = ContextCompat.getDrawable(context, R.drawable.ic_android)
-        val errorDraw = ScaleDrawable(temp, 0, (width / scale).toFloat(), (height / 4).toFloat())
+        val errorDraw = ScaleDrawable(temp, 0, (width / 2).toFloat(), (height / 4).toFloat())
         if (current.hasGif()) {
             Glide.with(context).asGif().load(current.url)
                     .override(width / scale, height / 4).centerCrop().into(holder.image)
