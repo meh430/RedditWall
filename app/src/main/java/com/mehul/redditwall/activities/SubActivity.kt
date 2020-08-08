@@ -68,7 +68,7 @@ class SubActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.elevation = 0f
-        supportActionBar?.title = "Search Subreddits"
+        supportActionBar?.title = "Saved Subreddits"
         val sortIcon = ContextCompat.getDrawable(applicationContext, R.drawable.ic_sort)
         val dark = getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
                 .getBoolean(SettingsActivity.DARK, false)
