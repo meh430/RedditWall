@@ -83,7 +83,6 @@ class ImageAdapter internal constructor(private val context: Context,
                     dontTransform()
                     placeholder(errorDraw)
                     error(errorDraw)
-                    //override(width/scale, height / 4)
                 }
 
                 Glide.with(context).applyDefaultRequestOptions(requestOptions).load(current.previewUrl).into(holder.image)

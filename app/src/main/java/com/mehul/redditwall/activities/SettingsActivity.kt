@@ -48,6 +48,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.changeIntervalTitle.visibility = View.GONE
         dark = preferences.getBoolean(DARK, false)
         binding.darkSwitch.isChecked = dark
+        binding.previewRes.isChecked = preferences.getBoolean(PREVIEW_RES, false)
         binding.gifSwitch.isChecked = preferences.getBoolean(LOAD_GIF, false)
         binding.downloadOrigin.isChecked = preferences.getBoolean(DOWNLOAD_ORIGIN, false)
         binding.randomSwitch.isChecked = preferences.getBoolean(RANDOM_ENABLED, false)
@@ -55,8 +56,8 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.intervalSeek.progress = preferences.getInt(RANDOM_INTERVAL, 0)
         binding.intervalCount.text = (binding.intervalSeek.progress + 1).toString() + " hrs"
-        binding.scaleSeek.progress = preferences.getInt(LOAD_SCALE, 0)
-        binding.scaleCount.text = ((binding.scaleSeek.progress + 1) * 2).toString() + "X"
+        //binding.scaleSeek.progress = preferences.getInt(LOAD_SCALE, 0)
+        //binding.scaleCount.text = ((binding.scaleSeek.progress + 1) * 2).toString() + "X"
         binding.randomSwitch.setOnCheckedChangeListener { _, b ->
             preferences.edit().putBoolean(RANDOM_ENABLED, b).apply()
             alarmChanged = b
@@ -67,6 +68,9 @@ class SettingsActivity : AppCompatActivity() {
         }
         binding.downloadOrigin.setOnCheckedChangeListener { _, b ->
             preferences.edit().putBoolean(DOWNLOAD_ORIGIN, b).apply()
+        }
+        binding.previewRes.setOnCheckedChangeListener { _, b ->
+            preferences.edit().putBoolean(PREVIEW_RES, b).apply()
         }
         binding.darkSwitch.setOnCheckedChangeListener { _, b ->
             dark = b
@@ -80,7 +84,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        binding.scaleSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        /*binding.scaleSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
                 if (i > 0) {
                     binding.scaleCount.text = ((i + 1) * 2).toString() + "X"
@@ -91,7 +95,7 @@ class SettingsActivity : AppCompatActivity() {
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
-        })
+        })*/
         binding.intervalSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
                 alarmChanged = true
@@ -139,7 +143,7 @@ class SettingsActivity : AppCompatActivity() {
         super.onPause()
         var valid = true
         val preferenceEditor = preferences.edit()
-        preferenceEditor.putInt(LOAD_SCALE, binding.scaleSeek.progress)
+        //preferenceEditor.putInt(LOAD_SCALE, binding.scaleSeek.progress)
         preferenceEditor.putBoolean(DARK, dark)
         preferenceEditor.putInt(RANDOM_INTERVAL, binding.intervalSeek.progress)
         val setRefresh = preferences.getBoolean(RANDOM_ENABLED, false) && alarmChanged
@@ -190,6 +194,7 @@ class SettingsActivity : AppCompatActivity() {
 
     companion object {
         //pref keys
+        const val PREVIEW_RES = "PREVIEWRES"
         const val SHOW_INFO = "INFOCARD"
         const val SORT_METHOD = "SORTIMG"
         const val IMG_WIDTH = "WIDTH"
