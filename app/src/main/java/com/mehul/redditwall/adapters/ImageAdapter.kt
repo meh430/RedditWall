@@ -72,7 +72,7 @@ class ImageAdapter internal constructor(private val context: Context,
         val errorDraw = ScaleDrawable(temp, 0, (width / 2).toFloat(), (height / 4).toFloat())
         if (current.hasGif()) {
             Glide.with(context).asGif().load(current.url)
-                    .override(width / scale, height / 4).centerCrop().into(holder.image)
+                    .override(400, 400).centerCrop().into(holder.image)
         } else {
             if (current.img == null) {
                 val requestOptions = RequestOptions()
@@ -83,10 +83,10 @@ class ImageAdapter internal constructor(private val context: Context,
                     dontTransform()
                     placeholder(errorDraw)
                     error(errorDraw)
-                    override(width / scale, height / 4)
+                    //override(width/scale, height / 4)
                 }
 
-                Glide.with(context).applyDefaultRequestOptions(requestOptions).load(current.url).into(holder.image)
+                Glide.with(context).applyDefaultRequestOptions(requestOptions).load(current.previewUrl).into(holder.image)
             } else {
                 holder.image.setImageBitmap(current.img)
             }

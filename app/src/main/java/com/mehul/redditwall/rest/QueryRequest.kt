@@ -177,6 +177,12 @@ internal class QueryRequest {
 
                         val url = source.getString("url").replace("amp;".toRegex(), "")
                         var bitmap: Bitmap? = null
+                        var previewUrl = ""
+                        if (isImage) {
+                            val resolutions = image.getJSONArray("resolutions")
+                            previewUrl = resolutions.getJSONObject(0).getString("url").replace("amp;".toRegex(), "")
+                        }
+
                         /*withContext(Dispatchers.IO) {
                             try {
                                 if (isImage && i % 4 == 0) {
@@ -189,7 +195,7 @@ internal class QueryRequest {
                         }*/
 
                         withContext(Dispatchers.Main) {
-                            val temp = BitURL(bitmap, url, "https://www.reddit.com$postLink")
+                            val temp = BitURL(bitmap, url, "https://www.reddit.com$postLink", previewUrl)
                             temp.setGif(!isImage)
                             images.add(temp)
                             if (first && i % 4 == 0 && i != 0) {
