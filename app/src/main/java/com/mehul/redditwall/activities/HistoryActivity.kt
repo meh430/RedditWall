@@ -33,7 +33,10 @@ import com.mehul.redditwall.objects.HistoryItem
 import com.mehul.redditwall.objects.ProgressNotify
 import com.mehul.redditwall.objects.RecyclerListener
 import com.mehul.redditwall.viewmodels.HistViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -43,7 +46,6 @@ class HistoryActivity : AppCompatActivity() {
     private var uiScope = CoroutineScope(Dispatchers.Main)
     private var currSort = R.id.recent
     private var json = ""
-    private var histJob: Job? = null
     private var adapt: HistAdapter? = null
     private lateinit var histViewModel: HistViewModel
     private var histories: List<HistoryItem> = ArrayList()
@@ -112,31 +114,26 @@ class HistoryActivity : AppCompatActivity() {
         histViewModel.allHist.observe(this, Observer { hists ->
             this.histories = sortList(currSort, hists)
             adapt!!.setHistories(histories)
-            histJob = uiScope.launch {
-                json = convertToJSON(histories)
-            }
+
             binding.histEmpty.visibility = if (adapt!!.itemCount == 0) View.VISIBLE else View.GONE
         })
         recycler.addOnItemTouchListener(RecyclerListener(this, recycler, object : RecyclerListener.OnItemClickListener {
             override fun onLongItemClick(view: View?, position: Int) {}
 
             override fun onItemClick(view: View, position: Int) {
-                if (histJob!!.isActive) {
-                    Snackbar.make(binding.root, "Please wait...", Snackbar.LENGTH_SHORT).show()
-                    return
-                }
 
-                cancelThreads()
                 val current = histories[position]
                 val wallIntent = Intent(getCon(), WallActivity::class.java)
+                val listRange = AppUtils.getListRange(position, histories.size)
+                val histJson = getJsonSlice(histories, listRange[0], listRange[1])
                 wallIntent.apply {
                     putExtra(WallActivity.WALL_URL, current.url)
                     putExtra(WallActivity.GIF, false)
                     putExtra(PostActivity.POST_LINK, current.postLink)
                     putExtra(WallActivity.FROM_HIST, true)
                     putExtra(WallActivity.FAV_LIST, current.subName)
-                    putExtra(WallActivity.INDEX, position)
-                    putExtra(WallActivity.LIST, json)
+                    putExtra(WallActivity.INDEX, listRange[2])
+                    putExtra(WallActivity.LIST, histJson)
                 }
                 Log.e("JSON", json)
 
@@ -195,7 +192,6 @@ class HistoryActivity : AppCompatActivity() {
                     while (randomNum >= histories.size || randomNum < 0) {
                         randomNum = (0..histories.size).random()
                     }
-                    cancelThreads()
                     val current = histories[randomNum]
                     val wallIntent = Intent(getCon(), WallActivity::class.java)
                     wallIntent.apply {
@@ -217,20 +213,6 @@ class HistoryActivity : AppCompatActivity() {
         })
     }
 
-    private fun cancelThreads() {
-        histJob?.cancel()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        cancelThreads()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        cancelThreads()
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         currSort = item.itemId
         when (item.itemId) {
@@ -246,9 +228,6 @@ class HistoryActivity : AppCompatActivity() {
 
         if (item.itemId != android.R.id.home) {
             adapt?.setHistories(histories)
-            histJob = uiScope.launch {
-                json = convertToJSON(histories)
-            }
         }
 
         return super.onOptionsItemSelected(item)
@@ -300,24 +279,19 @@ class HistoryActivity : AppCompatActivity() {
         notify.finish()
     }
 
-    private suspend fun convertToJSON(hists: List<HistoryItem>): String {
-        var json = ""
-        binding.wait.visibility = View.VISIBLE
-        withContext(Dispatchers.Default) {
-            val bits = ArrayList<BitURL>()
-            for (i in hists) {
-                if (!isActive) {
-                    break
-                }
 
-                val temp = BitURL(null, i.url, i.postLink)
-                temp.setGif(false)
-                bits.add(temp)
-            }
-            json = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(bits)
+    private fun getJsonSlice(hists: List<HistoryItem>, start: Int, end: Int): String {
+        var json = ""
+        val bitUrls = ArrayList<BitURL>()
+        val histSlice = hists.subList(start, end)
+
+        for (i in histSlice) {
+            val bitUrl = BitURL(null, i.url, i.postLink)
+            bitUrl.setGif(false)
+            bitUrls.add(bitUrl)
         }
-        binding.wait.visibility = View.GONE
-        return json
+
+        return GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(bitUrls)
     }
 
     private fun getCon(): Context {

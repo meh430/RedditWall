@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.GsonBuilder
+import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
 import com.mehul.redditwall.adapters.ImageAdapter
 import com.mehul.redditwall.databinding.ActivityMainBinding
@@ -62,14 +63,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
             override fun onItemClick(view: View, position: Int) {
                 var p = position
-                val currList: ArrayList<BitURL>? = when (currentSort) {
+                val currList: ArrayList<BitURL> = when (currentSort) {
                     HOT -> hotImages
                     NEW -> newImages
                     else -> topImages
                 }
                 //cancelThreads()
                 p = if (p <= 0) 0 else p
-                val current = currList!![p]
+                val current = currList[p]
                 val wallIntent = Intent(getCon(), WallActivity::class.java)
                 wallIntent.apply {
                     putExtra(WallActivity.WALL_URL, current.getUrl())
@@ -78,16 +79,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     putExtra(PostActivity.POST_LINK, current.postLink)
                     putExtra(QUERY, queryString)
                 }
-                val prevs = ArrayList<BitURL>()
-                val start = if (p >= 10) p - 10 else p
-                val limit = if (p + 10 < currList.size) p + 10 else currList.size
-                for (i in start..limit) {
-                    prevs.add(currList[i])
-                }
+                val listRange = AppUtils.getListRange(p, currList.size)
+                val prevs = currList.subList(listRange[0], listRange[1])
                 val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
-                val index = if (p >= 10) 10 else p
                 val jsonList = gson.toJson(prevs)
-                wallIntent.putExtra(WallActivity.INDEX, index)
+                wallIntent.putExtra(WallActivity.INDEX, listRange[2])
                 wallIntent.putExtra(WallActivity.LIST, jsonList)
                 getCon().startActivity(wallIntent)
             }

@@ -51,12 +51,14 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
         holder.itemView.setOnClickListener {
             val wallIntent = Intent(con, WallActivity::class.java)
             val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
-            val jsonList = gson.toJson(favList)
+            val listRange = AppUtils.getListRange(position, favList.size)
+            val swipeList = favList.subList(listRange[0], listRange[1])
+            val jsonList = gson.toJson(swipeList)
             wallIntent.apply {
                 putExtra(PostActivity.POST_LINK, current.postLink)
                 putExtra(WallActivity.WALL_URL, current.url)
                 putExtra(WallActivity.GIF, current.hasGif())
-                putExtra(WallActivity.INDEX, position)
+                putExtra(WallActivity.INDEX, listRange[2])
                 putExtra(WallActivity.FROM_FAV, true)
                 putExtra(WallActivity.LIST, jsonList)
                 putExtra(WallActivity.FAV_LIST, favList[position]?.favName)

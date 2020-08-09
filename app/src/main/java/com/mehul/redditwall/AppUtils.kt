@@ -29,6 +29,14 @@ import java.net.URL
 class AppUtils {
     companion object {
 
+        public fun getListRange(p: Int, listLength: Int): IntArray {
+            val start = if (p >= 10) p - 10 else 0
+            val end = if (p + 10 < listLength) p + 10 else listLength
+            val index = if (p >= 10) 10 else p
+            return intArrayOf(start, end, index)
+        }
+
+
         public fun getDimensions(con: Context): IntArray {
             val disp = DisplayMetrics()
             (con as Activity).windowManager.defaultDisplay.getMetrics(disp)
