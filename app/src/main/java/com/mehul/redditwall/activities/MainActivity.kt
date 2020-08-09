@@ -67,7 +67,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     NEW -> newImages
                     else -> topImages
                 }
-                val limit = currList?.size
                 //cancelThreads()
                 p = if (p <= 0) 0 else p
                 val current = currList!![p]
@@ -80,7 +79,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     putExtra(QUERY, queryString)
                 }
                 val prevs = ArrayList<BitURL>()
-                for (i in (if (p >= 10) p - 10 else 0) until limit!!) {
+                val start = if (p >= 10) p - 10 else p
+                val limit = if (p + 10 < currList.size) p + 10 else currList.size
+                for (i in start..limit) {
                     prevs.add(currList[i])
                 }
                 val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
