@@ -29,4 +29,4 @@ An app that pulls images from a specified subreddit to set as device wallpaper
 <img src="screens/home_light.png" height="331" width="223"><img src="screens/light_prev.png" height="331" width="223"><img src="screens/light_bottom.png" height="331" width="223"><img src="screens/favorites_light.png" height="331" width="223"><img src="screens/saved_light.png" height="331" width="223"><img src="screens/search_light.png" height="331" width="223"><img src="screens/light_hist.png" height="331" width="223">
 
 ## Download
-Download the apk [here](https://github.com/meh430/RedditWall/releases/download/v0.80-beta/reddit-walls-0.80b.apk)
+Download the apk [here](https://github.com/meh430/RedditWall/releases/download/v0.81-beta/reddit-walls-0.81b.apk)
