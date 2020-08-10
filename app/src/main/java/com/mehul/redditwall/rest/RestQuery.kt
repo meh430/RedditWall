@@ -1,7 +1,6 @@
 package com.mehul.redditwall.rest
 
 import android.content.Context
-import android.util.Log
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.activities.WallActivity
@@ -64,7 +63,6 @@ internal class RestQuery(private val QUERY: String, private val context: Context
                 }
                 queryBuild.append(AFTER)
 
-                Log.e("URL", queryBuild.toString())
 
                 val requestURL = URL(queryBuild.toString())
 
@@ -102,7 +100,6 @@ internal class RestQuery(private val QUERY: String, private val context: Context
             }
         }
 
-        Log.d("JSON", jsonString)
         return jsonString
     }
 
@@ -157,7 +154,6 @@ internal class RestQuery(private val QUERY: String, private val context: Context
                 e.printStackTrace()
             }
         }
-        Log.e("fin", "finished job")
         return ret
     }
 }

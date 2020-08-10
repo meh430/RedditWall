@@ -12,7 +12,6 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.DisplayMetrics
-import android.util.Log
 import com.bumptech.glide.Glide
 import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.SettingsActivity
@@ -88,7 +87,6 @@ class AppUtils {
                     if (uri == null) {
                         throw IOException("Failed to create new MediaStore record.")
                     }
-                    Log.e("URI", uri.toString())
                     stream = resolver.openOutputStream(uri)
                     if (stream == null) {
                         throw IOException("Failed to get output stream.")
@@ -192,7 +190,7 @@ class AppUtils {
                     }
                 }
             }
-            Log.e("JSON", jsonString)
+
             return jsonString
         }
     }

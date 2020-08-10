@@ -1,6 +1,5 @@
 package com.mehul.redditwall.rest
 
-import android.util.Log
 import com.mehul.redditwall.objects.Recommendation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
@@ -63,7 +62,6 @@ object RestRecs {
                 }
             }
         }
-        Log.e("RECC", jsonString)
         return jsonString
     }
 

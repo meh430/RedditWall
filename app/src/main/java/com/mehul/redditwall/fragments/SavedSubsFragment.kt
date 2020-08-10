@@ -2,7 +2,6 @@ package com.mehul.redditwall.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -126,16 +125,13 @@ class SavedSubsFragment : Fragment(), SubActivity.Sorting {
     private suspend fun updateInfo() {
         withContext(Dispatchers.Default) {
             for (sub in savedList) {
-                Log.e("SUBNAME", sub.subName)
                 val json = async { AppUtils.getSubInfo(sub.subName.replace("r/", "")) }
                 val result = json.await().getJSONObject("data")
                 sub.subIcon = result.getString("icon_img")
                 sub.subName = result.getString("display_name_prefixed")
                 sub.subDesc = result.getString("public_description")
                 sub.subscribers = result.getInt("subscribers")
-                if (sub.subName.contains("anime")) {
-                    Log.e("ANISUBS", sub.subscribers.toString())
-                }
+
             }
         }
 

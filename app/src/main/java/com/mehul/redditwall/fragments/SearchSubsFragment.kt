@@ -2,7 +2,6 @@ package com.mehul.redditwall.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -104,7 +103,6 @@ class SearchSubsFragment : Fragment() {
                     val subs = result.getInt("subscribers")
                     val sub = Subreddit((0..999999999).random(), title, desc, subs, iconUrl, null)
                     temp.add(sub)
-                    Log.e("LOADED", "loaded $title")
                 }
             } catch (e: JSONException) {
                 e.printStackTrace()

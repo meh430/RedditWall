@@ -10,7 +10,6 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -234,7 +233,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     public override fun onDestroy() {
         super.onDestroy()
-        Log.e("DESTROY", "DESTROY")
         cancelThreads()
     }
 
@@ -377,7 +375,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         val prefEdit = preferences!!.edit()
         if (view == binding.hotChip) {
             currentSort = HOT
-            Log.e("CLICk", "CLICKED HOT")
             prefEdit.putInt(SettingsActivity.SORT_METHOD, HOT)
             prefEdit.apply()
             changeChipColor(1)
@@ -389,7 +386,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
         } else if (view == binding.newChip) {
             currentSort = NEW
-            Log.e("CLICk", "CLICKED NEW")
             prefEdit.putInt(SettingsActivity.SORT_METHOD, NEW)
             prefEdit.apply()
             changeChipColor(0)
@@ -401,7 +397,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
         } else if (view == binding.topChip) {
             currentSort = TOP
-            Log.e("CLICk", "CLICKED TOP")
             prefEdit.putInt(SettingsActivity.SORT_METHOD, TOP)
             prefEdit.apply()
             changeChipColor(2)
@@ -435,7 +430,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         if (first && adapter?.itemCount == 0) {
-            Log.e("LIST", getList().toString())
             binding.info.visibility = View.VISIBLE
             binding.info.text = "Subreddit does not exist or it has no images"
         }

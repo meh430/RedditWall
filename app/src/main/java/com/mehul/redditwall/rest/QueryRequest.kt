@@ -2,7 +2,6 @@ package com.mehul.redditwall.rest
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import com.mehul.redditwall.activities.MainActivity
@@ -80,7 +79,6 @@ internal class QueryRequest {
                         queryBuild.append(AFTER)
                     }
 
-                    Log.e("URL", queryBuild.toString())
 
                     val requestURL = URL(queryBuild.toString())
 
@@ -127,7 +125,6 @@ internal class QueryRequest {
                 }
             }
 
-            Log.d("JSON", jsonString)
             return jsonString
         }
 
@@ -161,7 +158,7 @@ internal class QueryRequest {
                         var isImage = true
                         val canLoadGif = context.getSharedPreferences(MainActivity.SharedPrefFile,
                                 Context.MODE_PRIVATE).getBoolean(SettingsActivity.LOAD_GIF, true)
-                        val lowRes = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE).getBoolean(SettingsActivity.PREVIEW_RES, false)
+
                         if (canLoadGif) {
                             if (image.has("variants") && image.getJSONObject("variants").has("gif")) {
                                 isImage = false
@@ -181,11 +178,7 @@ internal class QueryRequest {
                         var previewUrl = ""
                         if (isImage) {
                             val resolutions = image.getJSONArray("resolutions")
-                            previewUrl = if (lowRes) {
-                                resolutions.getJSONObject(0).getString("url").replace("amp;".toRegex(), "")
-                            } else {
-                                resolutions.getJSONObject(resolutions.length() - 1).getString("url").replace("amp;".toRegex(), "")
-                            }
+                            previewUrl = resolutions.getJSONObject(0).getString("url").replace("amp;".toRegex(), "")
                         }
 
                         /*withContext(Dispatchers.IO) {

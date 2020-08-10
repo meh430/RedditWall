@@ -93,7 +93,7 @@
                     android:padding="8dp" />
             </LinearLayout>
 
-            <TextView
+            <!--<TextView
                 android:id="@+id/scaleSetting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -102,7 +102,7 @@
                 android:textColor="@color/textColor"
                 android:textSize="16sp" />
 
-            <!--<LinearLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">

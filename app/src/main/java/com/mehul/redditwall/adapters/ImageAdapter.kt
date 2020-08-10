@@ -13,6 +13,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
+import com.mehul.redditwall.activities.MainActivity
+import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.objects.BitURL
 
 
@@ -23,9 +25,11 @@ class ImageAdapter internal constructor(private val context: Context,
     private val width: Int
     private val height: Int
     private val scale: Int
+    private val lowRes: Boolean
 
     init {
         val dims = AppUtils.getDimensions(context)
+        lowRes = context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE).getBoolean(SettingsActivity.PREVIEW_RES, false)
         width = dims[0]
         height = dims[1]
         scale = AppUtils.getGridImageScale(context)
@@ -85,7 +89,7 @@ class ImageAdapter internal constructor(private val context: Context,
                     error(errorDraw)
                 }
 
-                Glide.with(context).applyDefaultRequestOptions(requestOptions).load(current.previewUrl).into(holder.image)
+                Glide.with(context).applyDefaultRequestOptions(requestOptions).load(if (lowRes) current.previewUrl else current.url).into(holder.image)
             } else {
                 holder.image.setImageBitmap(current.img)
             }

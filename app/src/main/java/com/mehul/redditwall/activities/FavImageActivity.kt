@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -210,7 +209,7 @@ class FavImageActivity : AppCompatActivity() {
                     }
                 }*/
 
-                val currLoadedImage = BitURL(bitmap, fav.favUrl, fav.postLink)
+                val currLoadedImage = BitURL(bitmap, fav.favUrl, fav.postLink, fav.previewUrl)
                 currLoadedImage.setGif(fav.isGif)
                 favBitmaps.add(currLoadedImage)
 
@@ -261,7 +260,6 @@ class FavImageActivity : AppCompatActivity() {
                 }
                 AppUtils.saveBitmap(bitmap, getCon())
                 withContext(Dispatchers.Main) {
-                    Log.e("PROGRESS", "$i / ${favImages.size}")
                     notify.updateProgress(i)
                 }
             }

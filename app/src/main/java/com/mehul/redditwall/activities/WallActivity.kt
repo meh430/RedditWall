@@ -17,7 +17,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -197,7 +196,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                                     wallSource, imgUrl, imageList[index].postLink)
                             histViewModel?.insert(histItem)
                         } catch (e: Exception) {
-                            Log.e("MainActivity", "Error setting wallpaper")
                             Toast.makeText(getCon(), "failed to set wallpaper", Toast.LENGTH_SHORT).show()
                         }
                     } else {
@@ -210,7 +208,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                                     HistoryItem.BOTH, imgUrl, imageList[index].postLink)
                             histViewModel?.insert(histItem)
                         } catch (e: Exception) {
-                            Log.e("MainActivity", "Error setting wallpaper")
                             Toast.makeText(getCon(), "failed to set wallpaper", Toast.LENGTH_SHORT).show()
                         }
                     }
@@ -332,7 +329,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         if (jsonList!!.isEmpty()) {
             return
         }
-        Log.e("R", "Right")
         if ((index - 1) >= 0) {
             index--
             val curr = imageList[index]
@@ -352,7 +348,6 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         if (jsonList!!.isEmpty()) {
             return
         }
-        Log.e("L", "LEFT")
         val inBound = index + 1 < imageList.size
         if (inBound) {
             index++
@@ -638,7 +633,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                         if (curr.getBoolean("gif")) {
                             gif = true
                         }
-                        val temp = BitURL(null, curr.getString("url"), curr.getString("post"))
+                        val temp = BitURL(null, curr.getString("url"), curr.getString("post"), curr.getString("preview"))
                         temp.setGif(gif)
                         withContext(Dispatchers.Main) {
                             ret.add(temp)
@@ -664,7 +659,7 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         }
         binding.favoriteButton.setImageDrawable(filledHeart)
         favViewModel?.insert(FavImage((0..999999999).random(), imgUrl,
-                isGif, imageList[index].postLink, query))
+                isGif, imageList[index].postLink, query, imageList[index].previewUrl))
     }
 
     fun backPress(view: View?) {

@@ -16,7 +16,9 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.gson.GsonBuilder
 import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
+import com.mehul.redditwall.activities.MainActivity
 import com.mehul.redditwall.activities.PostActivity
+import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.activities.WallActivity
 import com.mehul.redditwall.objects.BitURL
 import com.mehul.redditwall.objects.FavImage
@@ -28,6 +30,7 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
     private val width: Int
     private val height: Int
     private val scale: Int
+    private val lowRes: Boolean = con.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE).getBoolean(SettingsActivity.PREVIEW_RES, false)
 
     init {
         val dims = AppUtils.getDimensions(con)
@@ -135,7 +138,7 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
                         override(width / scale, height / 4)
                     }
 
-                    Glide.with(con).applyDefaultRequestOptions(requestOptions).load(saved.url).into(img)
+                    Glide.with(con).applyDefaultRequestOptions(requestOptions).load(if (lowRes) saved.previewUrl else saved.url).into(img)
                 } else {
                     img.setImageBitmap(saved.img)
                 }

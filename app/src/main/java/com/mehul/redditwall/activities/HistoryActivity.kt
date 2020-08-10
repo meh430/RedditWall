@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -135,7 +134,6 @@ class HistoryActivity : AppCompatActivity() {
                     putExtra(WallActivity.INDEX, listRange[2])
                     putExtra(WallActivity.LIST, histJson)
                 }
-                Log.e("JSON", json)
 
                 getCon().startActivity(wallIntent)
             }
@@ -202,7 +200,6 @@ class HistoryActivity : AppCompatActivity() {
                     }
                     wallIntent.putExtra(WallActivity.INDEX, randomNum)
                     wallIntent.putExtra(WallActivity.LIST, json)
-                    Log.e("JSON", json)
 
                     getCon().startActivity(wallIntent)
                     return@OnActionSelectedListener false
@@ -271,7 +268,6 @@ class HistoryActivity : AppCompatActivity() {
                 }
                 AppUtils.saveBitmap(bitmap, getCon())
                 withContext(Dispatchers.Main) {
-                    Log.e("PROGRESS", "$i / ${histories.size}")
                     notify.updateProgress(i)
                 }
             }
