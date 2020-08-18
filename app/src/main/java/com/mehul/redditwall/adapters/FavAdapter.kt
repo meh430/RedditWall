@@ -138,7 +138,11 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
                         override(width / scale, height / 4)
                     }
 
-                    Glide.with(con).applyDefaultRequestOptions(requestOptions).load(if (lowRes) saved.previewUrl else saved.url).into(img)
+                    Glide.with(con).applyDefaultRequestOptions(requestOptions).load(if (lowRes) {
+                        if (saved.previewUrl.isEmpty()) saved.url else saved.previewUrl
+                    } else {
+                        saved.url
+                    }).into(img)
                 } else {
                     img.setImageBitmap(saved.img)
                 }

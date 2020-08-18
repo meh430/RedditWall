@@ -633,17 +633,17 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
                         if (curr.getBoolean("gif")) {
                             gif = true
                         }
-                        val temp = BitURL(null, curr.getString("url"), curr.getString("post"), curr.getString("preview"))
+                        val temp = BitURL(null, curr.getString("url"), curr.getString("post"), curr.getString("preview_url"))
                         temp.setGif(gif)
                         withContext(Dispatchers.Main) {
                             ret.add(temp)
                         }
                     }
                 } catch (e: JSONException) {
+
                     e.printStackTrace()
                 }
             }
-
             return ret
         }
     }
