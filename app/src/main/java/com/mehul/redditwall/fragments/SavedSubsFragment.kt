@@ -22,6 +22,7 @@ import com.mehul.redditwall.databinding.FragmentSavedSubsBinding
 import com.mehul.redditwall.objects.Subreddit
 import com.mehul.redditwall.viewmodels.SubViewModel
 import kotlinx.coroutines.*
+import org.json.JSONException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -126,11 +127,16 @@ class SavedSubsFragment : Fragment(), SubActivity.Sorting {
         withContext(Dispatchers.Default) {
             for (sub in savedList) {
                 val json = async { AppUtils.getSubInfo(sub.subName.replace("r/", "")) }
-                val result = json.await().getJSONObject("data")
-                sub.subIcon = result.getString("icon_img")
-                sub.subName = result.getString("display_name_prefixed")
-                sub.subDesc = result.getString("public_description")
-                sub.subscribers = result.getInt("subscribers")
+                try {
+                    val result = json.await().getJSONObject("data")
+                    sub.subIcon = result.getString("icon_img")
+                    sub.subName = result.getString("display_name_prefixed")
+                    sub.subDesc = result.getString("public_description")
+                    sub.subscribers = result.getInt("subscribers")
+                } catch (e: JSONException) {
+                    sub.subDesc = "${sub.subName} has been deleted. Swipe this card to remove it"
+                    sub.subName = "Deleted Sub [${sub.subName}]"
+                }
 
             }
         }
