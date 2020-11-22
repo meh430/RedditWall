@@ -9,6 +9,7 @@ import android.app.WallpaperManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -511,15 +512,26 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             }
         }
 
+        var failed = false;
+
         if (downloadOriginal) {
             withContext(Dispatchers.IO) {
-                currentBitmap = with(con).asBitmap().load(imgUrl).submit().get()
+                try {
+                    currentBitmap = with(con).asBitmap().load(imgUrl).submit().get()
+                } catch (e: Exception) {
+                    failed = true;
+                    currentBitmap = BitmapFactory.decodeResource(resources, R.drawable.picerror)//with(con).asBitmap().load("https://github.com/meh430/RedditWall/blob/master/app/src/main/res/drawable/picerror.png?raw=true").submit().get();
+                }
             }
         }
 
         binding.favoriteButton.setImageDrawable(if (saved) filledHeart else openHeart)
         binding.loadMore.visibility = View.GONE
         binding.wallHolder.visibility = View.VISIBLE
+
+        if (failed) {
+            Toast.makeText(con, "Error loading image", Toast.LENGTH_SHORT).show()
+        }
 
         val dimensions = AppUtils.getWallDimensions(con)
 
