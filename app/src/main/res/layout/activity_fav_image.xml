@@ -1,62 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.FavImageActivity">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".activities.FavImageActivity"
+    tools:ignore="HardcodedText">
 
-    <ProgressBar
-        android:id="@+id/remaining"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:indeterminate="true"
-        android:visibility="gone" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/favRecycler"
-        android:layout_below="@id/remaining"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:paddingStart="6dp"
-        android:paddingEnd="6dp" />
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/favEmpty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_gravity="center"
-        android:layout_margin="16dp"
-        android:gravity="center"
-        android:text="You do not have any favorite images, find an image you like and click the star icon on the top right to add a favorite"
-        android:textColor="@color/textColor"
-        android:textSize="22sp"
-        android:visibility="gone" />
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
 
-    <ProgressBar
-        android:id="@+id/favLoading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone" />
+            android:theme="@style/AppTheme.AppBarOverlay"
+            app:elevation="0dp">
 
-    <com.leinardi.android.speeddial.SpeedDialOverlayLayout
-        android:id="@+id/overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-    <com.leinardi.android.speeddial.SpeedDialView
-        android:id="@+id/speedDial"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="bottom|end"
-        app:sdMainFabClosedSrc="@drawable/ic_info"
-        app:sdOverlayLayout="@id/overlay" />
-</RelativeLayout>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".activities.FavImageActivity">
+
+
+            <ProgressBar
+                android:id="@+id/remaining"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:indeterminate="true"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/favRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/remaining"
+                android:layout_centerInParent="true"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp" />
+
+            <TextView
+                android:id="@+id/favEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:layout_margin="16dp"
+                android:gravity="center"
+                android:text="You do not have any favorite images, find an image you like and click the star icon on the top right to add a favorite"
+                android:textColor="@color/textColor"
+                android:textSize="22sp"
+                android:visibility="gone" />
+
+            <ProgressBar
+                android:id="@+id/favLoading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="gone" />
+
+            <com.leinardi.android.speeddial.SpeedDialOverlayLayout
+                android:id="@+id/overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <com.leinardi.android.speeddial.SpeedDialView
+                android:id="@+id/speedDial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="bottom|end"
+                app:sdMainFabClosedSrc="@drawable/ic_info"
+                app:sdOverlayLayout="@id/overlay" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

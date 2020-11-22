@@ -17,4 +17,4 @@ class FavImage(@field:PrimaryKey(autoGenerate = true) var id: Int,
                @SerializedName("fav_name")
                @field:ColumnInfo(name = "fav_name") var favName: String,
                @Expose @field:SerializedName("preview_url")
-               @field:ColumnInfo(name = "preview_url") var previewUrl: String)
+               @field:ColumnInfo(name = "preview_url") var previewUrl: String, var selected: Boolean = false)

@@ -44,6 +44,9 @@ class FavImageActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityFavImageBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true);
+        supportActionBar?.setDisplayShowHomeEnabled(true);
         supportActionBar?.elevation = 0F
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
         favAdapter = FavAdapter(this, ArrayList())
