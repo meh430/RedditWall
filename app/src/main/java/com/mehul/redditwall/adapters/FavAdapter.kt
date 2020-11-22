@@ -51,6 +51,8 @@ class FavAdapter(private val con: Context, lis: ArrayList<BitURL>) : RecyclerVie
             isLongClickable = true
             isClickable = true
         }
+
+
         holder.itemView.setOnClickListener {
             val wallIntent = Intent(con, WallActivity::class.java)
             val gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
