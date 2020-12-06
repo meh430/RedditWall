@@ -1,0 +1,66 @@
+[
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_wall.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\activity_wall.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_search_subs.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\fragment_search_subs.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\history_item.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\history_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\card_image.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\card_image.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\next_wallpaper.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\next_wallpaper.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_settings.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\activity_settings.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_fav_image.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\activity_fav_image.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_splash.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\activity_splash.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_saved_subs.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\fragment_saved_subs.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\sub_card.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\sub_card.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_history.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\activity_history.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_post.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\activity_post.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_main.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\card_rec.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\card_rec.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_rec.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\activity_rec.xml"
+    },
+    {
+        "merged": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_sub.xml",
+        "source": "C:\\Users\\Mehul Pillai\\AndroidStudioProjects\\RedditWall\\app\\src\\main\\res\\layout\\activity_sub.xml"
+    }
+]

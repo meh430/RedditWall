@@ -1,0 +1,424 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:2:1-99:12
+INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:2:1-99:12
+INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:2:1-99:12
+INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:2:1-99:12
+MERGED from [androidx.databinding:viewbinding:4.0.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\da77357fa21bc64cadac11132a280863\jetified-viewbinding-4.0.1\AndroidManifest.xml:17:1-22:12
+MERGED from [com.leinardi.android:speed-dial:3.1.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\40d7e2691837ccdd09e6352a12247f3d\jetified-speed-dial-3.1.1\AndroidManifest.xml:17:1-26:12
+MERGED from [com.squareup.picasso:picasso:2.71828] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\08cd9f0b3f83334151cd23abe93b1ac9\jetified-picasso-2.71828\AndroidManifest.xml:2:1-14:12
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.4] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bc08719ea9ea387e30a7a82cb5e35262\constraintlayout-2.0.4\AndroidManifest.xml:2:1-11:12
+MERGED from [com.google.android.material:material:1.2.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\a5e7eec375bdec17f583d516eee54e31\material-1.2.1\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.appcompat:appcompat:1.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\3de8c5446691bdd796148fc514c87cbb\appcompat-1.2.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\4a0ef122b423008183bfea1ec47d0b83\legacy-support-v4-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\d63f575048fd7b2cdc281083851aa128\jetified-viewpager2-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\e0c59ffe9c9ba5e003275246d1defd72\recyclerview-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.cardview:cardview:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\3aba6a0463d1b139468d602217b31ceb\cardview-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.room:room-runtime:2.2.5] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\76c521f8baadcc252926f9cc54a0e3ef\room-runtime-2.2.5\AndroidManifest.xml:17:1-31:12
+MERGED from [androidx.lifecycle:lifecycle-extensions:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\68dbf81286879ab063b0f1f6f16db4d9\lifecycle-extensions-2.2.0\AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.core:core-ktx:1.3.2] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\a79e3ffb7d08ae6801154c68794d9a21\jetified-core-ktx-1.3.2\AndroidManifest.xml:2:1-9:12
+MERGED from [androidx.appcompat:appcompat-resources:1.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bb6e8a2b11e80dd33b10db79113fbc96\jetified-appcompat-resources-1.2.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\396a79e97878499255d408ac7484ecb5\legacy-support-core-ui-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\d5d69e2e3aadd2007dddccc005813d0d\drawerlayout-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media:media:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bc7153a42997949afc62e7501968d90f\media-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\21854e8b7b7b2ed6afc1a8476d1f9c87\legacy-support-core-utils-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\d4aa5e939feb48df896f375091ddb154\coordinatorlayout-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [com.github.bumptech.glide:glide:4.11.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\b631e54c296a1e7bc15f30dd1e029424\jetified-glide-4.11.0\AndroidManifest.xml:2:1-12:12
+MERGED from [androidx.fragment:fragment:1.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\480a2e890051c10a649b72bf0ee72345\fragment-1.2.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\19a701661476c2ba68e46569c24d4a63\viewpager-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\fc834016d1996c2324eb8913c21c2974\slidingpanelayout-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\ff5e4426f4cab509a8afb64532b570bd\customview-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.transition:transition:1.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\f707417f30abedcaeae2491372ba3f9a\transition-1.2.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\97fc2d6a3ca974b9dbbfd4db16971309\vectordrawable-animated-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\d5bd366f2e085618d421a39260ab5b22\vectordrawable-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\7d9dc5e77e276fa0bbf7415a33e8da4c\loader-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\5c6777d805fe97bc24705ad516e4722d\swiperefreshlayout-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\028875ac1755bbc395398b76cbb9bfc6\asynclayoutinflater-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.activity:activity:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\3ab219ff1684b76b00cd359a2045cbe9\jetified-activity-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.core:core:1.3.2] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\41bbcd773733de2593e7f4d0e6948561\core-1.3.2\AndroidManifest.xml:17:1-26:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\6437557e460ad2353af2d47a04402e61\jetified-lifecycle-viewmodel-ktx-2.2.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.exifinterface:exifinterface:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\1914460ab1bc6ab0de31741e50c58875\exifinterface-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\8d86e83c09ea30414d4e36e0db8d12c1\cursoradapter-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.sqlite:sqlite-framework:2.0.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\219d76774718d7dceec284032971b8bf\sqlite-framework-2.0.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.sqlite:sqlite:2.0.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\a4bda69f6c70b5d056936a108ea67f98\sqlite-2.0.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\6864640aa84227c27a585e8565b7410c\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:17:1-32:12
+MERGED from [androidx.lifecycle:lifecycle-service:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bf1a2d96dd3e961af6b49ddf32ff82f7\jetified-lifecycle-service-2.2.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\5beea733515a40a231141ff9af1ba0c5\lifecycle-runtime-2.2.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\12befbf553710521e28d0b3279119787\lifecycle-livedata-2.2.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\24860cc4685652ec3caf2d4983c6ee51\jetified-lifecycle-viewmodel-savedstate-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\f4d4b50b97e293de7af1d8bb7e9b2f0c\lifecycle-livedata-core-2.2.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.arch.core:core-runtime:2.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\3fec907a824d060d8a656c46fe59e5dc\core-runtime-2.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.savedstate:savedstate:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\8a06117cf6ed5b5c7d42dc8b7f9c6584\jetified-savedstate-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\71320ee8788e65f63edc4c9528ed09e8\lifecycle-viewmodel-2.2.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\2b9e480bb5efa5a0e37feb4e682fec4d\versionedparcelable-1.1.0\AndroidManifest.xml:17:1-27:12
+MERGED from [com.github.bumptech.glide:gifdecoder:4.11.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\1204ab970c5cdf8b9d33014412195481\jetified-gifdecoder-4.11.0\AndroidManifest.xml:2:1-11:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\40d751efeba0b1d489f62da2a3b7735e\documentfile-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\293c8e1a3f75ab719f10d0c042f2556b\localbroadcastmanager-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\633632acd67ebb3d7e795b8dfdf94cb0\print-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\2c00bfda97ae04113c343d7a5a29afa1\interpolator-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.annotation:annotation-experimental:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\700bd3a91e7c1a05a1c36813429d0444\jetified-annotation-experimental-1.0.0\AndroidManifest.xml:17:1-24:12
+INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:2:1-99:12
+INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:2:1-99:12
+INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:2:1-99:12
+	package
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:4:5-35
+		INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:2:1-99:12
+		INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+	xmlns:tools
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:3:5-51
+	android:versionCode
+		INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:2:1-99:12
+		INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:2:11-69
+uses-permission#android.permission.INTERNET
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:6:5-67
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:6:22-64
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:7:5-79
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:7:22-76
+uses-permission#android.permission.SET_WALLPAPER
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:8:5-72
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:8:22-69
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:9:5-81
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:9:22-78
+uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:10:5-81
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:10:22-78
+application
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:12:5-97:19
+MERGED from [com.squareup.picasso:picasso:2.71828] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\08cd9f0b3f83334151cd23abe93b1ac9\jetified-picasso-2.71828\AndroidManifest.xml:7:5-12:19
+MERGED from [com.squareup.picasso:picasso:2.71828] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\08cd9f0b3f83334151cd23abe93b1ac9\jetified-picasso-2.71828\AndroidManifest.xml:7:5-12:19
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.4] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bc08719ea9ea387e30a7a82cb5e35262\constraintlayout-2.0.4\AndroidManifest.xml:9:5-20
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.4] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bc08719ea9ea387e30a7a82cb5e35262\constraintlayout-2.0.4\AndroidManifest.xml:9:5-20
+MERGED from [com.google.android.material:material:1.2.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\a5e7eec375bdec17f583d516eee54e31\material-1.2.1\AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.material:material:1.2.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\a5e7eec375bdec17f583d516eee54e31\material-1.2.1\AndroidManifest.xml:22:5-20
+MERGED from [androidx.room:room-runtime:2.2.5] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\76c521f8baadcc252926f9cc54a0e3ef\room-runtime-2.2.5\AndroidManifest.xml:24:5-29:19
+MERGED from [androidx.room:room-runtime:2.2.5] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\76c521f8baadcc252926f9cc54a0e3ef\room-runtime-2.2.5\AndroidManifest.xml:24:5-29:19
+MERGED from [androidx.lifecycle:lifecycle-extensions:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\68dbf81286879ab063b0f1f6f16db4d9\lifecycle-extensions-2.2.0\AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.lifecycle:lifecycle-extensions:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\68dbf81286879ab063b0f1f6f16db4d9\lifecycle-extensions-2.2.0\AndroidManifest.xml:24:5-25:19
+MERGED from [com.github.bumptech.glide:glide:4.11.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\b631e54c296a1e7bc15f30dd1e029424\jetified-glide-4.11.0\AndroidManifest.xml:10:5-20
+MERGED from [com.github.bumptech.glide:glide:4.11.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\b631e54c296a1e7bc15f30dd1e029424\jetified-glide-4.11.0\AndroidManifest.xml:10:5-20
+MERGED from [androidx.core:core:1.3.2] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\41bbcd773733de2593e7f4d0e6948561\core-1.3.2\AndroidManifest.xml:24:5-89
+MERGED from [androidx.core:core:1.3.2] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\41bbcd773733de2593e7f4d0e6948561\core-1.3.2\AndroidManifest.xml:24:5-89
+MERGED from [androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\6864640aa84227c27a585e8565b7410c\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:24:5-30:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\6864640aa84227c27a585e8565b7410c\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:24:5-30:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\2b9e480bb5efa5a0e37feb4e682fec4d\versionedparcelable-1.1.0\AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\2b9e480bb5efa5a0e37feb4e682fec4d\versionedparcelable-1.1.0\AndroidManifest.xml:24:5-25:19
+MERGED from [com.github.bumptech.glide:gifdecoder:4.11.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\1204ab970c5cdf8b9d33014412195481\jetified-gifdecoder-4.11.0\AndroidManifest.xml:9:5-20
+MERGED from [com.github.bumptech.glide:gifdecoder:4.11.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\1204ab970c5cdf8b9d33014412195481\jetified-gifdecoder-4.11.0\AndroidManifest.xml:9:5-20
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.3.2] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\41bbcd773733de2593e7f4d0e6948561\core-1.3.2\AndroidManifest.xml:24:18-86
+	android:supportsRtl
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:19:9-35
+	android:label
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:16:9-41
+	android:fullBackupContent
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:14:9-41
+	android:roundIcon
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:18:9-54
+	android:largeHeap
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:17:9-33
+	android:icon
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:15:9-43
+	android:allowBackup
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:13:9-35
+	android:theme
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:20:9-40
+activity#com.mehul.redditwall.activities.SubActivity
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:21:9-28:56
+	android:screenOrientation
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:25:13-49
+	android:parentActivityName
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:24:13-66
+	android:windowSoftInputMode
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:27:13-54
+	tools:ignore
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:28:13-53
+	android:configChanges
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:23:13-63
+	android:theme
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:26:13-56
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:22:13-51
+receiver#com.mehul.redditwall.BootReceiver
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:30:9-38:20
+	android:enabled
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:32:13-35
+	android:exported
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:33:13-36
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:31:13-41
+intent-filter#action:name:android.intent.action.BOOT_COMPLETED+action:name:android.intent.action.QUICKBOOT_POWERON
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:34:13-37:29
+action#android.intent.action.QUICKBOOT_POWERON
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:35:17-82
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:35:25-79
+action#android.intent.action.BOOT_COMPLETED
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:36:17-79
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:36:25-76
+receiver#com.mehul.redditwall.NextWallpaper
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:39:9-47:20
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:39:19-48
+intent-filter#action:name:android.appwidget.action.APPWIDGET_UPDATE
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:40:13-42:29
+action#android.appwidget.action.APPWIDGET_UPDATE
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:41:17-84
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:41:25-81
+meta-data#android.appwidget.provider
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:44:13-46:63
+	android:resource
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:46:17-60
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:45:17-58
+receiver#com.mehul.redditwall.ChangeWallpaper
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:48:9-51:40
+	android:enabled
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:50:13-35
+	android:exported
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:51:13-37
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:49:13-44
+activity#com.mehul.redditwall.activities.HistoryActivity
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:53:9-57:59
+	android:parentActivityName
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:56:13-66
+	android:label
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:55:13-36
+	android:theme
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:57:13-56
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:54:13-55
+activity#com.mehul.redditwall.activities.PostActivity
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:58:9-61:69
+	android:parentActivityName
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:61:13-66
+	android:label
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:60:13-42
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:59:13-52
+activity#com.mehul.redditwall.activities.RecActivity
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:62:9-65:69
+	android:parentActivityName
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:65:13-66
+	android:label
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:64:13-44
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:63:13-51
+activity#com.mehul.redditwall.activities.FavImageActivity
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:66:9-70:69
+	android:parentActivityName
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:70:13-66
+	android:label
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:68:13-44
+	android:theme
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:69:13-56
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:67:13-56
+activity#com.mehul.redditwall.activities.SettingsActivity
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:71:9-75:57
+	android:parentActivityName
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:74:13-66
+	android:label
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:73:13-37
+	android:windowSoftInputMode
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:75:13-54
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:72:13-56
+activity#com.mehul.redditwall.activities.WallActivity
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:76:9-79:59
+	android:configChanges
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:78:13-63
+	android:theme
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:79:13-56
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:77:13-52
+activity#com.mehul.redditwall.activities.MainActivity
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:80:9-95:20
+	android:label
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:82:13-41
+	android:windowSoftInputMode
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:84:13-54
+	android:theme
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:83:13-56
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:81:13-52
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:85:13-89:29
+action#android.intent.action.MAIN
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:86:17-69
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:86:25-66
+category#android.intent.category.LAUNCHER
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:88:17-77
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:88:27-74
+meta-data#android.app.shortcuts
+ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:91:13-94:63
+	android:resource
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:93:17-50
+	android:theme
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:94:17-60
+	android:name
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:92:17-53
+uses-sdk
+INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+MERGED from [androidx.databinding:viewbinding:4.0.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\da77357fa21bc64cadac11132a280863\jetified-viewbinding-4.0.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.databinding:viewbinding:4.0.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\da77357fa21bc64cadac11132a280863\jetified-viewbinding-4.0.1\AndroidManifest.xml:20:5-44
+MERGED from [com.leinardi.android:speed-dial:3.1.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\40d7e2691837ccdd09e6352a12247f3d\jetified-speed-dial-3.1.1\AndroidManifest.xml:22:5-24:41
+MERGED from [com.leinardi.android:speed-dial:3.1.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\40d7e2691837ccdd09e6352a12247f3d\jetified-speed-dial-3.1.1\AndroidManifest.xml:22:5-24:41
+MERGED from [com.squareup.picasso:picasso:2.71828] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\08cd9f0b3f83334151cd23abe93b1ac9\jetified-picasso-2.71828\AndroidManifest.xml:5:5-44
+MERGED from [com.squareup.picasso:picasso:2.71828] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\08cd9f0b3f83334151cd23abe93b1ac9\jetified-picasso-2.71828\AndroidManifest.xml:5:5-44
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.4] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bc08719ea9ea387e30a7a82cb5e35262\constraintlayout-2.0.4\AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.constraintlayout:constraintlayout:2.0.4] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bc08719ea9ea387e30a7a82cb5e35262\constraintlayout-2.0.4\AndroidManifest.xml:5:5-7:41
+MERGED from [com.google.android.material:material:1.2.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\a5e7eec375bdec17f583d516eee54e31\material-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.material:material:1.2.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\a5e7eec375bdec17f583d516eee54e31\material-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat:1.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\3de8c5446691bdd796148fc514c87cbb\appcompat-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.appcompat:appcompat:1.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\3de8c5446691bdd796148fc514c87cbb\appcompat-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\4a0ef122b423008183bfea1ec47d0b83\legacy-support-v4-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\4a0ef122b423008183bfea1ec47d0b83\legacy-support-v4-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\d63f575048fd7b2cdc281083851aa128\jetified-viewpager2-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\d63f575048fd7b2cdc281083851aa128\jetified-viewpager2-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\e0c59ffe9c9ba5e003275246d1defd72\recyclerview-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.recyclerview:recyclerview:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\e0c59ffe9c9ba5e003275246d1defd72\recyclerview-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.cardview:cardview:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\3aba6a0463d1b139468d602217b31ceb\cardview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\3aba6a0463d1b139468d602217b31ceb\cardview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.room:room-runtime:2.2.5] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\76c521f8baadcc252926f9cc54a0e3ef\room-runtime-2.2.5\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.room:room-runtime:2.2.5] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\76c521f8baadcc252926f9cc54a0e3ef\room-runtime-2.2.5\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-extensions:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\68dbf81286879ab063b0f1f6f16db4d9\lifecycle-extensions-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-extensions:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\68dbf81286879ab063b0f1f6f16db4d9\lifecycle-extensions-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core-ktx:1.3.2] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\a79e3ffb7d08ae6801154c68794d9a21\jetified-core-ktx-1.3.2\AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.core:core-ktx:1.3.2] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\a79e3ffb7d08ae6801154c68794d9a21\jetified-core-ktx-1.3.2\AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.appcompat:appcompat-resources:1.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bb6e8a2b11e80dd33b10db79113fbc96\jetified-appcompat-resources-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.appcompat:appcompat-resources:1.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bb6e8a2b11e80dd33b10db79113fbc96\jetified-appcompat-resources-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\396a79e97878499255d408ac7484ecb5\legacy-support-core-ui-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\396a79e97878499255d408ac7484ecb5\legacy-support-core-ui-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\d5d69e2e3aadd2007dddccc005813d0d\drawerlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\d5d69e2e3aadd2007dddccc005813d0d\drawerlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media:media:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bc7153a42997949afc62e7501968d90f\media-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media:media:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bc7153a42997949afc62e7501968d90f\media-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\21854e8b7b7b2ed6afc1a8476d1f9c87\legacy-support-core-utils-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\21854e8b7b7b2ed6afc1a8476d1f9c87\legacy-support-core-utils-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\d4aa5e939feb48df896f375091ddb154\coordinatorlayout-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\d4aa5e939feb48df896f375091ddb154\coordinatorlayout-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [com.github.bumptech.glide:glide:4.11.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\b631e54c296a1e7bc15f30dd1e029424\jetified-glide-4.11.0\AndroidManifest.xml:6:5-8:41
+MERGED from [com.github.bumptech.glide:glide:4.11.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\b631e54c296a1e7bc15f30dd1e029424\jetified-glide-4.11.0\AndroidManifest.xml:6:5-8:41
+MERGED from [androidx.fragment:fragment:1.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\480a2e890051c10a649b72bf0ee72345\fragment-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\480a2e890051c10a649b72bf0ee72345\fragment-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\19a701661476c2ba68e46569c24d4a63\viewpager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\19a701661476c2ba68e46569c24d4a63\viewpager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\fc834016d1996c2324eb8913c21c2974\slidingpanelayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\fc834016d1996c2324eb8913c21c2974\slidingpanelayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\ff5e4426f4cab509a8afb64532b570bd\customview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\ff5e4426f4cab509a8afb64532b570bd\customview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.transition:transition:1.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\f707417f30abedcaeae2491372ba3f9a\transition-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.transition:transition:1.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\f707417f30abedcaeae2491372ba3f9a\transition-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\97fc2d6a3ca974b9dbbfd4db16971309\vectordrawable-animated-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\97fc2d6a3ca974b9dbbfd4db16971309\vectordrawable-animated-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\d5bd366f2e085618d421a39260ab5b22\vectordrawable-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\d5bd366f2e085618d421a39260ab5b22\vectordrawable-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\7d9dc5e77e276fa0bbf7415a33e8da4c\loader-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\7d9dc5e77e276fa0bbf7415a33e8da4c\loader-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\5c6777d805fe97bc24705ad516e4722d\swiperefreshlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\5c6777d805fe97bc24705ad516e4722d\swiperefreshlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\028875ac1755bbc395398b76cbb9bfc6\asynclayoutinflater-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\028875ac1755bbc395398b76cbb9bfc6\asynclayoutinflater-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\3ab219ff1684b76b00cd359a2045cbe9\jetified-activity-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.activity:activity:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\3ab219ff1684b76b00cd359a2045cbe9\jetified-activity-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.3.2] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\41bbcd773733de2593e7f4d0e6948561\core-1.3.2\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.3.2] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\41bbcd773733de2593e7f4d0e6948561\core-1.3.2\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\6437557e460ad2353af2d47a04402e61\jetified-lifecycle-viewmodel-ktx-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\6437557e460ad2353af2d47a04402e61\jetified-lifecycle-viewmodel-ktx-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.exifinterface:exifinterface:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\1914460ab1bc6ab0de31741e50c58875\exifinterface-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.exifinterface:exifinterface:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\1914460ab1bc6ab0de31741e50c58875\exifinterface-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\8d86e83c09ea30414d4e36e0db8d12c1\cursoradapter-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\8d86e83c09ea30414d4e36e0db8d12c1\cursoradapter-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite-framework:2.0.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\219d76774718d7dceec284032971b8bf\sqlite-framework-2.0.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite-framework:2.0.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\219d76774718d7dceec284032971b8bf\sqlite-framework-2.0.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite:2.0.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\a4bda69f6c70b5d056936a108ea67f98\sqlite-2.0.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite:2.0.1] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\a4bda69f6c70b5d056936a108ea67f98\sqlite-2.0.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\6864640aa84227c27a585e8565b7410c\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\6864640aa84227c27a585e8565b7410c\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-service:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bf1a2d96dd3e961af6b49ddf32ff82f7\jetified-lifecycle-service-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-service:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\bf1a2d96dd3e961af6b49ddf32ff82f7\jetified-lifecycle-service-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\5beea733515a40a231141ff9af1ba0c5\lifecycle-runtime-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\5beea733515a40a231141ff9af1ba0c5\lifecycle-runtime-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\12befbf553710521e28d0b3279119787\lifecycle-livedata-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\12befbf553710521e28d0b3279119787\lifecycle-livedata-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\24860cc4685652ec3caf2d4983c6ee51\jetified-lifecycle-viewmodel-savedstate-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\24860cc4685652ec3caf2d4983c6ee51\jetified-lifecycle-viewmodel-savedstate-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\f4d4b50b97e293de7af1d8bb7e9b2f0c\lifecycle-livedata-core-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\f4d4b50b97e293de7af1d8bb7e9b2f0c\lifecycle-livedata-core-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\3fec907a824d060d8a656c46fe59e5dc\core-runtime-2.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\3fec907a824d060d8a656c46fe59e5dc\core-runtime-2.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.savedstate:savedstate:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\8a06117cf6ed5b5c7d42dc8b7f9c6584\jetified-savedstate-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.savedstate:savedstate:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\8a06117cf6ed5b5c7d42dc8b7f9c6584\jetified-savedstate-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\71320ee8788e65f63edc4c9528ed09e8\lifecycle-viewmodel-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\71320ee8788e65f63edc4c9528ed09e8\lifecycle-viewmodel-2.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\2b9e480bb5efa5a0e37feb4e682fec4d\versionedparcelable-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\2b9e480bb5efa5a0e37feb4e682fec4d\versionedparcelable-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [com.github.bumptech.glide:gifdecoder:4.11.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\1204ab970c5cdf8b9d33014412195481\jetified-gifdecoder-4.11.0\AndroidManifest.xml:5:5-7:41
+MERGED from [com.github.bumptech.glide:gifdecoder:4.11.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\1204ab970c5cdf8b9d33014412195481\jetified-gifdecoder-4.11.0\AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\40d751efeba0b1d489f62da2a3b7735e\documentfile-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\40d751efeba0b1d489f62da2a3b7735e\documentfile-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\293c8e1a3f75ab719f10d0c042f2556b\localbroadcastmanager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\293c8e1a3f75ab719f10d0c042f2556b\localbroadcastmanager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\633632acd67ebb3d7e795b8dfdf94cb0\print-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\633632acd67ebb3d7e795b8dfdf94cb0\print-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\2c00bfda97ae04113c343d7a5a29afa1\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\2c00bfda97ae04113c343d7a5a29afa1\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\700bd3a91e7c1a05a1c36813429d0444\jetified-annotation-experimental-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.annotation:annotation-experimental:1.0.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\700bd3a91e7c1a05a1c36813429d0444\jetified-annotation-experimental-1.0.0\AndroidManifest.xml:20:5-22:41
+INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+		ADDED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+provider#com.squareup.picasso.PicassoProvider
+ADDED from [com.squareup.picasso:picasso:2.71828] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\08cd9f0b3f83334151cd23abe93b1ac9\jetified-picasso-2.71828\AndroidManifest.xml:8:9-11:40
+	android:authorities
+		ADDED from [com.squareup.picasso:picasso:2.71828] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\08cd9f0b3f83334151cd23abe93b1ac9\jetified-picasso-2.71828\AndroidManifest.xml:10:13-72
+	android:exported
+		ADDED from [com.squareup.picasso:picasso:2.71828] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\08cd9f0b3f83334151cd23abe93b1ac9\jetified-picasso-2.71828\AndroidManifest.xml:11:13-37
+	android:name
+		ADDED from [com.squareup.picasso:picasso:2.71828] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\08cd9f0b3f83334151cd23abe93b1ac9\jetified-picasso-2.71828\AndroidManifest.xml:9:13-64
+service#androidx.room.MultiInstanceInvalidationService
+ADDED from [androidx.room:room-runtime:2.2.5] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\76c521f8baadcc252926f9cc54a0e3ef\room-runtime-2.2.5\AndroidManifest.xml:25:9-28:40
+	android:exported
+		ADDED from [androidx.room:room-runtime:2.2.5] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\76c521f8baadcc252926f9cc54a0e3ef\room-runtime-2.2.5\AndroidManifest.xml:28:13-37
+	android:directBootAware
+		ADDED from [androidx.room:room-runtime:2.2.5] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\76c521f8baadcc252926f9cc54a0e3ef\room-runtime-2.2.5\AndroidManifest.xml:27:13-43
+	android:name
+		ADDED from [androidx.room:room-runtime:2.2.5] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\76c521f8baadcc252926f9cc54a0e3ef\room-runtime-2.2.5\AndroidManifest.xml:26:13-74
+provider#androidx.lifecycle.ProcessLifecycleOwnerInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\6864640aa84227c27a585e8565b7410c\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:25:9-29:43
+	android:authorities
+		ADDED from [androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\6864640aa84227c27a585e8565b7410c\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:27:13-69
+	android:multiprocess
+		ADDED from [androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\6864640aa84227c27a585e8565b7410c\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:29:13-40
+	android:exported
+		ADDED from [androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\6864640aa84227c27a585e8565b7410c\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:28:13-37
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\6864640aa84227c27a585e8565b7410c\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:26:13-79

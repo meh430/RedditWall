@@ -1,0 +1,143 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.mehul.redditwall"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="22"
+8-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+9        android:targetSdkVersion="29" />
+9-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:6:5-67
+11-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:6:22-64
+12    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+12-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:7:5-79
+12-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:7:22-76
+13    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+13-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:8:5-72
+13-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:8:22-69
+14    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+14-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:9:5-81
+14-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:9:22-78
+15
+16    <application
+16-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:11:5-55:19
+17        android:allowBackup="true"
+17-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:12:9-35
+18        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+18-->[androidx.core:core:1.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\f8a25a8e7a6c14f5ca703a491b755ba2\core-1.2.0\AndroidManifest.xml:24:18-86
+19        android:fullBackupContent="true"
+19-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:13:9-41
+20        android:icon="@mipmap/ic_launcher"
+20-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:14:9-43
+21        android:label="@string/app_name"
+21-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:15:9-41
+22        android:roundIcon="@mipmap/ic_launcher_round"
+22-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:16:9-54
+23        android:supportsRtl="true"
+23-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:17:9-35
+24        android:testOnly="true"
+25        android:theme="@style/AppTheme" >
+25-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:18:9-40
+26        <activity
+26-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:20:9-23:58
+27            android:name="com.mehul.redditwall.PostActivity"
+27-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:21:13-41
+28            android:label="Post Comments"
+28-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:22:13-42
+29            android:parentActivityName="com.mehul.redditwall.WallActivity" />
+29-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:23:13-55
+30        <activity
+30-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:24:9-27:58
+31            android:name="com.mehul.redditwall.RecActivity"
+31-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:25:13-40
+32            android:label="Recommendations"
+32-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:26:13-44
+33            android:parentActivityName="com.mehul.redditwall.MainActivity" />
+33-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:27:13-55
+34        <activity
+34-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:28:9-31:58
+35            android:name="com.mehul.redditwall.FavImageActivity"
+35-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:29:13-45
+36            android:label="Favorite Images"
+36-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:30:13-44
+37            android:parentActivityName="com.mehul.redditwall.MainActivity" />
+37-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:31:13-55
+38        <activity
+38-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:32:9-35:58
+39            android:name="com.mehul.redditwall.SavedActivity"
+39-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:33:13-42
+40            android:label="Saved Reddits"
+40-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:34:13-42
+41            android:parentActivityName="com.mehul.redditwall.MainActivity" />
+41-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:35:13-55
+42        <activity
+42-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:36:9-39:58
+43            android:name="com.mehul.redditwall.SettingsActivity"
+43-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:37:13-45
+44            android:label="Settings"
+44-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:38:13-37
+45            android:parentActivityName="com.mehul.redditwall.MainActivity" />
+45-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:39:13-55
+46        <activity
+46-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:40:9-44:57
+47            android:name="com.mehul.redditwall.WallActivity"
+47-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:41:13-41
+48            android:label="Image Preview"
+48-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:42:13-42
+49            android:parentActivityName="com.mehul.redditwall.MainActivity"
+49-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:43:13-55
+50            android:theme="@style/AppTheme.ActionBar" />
+50-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:44:13-54
+51        <activity
+51-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:45:9-54:20
+52            android:name="com.mehul.redditwall.MainActivity"
+52-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:46:13-41
+53            android:label="Reddit Walls"
+53-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:47:13-41
+54            android:theme="@style/AppTheme.NoActionBar" >
+54-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:48:13-56
+55            <intent-filter>
+55-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:49:13-53:29
+56                <action android:name="android.intent.action.MAIN" />
+56-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:50:17-69
+56-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:50:25-66
+57
+58                <category android:name="android.intent.category.LAUNCHER" />
+58-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:52:17-77
+58-->C:\Users\Mehul Pillai\AndroidStudioProjects\RedditWall\app\src\main\AndroidManifest.xml:52:27-74
+59            </intent-filter>
+60        </activity>
+61
+62        <provider
+62-->[com.squareup.picasso:picasso:2.71828] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\26f147ab1e75e9423c796f648aec603f\jetified-picasso-2.71828\AndroidManifest.xml:8:9-11:40
+63            android:name="com.squareup.picasso.PicassoProvider"
+63-->[com.squareup.picasso:picasso:2.71828] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\26f147ab1e75e9423c796f648aec603f\jetified-picasso-2.71828\AndroidManifest.xml:9:13-64
+64            android:authorities="com.mehul.redditwall.com.squareup.picasso"
+64-->[com.squareup.picasso:picasso:2.71828] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\26f147ab1e75e9423c796f648aec603f\jetified-picasso-2.71828\AndroidManifest.xml:10:13-72
+65            android:exported="false" />
+65-->[com.squareup.picasso:picasso:2.71828] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\26f147ab1e75e9423c796f648aec603f\jetified-picasso-2.71828\AndroidManifest.xml:11:13-37
+66
+67        <service
+67-->[androidx.room:room-runtime:2.2.4] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\efc88a6fb3706d8346f21c2e0a4460a5\room-runtime-2.2.4\AndroidManifest.xml:25:9-27:40
+68            android:name="androidx.room.MultiInstanceInvalidationService"
+68-->[androidx.room:room-runtime:2.2.4] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\efc88a6fb3706d8346f21c2e0a4460a5\room-runtime-2.2.4\AndroidManifest.xml:26:13-74
+69            android:exported="false" />
+69-->[androidx.room:room-runtime:2.2.4] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\efc88a6fb3706d8346f21c2e0a4460a5\room-runtime-2.2.4\AndroidManifest.xml:27:13-37
+70
+71        <provider
+71-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\27dd37167b9681eb0faa6b8c069df9ed\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:25:9-29:43
+72            android:name="androidx.lifecycle.ProcessLifecycleOwnerInitializer"
+72-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\27dd37167b9681eb0faa6b8c069df9ed\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:26:13-79
+73            android:authorities="com.mehul.redditwall.lifecycle-process"
+73-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\27dd37167b9681eb0faa6b8c069df9ed\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:27:13-69
+74            android:exported="false"
+74-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\27dd37167b9681eb0faa6b8c069df9ed\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:28:13-37
+75            android:multiprocess="true" />
+75-->[androidx.lifecycle:lifecycle-process:2.2.0] C:\Users\Mehul Pillai\.gradle\caches\transforms-2\files-2.1\27dd37167b9681eb0faa6b8c069df9ed\jetified-lifecycle-process-2.2.0\AndroidManifest.xml:29:13-40
+76    </application>
+77
+78</manifest>

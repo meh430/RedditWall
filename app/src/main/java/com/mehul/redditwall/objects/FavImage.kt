@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
+
 @Entity(tableName = "fav_table")
 class FavImage(@field:PrimaryKey(autoGenerate = true) var id: Int,
                @Expose @field:SerializedName("url")
