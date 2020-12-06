@@ -1,0 +1,12 @@
+<!--suppress ALL -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".Activities.WebActivity">
+    <item
+        android:id="@+id/refresh_web"
+        android:icon="@drawable/ic_refresh"
+        android:orderInCategory="50"
+        android:title="Home Page"
+        app:showAsAction="always" />
+</menu>

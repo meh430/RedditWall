@@ -1,0 +1,37 @@
+<!--suppress ALL -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activities.MainActivity">
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/ic_settings"
+        android:orderInCategory="60"
+        android:title="Settings"
+        app:showAsAction="never" />
+
+    <item
+        android:icon="@drawable/ic_heart_filled"
+        android:id="@+id/fav_pics"
+        android:orderInCategory="50"
+        android:title="FAVORITES"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/recc_subs"
+        android:orderInCategory="40"
+        android:title="Recommendations"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/history"
+        android:orderInCategory="30"
+        android:title="History"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/subreddits"
+        android:orderInCategory="10"
+        android:title="Subreddits"
+        app:showAsAction="never" />
+</menu>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bottomColor">#121212</color>
+
+    <color name="colorPrimary">#000000</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#D81B1B</color>
+    <color name="cardViewBackground">#2D2E31</color>
+    <color name="chip">#E53935</color>
+    <color name="white">@android:color/white</color>
+    <color name="textColor">#FFFFFF</color>
+    <color name="secondary">@android:color/secondary_text_dark</color>
+    <color name="edit">#807F7F</color>
+    <color name="fill">#FFFFFF</color>
+    <color name="grey">#272626</color>
+    <color name="sheetCol">#D9000000</color>
+</resources>

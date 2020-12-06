@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_favorite_black"
+        android:shortcutDisabledMessage="@string/fav_scut"
+        android:shortcutId="fav"
+        android:shortcutLongLabel="@string/fav_scut"
+        android:shortcutShortLabel="@string/fav_scut">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.mehul.redditwall.activities.FavImageActivity"
+            android:targetPackage="com.mehul.redditwall" />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_save_black"
+        android:shortcutDisabledMessage="@string/saved_scut"
+        android:shortcutId="saved"
+        android:shortcutLongLabel="@string/saved_scut"
+        android:shortcutShortLabel="@string/saved_scut">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.mehul.redditwall.activities.SubActivity"
+            android:targetPackage="com.mehul.redditwall" />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_history_black"
+        android:shortcutDisabledMessage="@string/hist_scut"
+        android:shortcutId="hist"
+        android:shortcutLongLabel="@string/hist_scut"
+        android:shortcutShortLabel="@string/hist_scut">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.mehul.redditwall.activities.HistoryActivity"
+            android:targetPackage="com.mehul.redditwall" />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_settings_black"
+        android:shortcutDisabledMessage="@string/set_scut"
+        android:shortcutId="settings"
+        android:shortcutLongLabel="@string/set_scut"
+        android:shortcutShortLabel="@string/set_scut">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.mehul.redditwall.activities.SettingsActivity"
+            android:targetPackage="com.mehul.redditwall" />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+    <!-- Specify more shortcuts here. -->
+</shortcuts>

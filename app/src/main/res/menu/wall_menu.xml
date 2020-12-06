@@ -1,0 +1,12 @@
+<!--suppress ALL -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activities.WallActivity">
+    <item
+        android:id="@+id/fav_image"
+        style="@style/open"
+        android:orderInCategory="50"
+        android:title="SAVED"
+        app:showAsAction="always" />
+</menu>

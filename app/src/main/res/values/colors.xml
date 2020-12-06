@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bottomColor">#E6E1E1</color>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryDark">#FFFFFF</color>
+    <color name="colorAccent">#D81B1B</color>
+    <color name="cardViewBackground">#F8F8F8</color>
+    <color name="chip">#E53935</color>
+    <color name="white">#EAE2E2</color>
+    <color name="textColor">#000000</color>
+    <color name="secondary">#5D5B5B</color>
+    <color name="edit">#CBC8C8</color>
+    <color name="fill">#000000</color>
+    <color name="grey">#D4D1D1</color>
+    <color name="sheetCol">#D9FFFFFF</color>
+
+</resources>
