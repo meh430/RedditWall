@@ -14,10 +14,10 @@ An app that uses the model-view-viewmodel pattern with the help of Android Jetpa
 - Place a widget on the homescreen that allows you to quickly switch to another random wallpaper from you favorites list
 - Set scale down for images being loaded in gridview to minimize bandwidth consumption
 - View history of downloaded or set wallpapers
-### Dark Mode Screenshots
-<img src="screens/home_dark.png" height="331" width="223"><img src="screens/dark_prev.png" height="331" width="223"><img src="screens/dark_bottom.png" height="331" width="223"/><img src="screens/favorites_dark.png" height="331" width="223"><img src="screens/saved_dark.png" height="331" width="223"><img src="screens/search_dark.png" height="331" width="223"><img src="screens/dark_hist.png" height="331" width="223"><img src="screens/settings_dark.png" height="331" width="223">
 ### Light Mode Screenshots
-<img src="screens/home_light.png" height="331" width="223"><img src="screens/light_prev.png" height="331" width="223"><img src="screens/light_bottom.png" height="331" width="223"><img src="screens/favorites_light.png" height="331" width="223"><img src="screens/saved_light.png" height="331" width="223"><img src="screens/search_light.png" height="331" width="223"><img src="screens/light_hist.png" height="331" width="223">
+<img src="screens/light_home.png" height="331" width="223"><img src="screens/light_prev.png" height="331" width="223"><img src="screens/light_bottom.png" height="331" width="223"><img src="screens/light_fav.png" height="331" width="223"><img src="screens/light_sub.png" height="331" width="223"><img src="screens/light_search.png" height="331" width="223"><img src="screens/light_history.png" height="331" width="223">
+### Dark Mode Screenshots
+<img src="screens/dark_prev.png" height="331" width="223"><img src="screens/dark_bottom.png" height="331" width="223"/><img src="screens/dark_fav.png" height="331" width="223"><img src="screens/dark_sub.png" height="331" width="223"><img src="screens/dark_history.png" height="331" width="223">
 
 ## Download
 Download the apk [here](https://github.com/meh430/RedditWall/releases/download/v0.85-beta/reddit-walls-0.85b.apk)
