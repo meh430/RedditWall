@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.mehul.redditwall.objects.HistoryItem
 
-@Database(entities = [HistoryItem::class], version = 1, exportSchema = false)
+@Database(entities = [HistoryItem::class], version = 4, exportSchema = false)
 abstract class HistRoomDatabase : RoomDatabase() {
     abstract fun historyDAO(): HistoryDAO
 
@@ -18,7 +18,7 @@ abstract class HistRoomDatabase : RoomDatabase() {
                     if (SINGLETON == null) {
                         // Create database here
                         SINGLETON = Room.databaseBuilder(context.applicationContext,
-                                        HistRoomDatabase::class.java, "hist_database") // Wipes and rebuilds instead of migrating
+                                HistRoomDatabase::class.java, "hist_database") // Wipes and rebuilds instead of migrating
                                 // if no Migration object.
                                 .fallbackToDestructiveMigration()
                                 .build()

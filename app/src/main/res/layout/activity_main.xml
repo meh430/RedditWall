@@ -1,171 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activities.MainActivity"
-    tools:ignore="HardcodedText">
+    android:orientation="vertical"
+    tools:context=".activities.MainActivity">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_above="@id/bottomNavView"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavView"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.appbar.AppBarLayout
+        <fragment
+            android:id="@+id/fragNavHost"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/bottom_nav_graph" />
 
-            android:theme="@style/AppTheme.AppBarOverlay"
-            app:elevation="0dp">
+    </FrameLayout>
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_scrollFlags="scroll|enterAlways|snap"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavView"
+        style="@style/Widget.MaterialComponents.BottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bottom_background"
+        android:elevation="4dp"
+        android:padding="4dp"
+        app:itemIconSize="30dp"
+        app:itemIconTint="@drawable/bottom_selector"
+        app:itemTextColor="@android:color/holo_red_dark"
+        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
+        app:menu="@menu/bottom_navigation_menu" />
 
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-                android:id="@+id/top"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_margin="8dp"
-                android:orientation="horizontal"
-                tools:ignore="UselessParent">
-
-                <EditText
-                    android:id="@+id/search"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_margin="8dp"
-                    android:layout_weight="5"
-                    android:background="@drawable/edit_states"
-                    android:hint="mobilewallpaper"
-                    android:imeOptions="actionSearch"
-                    android:importantForAutofill="no"
-                    android:inputType="text"
-                    android:padding="12dp"
-                    tools:ignore="LabelFor" />
-
-                <ImageButton
-                    android:id="@+id/searchButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:paddingStart="15dp"
-                    android:paddingEnd="15dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_search"
-                    android:background="@drawable/rounded_button"
-                    android:onClick="startSearch"
-                    android:textColor="#FFFFFF" />
-            </LinearLayout>
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/sorting"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/top"
-                android:layout_centerInParent="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="-8dp"
-                android:layout_marginEnd="4dp"
-                android:padding="8dp"
-                android:paddingStart="14dp"
-                android:paddingEnd="8dp">
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/hotChip"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/chip_background"
-                    android:button="@android:color/transparent"
-                    android:padding="6dp"
-                    android:text="Hot"
-                    app:checkedIcon="@null"
-                    app:checkedIconEnabled="false" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/newChip"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/chip_background"
-                    android:button="@android:color/transparent"
-                    android:padding="6dp"
-                    android:text="New"
-                    app:checkedIcon="@null"
-                    app:checkedIconEnabled="false" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/topChip"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/chip_background"
-                    android:button="@android:color/transparent"
-                    android:padding="6dp"
-                    android:text="Top"
-                    app:checkedIcon="@null"
-                    app:checkedIconEnabled="false" />
-            </com.google.android.material.chip.ChipGroup>
-
-            <TextView
-                android:id="@+id/info"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/sorting"
-                android:layout_gravity="center"
-                android:layout_margin="16dp"
-                android:gravity="center"
-                android:text="LOADING..."
-                android:textColor="@color/textColor"
-                android:textSize="26sp"
-                android:visibility="gone" />
-
-            <ProgressBar
-                android:id="@+id/loading"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/sorting"
-                android:layout_margin="12dp"
-                android:visibility="gone" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/imageScroll"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/sorting"
-                android:layout_marginStart="6dp"
-                android:layout_marginTop="-2dp"
-                android:layout_marginEnd="6dp"
-                android:clipToPadding="false"
-                android:paddingBottom="70dp"
-                android:scrollbars="vertical"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-            <ProgressBar
-                android:id="@+id/bottomLoad"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_margin="12dp"
-                android:visibility="invisible" />
-        </RelativeLayout>
-    </LinearLayout>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</RelativeLayout>

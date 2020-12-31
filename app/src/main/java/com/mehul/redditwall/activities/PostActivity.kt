@@ -12,22 +12,22 @@ import com.mehul.redditwall.databinding.ActivityPostBinding
 
 
 class PostActivity : AppCompatActivity() {
-    private var postLink: String? = ""
+    private var postLink: String = ""
     private lateinit var binding: ActivityPostBinding
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        postLink = intent.getStringExtra(POST_LINK)
+        postLink = intent.getStringExtra(POST_LINK).toString()
         supportActionBar?.title = intent.getStringExtra(POST_TITLE)
         val client = WebViewClient()
 
         binding.webPost.webViewClient = client
-        binding.webPost.settings?.javaScriptEnabled = true
-        binding.webPost.settings?.setAppCacheEnabled(true)
-        binding.webPost.settings?.builtInZoomControls = true
-        binding.webPost.settings?.saveFormData = true
+        binding.webPost.settings.javaScriptEnabled = true
+        binding.webPost.settings.setAppCacheEnabled(true)
+        binding.webPost.settings.builtInZoomControls = true
+        binding.webPost.settings.saveFormData = true
         binding.webPost.loadUrl(postLink)
     }
 

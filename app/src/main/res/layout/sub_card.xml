@@ -46,19 +46,6 @@
                 android:text="Name"
                 android:textColor="@color/textColor"
                 android:textSize="26sp" />
-
-            <TextView
-                android:id="@+id/subOptions"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:layout_weight="0.5"
-                android:gravity="center"
-                android:padding="12dp"
-                android:text="&#8942;"
-                android:textAppearance="?android:textAppearanceLarge"
-                android:textColor="@color/textColor"
-                android:textSize="24sp" />
         </LinearLayout>
 
         <TextView

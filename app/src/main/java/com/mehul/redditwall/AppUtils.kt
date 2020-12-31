@@ -3,10 +3,12 @@ package com.mehul.redditwall
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -14,7 +16,12 @@ import android.provider.MediaStore
 import android.util.DisplayMetrics
 import com.bumptech.glide.Glide
 import com.mehul.redditwall.activities.MainActivity
+import com.mehul.redditwall.activities.PostActivity
 import com.mehul.redditwall.activities.SettingsActivity
+import com.mehul.redditwall.activities.WallActivity
+import com.mehul.redditwall.objects.HistoryItem
+import com.mehul.redditwall.objects.ProgressNotify
+import com.mehul.redditwall.objects.WallImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.isActive
@@ -24,6 +31,8 @@ import org.json.JSONObject
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AppUtils {
     companion object {
@@ -64,6 +73,66 @@ class AppUtils {
 
         public fun getPreferences(context: Context): SharedPreferences {
             return context.getSharedPreferences(MainActivity.SharedPrefFile, Context.MODE_PRIVATE)
+        }
+
+        public fun networkAvailable(context: Context): Boolean {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetworkInfo = connectivityManager.activeNetworkInfo
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected
+        }
+
+        public fun startWallActivity(context: Context, selectedImage: WallImage) {
+            val wallActivityIntent = Intent(context, WallActivity::class.java)
+            wallActivityIntent.apply {
+                putExtra(WallActivity.IMAGE_URL, selectedImage.imgUrl)
+                putExtra(WallActivity.SUB_NAME, selectedImage.subName)
+                putExtra(WallActivity.PREVIEW_URL, selectedImage.previewUrl)
+                putExtra(PostActivity.POST_LINK, selectedImage.postLink)
+            }
+
+            context.startActivity(wallActivityIntent)
+        }
+
+        public fun convertUTC(utc: Long): String {
+            val format = SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date(utc))
+            val tempDate = format.trim().split(" at ")
+            val date = tempDate[0].trim().split("-")
+            val time = tempDate[1].trim().split(":")
+            val month = HistoryItem.months[Integer.parseInt(date[0])]
+            var hours = Integer.parseInt(time[0])
+            val pmam = if (hours > 12) {
+                hours -= 12
+                "p.m"
+            } else {
+                "a.m"
+            }
+            return "$month ${HistoryItem.getOrdinal(Integer.parseInt(date[1]))}, ${date[2]} | ${hours}:${time[1]} $pmam"
+        }
+
+        public suspend fun downloadAllImages(context: Context, images: ArrayList<String>) {
+            val downloadOriginal = getPreferences(context).getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
+            val notify = ProgressNotify(context, images.size)
+            notify.sendNotification()
+            val downloadDimensions = getWallDimensions(context)
+
+            withContext(Dispatchers.IO) {
+                for (i in images.indices) {
+                    val bitmap = if (downloadOriginal) {
+                        Glide.with(context).asBitmap().load(images[i]).submit().get()
+                    } else {
+                        Glide.with(context).asBitmap().load(images[i]).override(downloadDimensions[0], downloadDimensions[1]).submit().get()
+                    }
+                    saveBitmap(bitmap, context)
+                    withContext(Dispatchers.Main) {
+                        notify.updateProgress(i)
+                    }
+                }
+            }
+            notify.finish()
+        }
+
+        public fun getDate(): String {
+            return SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date());
         }
 
         public fun saveBitmap(bitmap: Bitmap, context: Context): String {

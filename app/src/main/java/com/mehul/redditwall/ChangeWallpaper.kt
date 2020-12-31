@@ -19,7 +19,6 @@ import com.mehul.redditwall.objects.HistoryItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.*
 
 class ChangeWallpaper : BroadcastReceiver() {
@@ -54,7 +53,7 @@ class ChangeWallpaper : BroadcastReceiver() {
             val wall: WallpaperManager? = con.applicationContext.getSystemService(Context.WALLPAPER_SERVICE) as WallpaperManager
             Glide.with(con)
                     .asBitmap()
-                    .load(current.favUrl)
+                    .load(current.imgUrl)
                     .override(width, height)
                     .into(object : CustomTarget<Bitmap>() {
                         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
@@ -69,11 +68,9 @@ class ChangeWallpaper : BroadcastReceiver() {
                                 }
                             }
 
-                            val histItem = HistoryItem((0..999999999).random(), current.favName,
-                                    SimpleDateFormat("MM-dd-yyyy 'at' HH:mm:ss", Locale.CANADA).format(Date()),
-                                    HistoryItem.REFRESH, current.favUrl, current.postLink)
+                            val histItem = HistoryItem(subName = current.subName, setDate = Date().time,
+                                    source = HistoryItem.REFRESH, imgUrl = current.imgUrl, postLink = current.postLink, previewUrl = current.previewUrl)
                             refreshHistory(histItem, con)
-                            //HistoryRepository(con).insert(histItem)
                         }
 
                         override fun onLoadCleared(placeholder: Drawable?) {}

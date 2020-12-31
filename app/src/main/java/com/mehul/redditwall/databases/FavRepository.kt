@@ -3,14 +3,14 @@ package com.mehul.redditwall.databases
 import android.content.Context
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
-import com.mehul.redditwall.objects.FavImage
+import com.mehul.redditwall.objects.WallImage
 import java.util.concurrent.ExecutionException
 
 class FavRepository constructor(application: Context) {
     private val favDAO: FavDAO
-    val allFav: LiveData<List<FavImage>>
+    val allFav: LiveData<List<WallImage>>
 
-    val favAsList: List<FavImage>
+    val favAsList: List<WallImage>
         get() {
             try {
                 return GetFavListAsyncTask(favDAO).execute().get()
@@ -22,7 +22,7 @@ class FavRepository constructor(application: Context) {
             return ArrayList()
         }
 
-    suspend fun insert(saved: FavImage) {
+    suspend fun insert(saved: WallImage) {
         favDAO.insert(saved)
     }
 
@@ -30,13 +30,13 @@ class FavRepository constructor(application: Context) {
         favDAO.deleteAll()
     }
 
-    suspend fun deleteFav(saved: FavImage) {
+    suspend fun deleteFav(saved: WallImage) {
         favDAO.deleteFavImage(saved)
     }
 
     private class GetFavListAsyncTask internal constructor(private val mAsyncTaskDao: FavDAO)
-        : AsyncTask<Void, Void, List<FavImage>>() {
-        override fun doInBackground(vararg voids: Void): List<FavImage> {
+        : AsyncTask<Void, Void, List<WallImage>>() {
+        override fun doInBackground(vararg voids: Void): List<WallImage> {
             return mAsyncTaskDao.favAsList
         }
 

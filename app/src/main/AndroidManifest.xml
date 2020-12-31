@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.mehul.redditwall">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -18,14 +17,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".activities.SubActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:parentActivityName=".activities.MainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden"
-            tools:ignore="LockedOrientationActivity" />
 
         <receiver
             android:name=".BootReceiver"
@@ -49,25 +40,10 @@
             android:name=".ChangeWallpaper"
             android:enabled="true"
             android:exported="false" />
-
-        <activity
-            android:name=".activities.HistoryActivity"
-            android:label="History"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.PostActivity"
             android:label="Post Comments"
             android:parentActivityName=".activities.WallActivity" />
-        <activity
-            android:name=".activities.RecActivity"
-            android:label="Recommendations"
-            android:parentActivityName=".activities.MainActivity" />
-        <activity
-            android:name=".activities.FavImageActivity"
-            android:label="Favorite Images"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".activities.MainActivity" />
         <activity
             android:name=".activities.SettingsActivity"
             android:label="Settings"
@@ -77,23 +53,18 @@
             android:name=".activities.WallActivity"
             android:configChanges="orientation|keyboardHidden"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".activities.MainActivity"
             android:label="Reddit Walls"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/AppTheme.ActionBar"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts"
-                android:theme="@style/AppTheme.NoActionBar" />
         </activity>
-
     </application>
 
 </manifest>

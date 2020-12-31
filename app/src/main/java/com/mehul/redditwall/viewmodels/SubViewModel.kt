@@ -1,31 +1,32 @@
 package com.mehul.redditwall.viewmodels
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mehul.redditwall.databases.SubRepository
 import com.mehul.redditwall.objects.Subreddit
-import kotlinx.coroutines.Dispatchers
+import com.mehul.redditwall.rest.RedditApi
 import kotlinx.coroutines.launch
 
-class SubViewModel(application: Application) : AndroidViewModel(application) {
-    private val repo: SubRepository = SubRepository(application.applicationContext)
-    val allSubs: LiveData<List<Subreddit>>
-
-    fun deleteAll() = viewModelScope.launch(Dispatchers.IO) {
-        repo.deleteAll()
-    }
-
-    fun insert(saved: Subreddit) = viewModelScope.launch(Dispatchers.IO) {
-        repo.insert(saved)
-    }
-
-    fun deleteSubreddit(saved: Subreddit) = viewModelScope.launch(Dispatchers.IO) {
-        repo.deleteSubreddit(saved)
-    }
+class SubViewModel : ViewModel() {
+    var subreddits = MutableLiveData<ArrayList<Subreddit>>()
+    var isLoading = MutableLiveData<Boolean>()
 
     init {
-        allSubs = repo.allSubreddit
+        subreddits.value = ArrayList()
+        isLoading.value = false
+    }
+
+    fun searchSubs(query: String) {
+        subreddits.value?.clear()
+        isLoading.value = true
+        subreddits.value = subreddits.value
+
+        viewModelScope.launch {
+            RedditApi.loadSearchedSubs(query) {
+                subreddits.value?.addAll(it)
+                isLoading.postValue(false)
+                subreddits.postValue(subreddits.value)
+            }
+        }
     }
 }

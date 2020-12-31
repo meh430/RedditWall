@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.mehul.redditwall.objects.FavImage
+import com.mehul.redditwall.objects.WallImage
 
-@Database(entities = [FavImage::class], version = 6, exportSchema = false)
+@Database(entities = [WallImage::class], version = 7, exportSchema = false)
 abstract class FavRoomDatabase : RoomDatabase() {
     abstract fun favDAO(): FavDAO
 

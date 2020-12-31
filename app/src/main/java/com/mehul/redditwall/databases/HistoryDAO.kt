@@ -12,7 +12,7 @@ interface HistoryDAO {
     @Query("DELETE FROM hist_table")
     fun deleteAll()
 
-    @get:Query("SELECT * from hist_table ORDER BY hist_name ASC")
+    @get:Query("SELECT * from hist_table ORDER BY hist_date DESC")
     val allHistoryItems: LiveData<List<HistoryItem>>
 
     @get:Query("SELECT * from hist_table LIMIT 1")

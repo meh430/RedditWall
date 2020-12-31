@@ -77,6 +77,7 @@ class SettingsActivity : AppCompatActivity() {
             stateChanged = true
             if (b) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+
                 delegate.applyDayNight()
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)

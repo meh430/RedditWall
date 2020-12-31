@@ -1,6 +1,5 @@
-package com.mehul.redditwall.adapters
+package com.mehul.redditwall.rv_adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,15 +7,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
 import com.mehul.redditwall.objects.HistoryItem
 
-class HistAdapter(private val con: Context) : RecyclerView.Adapter<HistAdapter.HistViewHolder>() {
-    private val inflater = LayoutInflater.from(con)
-    private var histories: List<HistoryItem> = ArrayList()
+class HistAdapter : RecyclerView.Adapter<HistAdapter.HistViewHolder>() {
+    var histories: ArrayList<HistoryItem> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistViewHolder {
-        val itemView = inflater.inflate(R.layout.history_item, parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.history_item, parent, false)
         return HistViewHolder(itemView)
     }
 
@@ -24,7 +23,7 @@ class HistAdapter(private val con: Context) : RecyclerView.Adapter<HistAdapter.H
         return histories.size
     }
 
-    fun setHistories(hists: List<HistoryItem>) {
+    fun updateHistories(hists: ArrayList<HistoryItem>) {
         this.histories = hists
         notifyDataSetChanged()
     }
@@ -51,8 +50,8 @@ class HistAdapter(private val con: Context) : RecyclerView.Adapter<HistAdapter.H
 
             nameTv.text = name
             sourceTv.text = source
-            dateTv.text = date
-            Glide.with(con).load(history.url).override(210, 350).into(img)
+            dateTv.text = AppUtils.convertUTC(date)
+            Glide.with(img.context).load(history.imgUrl).fitCenter().into(img)
         }
     }
 }
