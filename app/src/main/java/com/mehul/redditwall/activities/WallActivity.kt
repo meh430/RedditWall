@@ -66,6 +66,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var currentBitmap: Bitmap? = null
     private lateinit var preferences: SharedPreferences
 
+    private lateinit var startJob: Job
+
     private lateinit var binding: ActivityWallBinding
 
     private var notifyManager: NotificationManager? = null
@@ -117,9 +119,14 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         filledHeart = ContextCompat.getDrawable(applicationContext, R.drawable.ic_heart_filled)
         openHeart = ContextCompat.getDrawable(applicationContext, R.drawable.ic_heart)
         binding.subreddit.text = "Subreddit: $subName"
-        uiScope.launch {
+        startJob = uiScope.launch {
             startUp(getCon())
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        startJob.cancel()
     }
 
     @SuppressLint("NewApi")
