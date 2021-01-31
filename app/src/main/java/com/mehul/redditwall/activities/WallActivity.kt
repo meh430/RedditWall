@@ -45,7 +45,6 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-@Suppress("PrivatePropertyName", "DEPRECATION", "RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "LocalVariableName")
 class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
     private var fileName = ""
     private var imgUrl = ""

@@ -16,7 +16,7 @@ class ProgressNotify(val context: Context, val size: Int) {
         get() {
             val notifyBuilder = NotificationCompat.Builder(context, SECONDARY_CHANNEL_ID)
             notifyBuilder.apply {
-                setOngoing(true)
+                setOngoing(false)
                 setOnlyAlertOnce(true)
                 setAutoCancel(true)
                 setContentTitle("Downloading all images")
@@ -47,6 +47,7 @@ class ProgressNotify(val context: Context, val size: Int) {
     }
 
     fun finish() {
+        notifyManager!!.cancel(NOTIF_ID)
         val viewIntent = Intent()
         viewIntent.action = Intent.ACTION_VIEW
         viewIntent.type = "image/*"

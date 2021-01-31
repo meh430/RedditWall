@@ -124,10 +124,11 @@ class AppUtils {
                     }
                     saveBitmap(bitmap, context)
                     withContext(Dispatchers.Main) {
-                        notify.updateProgress(i)
+                        notify.updateProgress(i + 1)
                     }
                 }
             }
+
             notify.finish()
         }
 
