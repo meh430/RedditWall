@@ -42,6 +42,12 @@ class WallImageViewModel : ViewModel() {
         }
     }
 
+    fun clear() {
+        wallImages.value?.clear()
+        wallImages.value = wallImages.value
+        isLoading.value = false
+    }
+
     @InternalCoroutinesApi
     fun setQAndSort(q: String, sort: Int) {
         query = q

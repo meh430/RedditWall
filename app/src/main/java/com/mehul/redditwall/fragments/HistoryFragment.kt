@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,6 +42,12 @@ class HistoryFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHistoryBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.e("RESET", "history init")
         historyViewModel = ViewModelProvider(this).get(HistViewModel::class.java)
         historyAdapter = HistAdapter()
 
@@ -126,8 +133,6 @@ class HistoryFragment : Fragment() {
 
             false
         })
-
-        return binding.root
     }
 
     override fun onDestroyView() {

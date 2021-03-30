@@ -1,6 +1,7 @@
 package com.mehul.redditwall.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,14 +26,19 @@ class HomeFragment : Fragment() {
     private lateinit var wallImageAdapter: WallImageAdapter
     private var isLoading = false
 
-    @InternalCoroutinesApi
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
+    @InternalCoroutinesApi
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.e("RESET", "home init")
         wallImageViewModel = ViewModelProvider(this).get(WallImageViewModel::class.java)
 
         val prefs = AppUtils.getPreferences(requireContext())
@@ -96,13 +102,13 @@ class HomeFragment : Fragment() {
                 }
             }
         })
-
-        return binding.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.e("DESTROY", "home")
         _binding = null
+        wallImageViewModel.clear()
     }
 
     private fun showView(view: Int) {

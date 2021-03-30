@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.SystemClock
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,6 +41,12 @@ class SettingsFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.e("RESET", "settings init")
         val context = requireContext()
         preferences = AppUtils.getPreferences(context)
         wallChangeIntent = Intent(context, ChangeWallpaper::class.java)
@@ -161,8 +168,6 @@ class SettingsFragment : Fragment() {
                     }
             builder.create().show()
         }
-
-        return binding.root
     }
 
     private fun showRandomSettings(show: Boolean) {

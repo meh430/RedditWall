@@ -95,8 +95,11 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
         super.onCreate(savedInstanceState)
         binding = ActivityWallBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window.setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
+
         supportActionBar?.hide()
 
         histViewModel = ViewModelProvider(this).get(HistViewModel::class.java)
@@ -496,7 +499,8 @@ class WallActivity : AppCompatActivity(), GestureDetector.OnGestureListener {
             toggle(false)
             bottomUp = false
         } else {
-            super.onBackPressed()
+            finish()
+            //super.onBackPressed()
         }
     }
 }

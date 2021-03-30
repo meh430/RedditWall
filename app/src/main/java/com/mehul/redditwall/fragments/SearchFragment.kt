@@ -90,6 +90,13 @@ class SearchFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    @InternalCoroutinesApi
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.e("RESET", "search init")
         prefs = AppUtils.getPreferences(requireContext())
 
         subViewModel = ViewModelProvider(this).get(SubViewModel::class.java)
@@ -200,7 +207,6 @@ class SearchFragment : Fragment() {
             }
             false
         })
-        return binding.root
     }
 
     private fun showView(view: Int) {

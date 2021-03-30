@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,6 +42,13 @@ class FavsFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View {
         _binding = FragmentFavsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.e("RESET", "fave init")
+
         favViewModel = ViewModelProvider(this).get(FavViewModel::class.java)
 
         val dimensions = AppUtils.getDimensions(requireContext())
@@ -127,7 +135,6 @@ class FavsFragment : Fragment() {
 
             false
         })
-        return binding.root
     }
 
     override fun onDestroyView() {

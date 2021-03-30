@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.findNavController
@@ -56,6 +57,12 @@ class MainActivity : AppCompatActivity() {
                 )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.e("DESTROY", "main")
+
     }
 
     companion object {
