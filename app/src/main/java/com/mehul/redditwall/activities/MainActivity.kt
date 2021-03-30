@@ -8,7 +8,6 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -32,14 +31,14 @@ class MainActivity : AppCompatActivity() {
 
         preferences = getSharedPreferences(SharedPrefFile, Context.MODE_PRIVATE)
 
-        val dark = preferences!!.getBoolean(SettingsActivity.DARK, false)
+        /*val dark = preferences!!.getBoolean(SettingsActivity.DARK, false)
         if (dark) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             delegate.applyDayNight()
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             delegate.applyDayNight()
-        }
+        }*/
 
         setupNavigation()
     }

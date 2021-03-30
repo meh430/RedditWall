@@ -226,16 +226,6 @@
                 android:textSize="16sp"
                 android:theme="@style/ThemeOverlay.AppCompat.DayNight" />
 
-            <Switch
-                android:id="@+id/darkSwitch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                android:switchPadding="10dp"
-                android:text="Toggle dark mode"
-                android:textColor="@color/textColor"
-                android:textSize="16sp"
-                android:theme="@style/ThemeOverlay.AppCompat.DayNight" />
 
             <LinearLayout
                 android:id="@+id/buttons"

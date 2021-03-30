@@ -13,8 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.mehul.redditwall.AppUtils
@@ -28,7 +26,7 @@ class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
     private lateinit var preferences: SharedPreferences
-    private var dark = false
+    //private var dark = false
     private var alarmChanged = false
     private var stateChanged = false
     private var wallAlarm: AlarmManager? = null
@@ -54,8 +52,8 @@ class SettingsFragment : Fragment() {
         wallChangeIntent?.action = "CHANGE_WALL"
         pending = PendingIntent.getBroadcast(context, 2, wallChangeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         binding.changeIntervalTitle.visibility = View.GONE
-        dark = preferences.getBoolean(SettingsActivity.DARK, false)
-        binding.darkSwitch.isChecked = dark
+        //dark = preferences.getBoolean(SettingsActivity.DARK, false)
+        //binding.darkSwitch.isChecked = dark
         binding.previewRes.isChecked = preferences.getBoolean(SettingsActivity.PREVIEW_RES, false)
         binding.downloadOrigin.isChecked = preferences.getBoolean(SettingsActivity.DOWNLOAD_ORIGIN, false)
         binding.randomSwitch.isChecked = preferences.getBoolean(SettingsActivity.RANDOM_ENABLED, false)
@@ -76,7 +74,7 @@ class SettingsFragment : Fragment() {
         binding.previewRes.setOnCheckedChangeListener { _, b ->
             preferences.edit().putBoolean(SettingsActivity.PREVIEW_RES, b).apply()
         }
-        binding.darkSwitch.setOnCheckedChangeListener { _, b ->
+        /*binding.darkSwitch.setOnCheckedChangeListener { _, b ->
             dark = b
             stateChanged = true
             preferences.edit().putBoolean(SettingsActivity.DARK, dark).apply()
@@ -87,7 +85,7 @@ class SettingsFragment : Fragment() {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 (activity as AppCompatActivity).delegate.applyDayNight()
             }
-        }
+        }*/
 
         /*binding.scaleSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
