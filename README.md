@@ -20,4 +20,4 @@ An app that uses the model-view-viewmodel pattern with the help of Android Jetpa
 <img src="screens/dark_prev.png" height="331" width="223"><img src="screens/dark_bottom.png" height="331" width="223"/><img src="screens/dark_fav.png" height="331" width="223"><img src="screens/dark_sub.png" height="331" width="223"><img src="screens/dark_history.png" height="331" width="223">
 
 ## Download
-Download the apk [here](https://github.com/meh430/RedditWall/releases/download/v0.90-beta/redditwallsv0.90-beta.apk)
+Download the apk [here](https://github.com/meh430/RedditWall/releases/download/v0.92-beta/redditwallsv0.92-beta.apk)
