@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -46,6 +47,14 @@ class MainActivity : AppCompatActivity() {
     private fun setupNavigation() {
         val navController = findNavController(R.id.fragNavHost)
         binding.bottomNavView.setupWithNavController(navController)
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.subImagesFragment) {
+                binding.bottomNavView.visibility = View.GONE
+            } else {
+                binding.bottomNavView.visibility = View.VISIBLE
+            }
+        }
+
         val appBarConfiguration = AppBarConfiguration(
                 topLevelDestinationIds = setOf(
                         R.id.homeFragment,
@@ -56,6 +65,11 @@ class MainActivity : AppCompatActivity() {
                 )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.fragNavHost)
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
     override fun onDestroy() {

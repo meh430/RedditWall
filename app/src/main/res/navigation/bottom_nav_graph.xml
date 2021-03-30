@@ -15,11 +15,27 @@
         android:name="com.mehul.redditwall.fragments.FavsFragment"
         android:label="Favorites"
         tools:layout="@layout/fragment_favs" />
+
+    <fragment
+        android:id="@+id/subImagesFragment"
+        android:name="com.mehul.redditwall.fragments.SubImagesFragment"
+        tools:layout="@layout/fragment_sub_images">
+        <argument
+            android:name="subName"
+            android:defaultValue="mobilewallpaper"
+            app:argType="string" />
+    </fragment>
+
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.mehul.redditwall.fragments.SearchFragment"
         android:label="Search"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/action_searchFragment_to_subImagesFragment"
+            app:destination="@id/subImagesFragment" />
+    </fragment>
+
     <fragment
         android:id="@+id/historyFragment"
         android:name="com.mehul.redditwall.fragments.HistoryFragment"

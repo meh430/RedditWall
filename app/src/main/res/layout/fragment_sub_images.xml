@@ -4,23 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.SearchFragment">
-
-    <EditText
-        android:id="@+id/search"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center"
-        android:layout_margin="8dp"
-        android:background="@drawable/edit_states"
-        android:hint="Search..."
-        android:imeOptions="actionSearch"
-        android:importantForAutofill="no"
-        android:inputType="text"
-        android:padding="10dp" />
-
+    tools:context=".fragments.SubImagesFragment">
 
     <ProgressBar
         android:id="@+id/loading"
@@ -43,16 +27,19 @@
         android:visibility="visible" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/subsScroll"
+        android:id="@+id/imageScroll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/search"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
-
-        android:layout_marginEnd="4dp"
-        android:visibility="gone"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="-2dp"
+        android:layout_marginEnd="6dp"
+        android:clipToPadding="false"
+        android:paddingBottom="70dp"
+        android:scrollbars="vertical"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:spanCount="2" />
 
     <ProgressBar
         android:id="@+id/bottomLoad"

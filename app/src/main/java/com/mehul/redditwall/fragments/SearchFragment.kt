@@ -12,17 +12,14 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
+import androidx.navigation.fragment.findNavController
 import com.mehul.redditwall.AppUtils
 import com.mehul.redditwall.R
 import com.mehul.redditwall.activities.SettingsActivity
 import com.mehul.redditwall.databinding.FragmentSearchBinding
 import com.mehul.redditwall.objects.RecyclerListener
-import com.mehul.redditwall.rest.RedditApi
 import com.mehul.redditwall.rv_adapters.SubAdapter
-import com.mehul.redditwall.rv_adapters.WallImageAdapter
 import com.mehul.redditwall.viewmodels.SubViewModel
-import com.mehul.redditwall.viewmodels.WallImageViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -32,56 +29,19 @@ class SearchFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var subLoading = false
-    private var imageLoading = false
-    private var viewingImages = false
     private var searched = false
 
     private lateinit var prefs: SharedPreferences
     private lateinit var subViewModel: SubViewModel
-    private lateinit var wallImageViewModel: WallImageViewModel
 
     private lateinit var subAdapter: SubAdapter
-    private lateinit var wallImageAdapter: WallImageAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.reddit_sort, menu)
     }
 
-    @InternalCoroutinesApi
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (!viewingImages) {
-            return super.onOptionsItemSelected(item)
-        }
-
-        when (item.itemId) {
-            R.id.hot -> {
-                wallImageViewModel.setQAndSort(wallImageViewModel.query, RedditApi.HOT)
-            }
-
-            R.id.new_sort -> {
-                wallImageViewModel.setQAndSort(wallImageViewModel.query, RedditApi.NEW)
-            }
-
-            R.id.top_week -> {
-                wallImageViewModel.setQAndSort(wallImageViewModel.query, RedditApi.TOP_WEEK)
-            }
-
-            R.id.top_year -> {
-                wallImageViewModel.setQAndSort(wallImageViewModel.query, RedditApi.TOP_YEAR)
-            }
-
-            R.id.top_all -> {
-                wallImageViewModel.setQAndSort(wallImageViewModel.query, RedditApi.TOP_ALL)
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
     @InternalCoroutinesApi
     override fun onCreateView(
@@ -100,17 +60,12 @@ class SearchFragment : Fragment() {
         prefs = AppUtils.getPreferences(requireContext())
 
         subViewModel = ViewModelProvider(this).get(SubViewModel::class.java)
-        wallImageViewModel = ViewModelProvider(this).get(WallImageViewModel::class.java)
 
         val prefs = AppUtils.getPreferences(requireContext())
-        val lowRes = prefs.getBoolean(SettingsActivity.PREVIEW_RES, false)
-        val dimensions = AppUtils.getDimensions(requireContext())
 
         subAdapter = SubAdapter()
-        wallImageAdapter = WallImageAdapter(dimensions, lowRes)
 
         binding.subsScroll.adapter = subAdapter
-        binding.imageScroll.adapter = wallImageAdapter
 
         if (!searched) {
             binding.errorInfo.text = "Search for subs"
@@ -119,26 +74,14 @@ class SearchFragment : Fragment() {
         }
 
         subViewModel.subreddits.observe(viewLifecycleOwner, Observer {
-            if (it.isEmpty() && subLoading && !viewingImages) {
+            if (it.isEmpty() && subLoading) {
                 showView(HomeFragment.LOADING)
-            } else if (it.isEmpty() && !subLoading && !viewingImages && searched) {
+            } else if (it.isEmpty() && !subLoading && searched) {
                 binding.errorInfo.text = "Unable to find subs"
                 showView(HomeFragment.ERROR_INFO)
-            } else if (!viewingImages && searched) {
+            } else if (searched) {
                 showView(HomeFragment.SUB_SCROLL)
                 subAdapter.updateSubreddits(it)
-            }
-        })
-
-        wallImageViewModel.wallImages.observe(viewLifecycleOwner, Observer {
-            if (it.isEmpty() && imageLoading && viewingImages) {
-                showView(HomeFragment.LOADING)
-            } else if (it.isEmpty() && !imageLoading && viewingImages) {
-                binding.errorInfo.text = "Unable to find images"
-                showView(HomeFragment.ERROR_INFO)
-            } else if (viewingImages) {
-                showView(HomeFragment.IMAGE_SCROLL)
-                wallImageAdapter.updateWallImages(it)
             }
         })
 
@@ -146,15 +89,12 @@ class SearchFragment : Fragment() {
             subLoading = it
         })
 
-        wallImageViewModel.isLoading.observe(viewLifecycleOwner, Observer {
-            imageLoading = it
-        })
-
         binding.subsScroll.addOnItemTouchListener(RecyclerListener(requireContext(),
                 binding.subsScroll, object : RecyclerListener.OnItemClickListener {
             override fun onItemClick(view: View, position: Int) {
-                viewingImages = true
-                wallImageViewModel.setQAndSort(subAdapter.subreddits[position].subName.substring(2), RedditApi.HOT)
+                val subName = subAdapter.subreddits[position].subName.substring(2)
+                val toSubImages = SearchFragmentDirections.actionSearchFragmentToSubImagesFragment(subName)
+                findNavController().navigate(toSubImages)
             }
 
             override fun onLongItemClick(view: View?, position: Int) {
@@ -163,37 +103,6 @@ class SearchFragment : Fragment() {
             }
         }))
 
-        binding.imageScroll.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (dy < 0) {
-                    binding.bottomLoad.visibility = View.INVISIBLE
-                }
-            }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-
-                if (!recyclerView.canScrollVertically(1) && imageLoading) {
-                    binding.bottomLoad.visibility = View.VISIBLE
-                } else if (!recyclerView.canScrollVertically(1) && !imageLoading) {
-                    binding.bottomLoad.visibility = View.VISIBLE
-                    wallImageViewModel.getNextImages()
-                } else {
-                    binding.bottomLoad.visibility = View.INVISIBLE
-                }
-            }
-        })
-
-        binding.imageScroll.addOnItemTouchListener(RecyclerListener(requireContext(),
-                binding.imageScroll, object : RecyclerListener.OnItemClickListener {
-            override fun onItemClick(view: View, position: Int) {
-                val selectedImage = wallImageAdapter.getWallImage(position)
-                AppUtils.startWallActivity(requireContext(), selectedImage)
-            }
-
-            override fun onLongItemClick(view: View?, position: Int) {}
-        }))
 
         binding.search.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -201,7 +110,6 @@ class SearchFragment : Fragment() {
                 inputManager.hideSoftInputFromWindow(binding.root.windowToken,
                         InputMethodManager.HIDE_NOT_ALWAYS)
                 searched = true
-                viewingImages = false
                 subViewModel.searchSubs(binding.search.text.toString())
                 return@OnEditorActionListener true
             }
@@ -210,11 +118,6 @@ class SearchFragment : Fragment() {
     }
 
     private fun showView(view: Int) {
-        if (view == HomeFragment.IMAGE_SCROLL) {
-            binding.imageScroll.visibility = View.VISIBLE
-        } else {
-            binding.imageScroll.visibility = View.GONE
-        }
 
         if (view == HomeFragment.SUB_SCROLL) {
             binding.subsScroll.visibility = View.VISIBLE
